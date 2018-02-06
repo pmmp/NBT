@@ -29,6 +29,8 @@ use pocketmine\nbt\NBTStream;
 #include <rules/NBT.h>
 
 class CompoundTag extends NamedTag implements \ArrayAccess{
+	/** @var NamedTag[] */
+	protected $value = [];
 
 	/**
 	 * CompoundTag constructor.
@@ -51,14 +53,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess{
 	 * @return NamedTag[]
 	 */
 	public function &getValue(){
-		$result = [];
-		foreach($this as $tag){
-			if($tag instanceof NamedTag){
-				$result[$tag->getName()] = $tag;
-			}
-		}
-
-		return $result;
+		return $this->value;
 	}
 
 	/**
@@ -70,7 +65,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess{
 		if(is_array($value)){
 			foreach($value as $name => $tag){
 				if($tag instanceof NamedTag){
-					$this->{$tag->__name} = $tag;
+					$this->value[$tag->__name] = $tag;
 				}else{
 					throw new \TypeError("CompoundTag members must be NamedTags, got " . gettype($tag) . " in given array");
 				}
@@ -95,7 +90,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess{
 	 */
 	public function getTag(string $name, string $expectedClass = NamedTag::class) : ?NamedTag{
 		assert(is_a($expectedClass, NamedTag::class, true));
-		$tag = $this->{$name} ?? null;
+		$tag = $this->value[$name] ?? null;
 		if($tag !== null and !($tag instanceof $expectedClass)){
 			throw new \RuntimeException("Expected a tag of type $expectedClass, got " . get_class($tag));
 		}
@@ -132,7 +127,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess{
 	 * @param NamedTag $tag
 	 */
 	public function setTag(NamedTag $tag) : void{
-		$this->{$tag->__name} = $tag;
+		$this->value[$tag->__name] = $tag;
 	}
 
 	/**
@@ -143,7 +138,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess{
 	 */
 	public function removeTag(string ...$names) : void{
 		foreach($names as $name){
-			unset($this->{$name});
+			unset($this->value[$name]);
 		}
 	}
 
@@ -157,7 +152,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess{
 	 */
 	public function hasTag(string $name, string $expectedClass = NamedTag::class) : bool{
 		assert(is_a($expectedClass, NamedTag::class, true));
-		return ($this->{$name} ?? null) instanceof $expectedClass;
+		return ($this->value[$name] ?? null) instanceof $expectedClass;
 	}
 
 	/**
@@ -395,15 +390,15 @@ class CompoundTag extends NamedTag implements \ArrayAccess{
 
 
 	public function offsetExists($offset){
-		return isset($this->{$offset}) and $this->{$offset} instanceof Tag;
+		return isset($this->value[$offset]) and $this->value[$offset] instanceof Tag;
 	}
 
 	public function offsetGet($offset){
-		if(isset($this->{$offset}) and $this->{$offset} instanceof Tag){
-			if($this->{$offset} instanceof \ArrayAccess){
-				return $this->{$offset};
+		if(isset($this->value[$offset]) and $this->value[$offset] instanceof Tag){
+			if($this->value[$offset] instanceof \ArrayAccess){
+				return $this->value[$offset];
 			}else{
-				return $this->{$offset}->getValue();
+				return $this->value[$offset]->getValue();
 			}
 		}
 
@@ -414,14 +409,14 @@ class CompoundTag extends NamedTag implements \ArrayAccess{
 
 	public function offsetSet($offset, $value){
 		if($value instanceof Tag){
-			$this->{$offset} = $value;
-		}elseif(isset($this->{$offset}) and $this->{$offset} instanceof Tag){
-			$this->{$offset}->setValue($value);
+			$this->value[$offset] = $value;
+		}elseif(isset($this->value[$offset]) and $this->value[$offset] instanceof Tag){
+			$this->value[$offset]->setValue($value);
 		}
 	}
 
 	public function offsetUnset($offset){
-		unset($this->{$offset});
+		unset($this->value[$offset]);
 	}
 
 	public function getType() : int{
@@ -433,14 +428,14 @@ class CompoundTag extends NamedTag implements \ArrayAccess{
 		do{
 			$tag = $nbt->readTag();
 			if($tag instanceof NamedTag and $tag->__name !== ""){
-				$this->{$tag->__name} = $tag;
+				$this->value[$tag->__name] = $tag;
 			}
 		}while(!($tag instanceof EndTag) and !$nbt->feof());
 	}
 
 	public function write(NBTStream $nbt) : void{
-		foreach($this as $tag){
-			if($tag instanceof Tag and !($tag instanceof EndTag)){
+		foreach($this->value as $tag){
+			if(!($tag instanceof EndTag)){
 				$nbt->writeTag($tag);
 			}
 		}
@@ -449,19 +444,15 @@ class CompoundTag extends NamedTag implements \ArrayAccess{
 
 	public function __toString(){
 		$str = get_class($this) . "{\n";
-		foreach($this as $tag){
-			if($tag instanceof Tag){
-				$str .= get_class($tag) . ":" . $tag->__toString() . "\n";
-			}
+		foreach($this->value as $tag){
+			$str .= get_class($tag) . ":" . $tag->__toString() . "\n";
 		}
 		return $str . "}";
 	}
 
 	public function __clone(){
-		foreach($this as $key => $tag){
-			if($tag instanceof Tag){
-				$this->{$key} = clone $tag;
-			}
+		foreach($this->value as $key => $tag){
+			$this->value[$key] = clone $tag;
 		}
 	}
 }
