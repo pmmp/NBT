@@ -46,7 +46,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 	 * @return int
 	 */
 	public function getCount(){
-		return count($this->getValue());
+		return count($this->value);
 	}
 
 	/**
