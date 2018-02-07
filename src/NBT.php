@@ -130,25 +130,25 @@ abstract class NBT{
 			return false;
 		}
 
-		foreach($tag1 as $k => $v){
-			if(!($v instanceof Tag)){
-				continue;
-			}
+		foreach($tag1->getValue() as $k => $v){
 
-			if(!isset($tag2->{$k}) or !($tag2->{$k} instanceof $v)){
+			$other = $tag2->getTag($k);
+			if($other === null or !($other instanceof $v)){
 				return false;
 			}
 
 			if($v instanceof CompoundTag){
-				if(!self::matchTree($v, $tag2->{$k})){
+				/** @var CompoundTag $other */
+				if(!self::matchTree($v, $other)){
 					return false;
 				}
 			}elseif($v instanceof ListTag){
-				if(!self::matchList($v, $tag2->{$k})){
+				/** @var ListTag $other */
+				if(!self::matchList($v, $other)){
 					return false;
 				}
 			}else{
-				if($v->getValue() !== $tag2->{$k}->getValue()){
+				if($v->getValue() !== $other->getValue()){
 					return false;
 				}
 			}
