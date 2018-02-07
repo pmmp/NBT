@@ -28,10 +28,12 @@ use pocketmine\nbt\NBTStream;
 
 #include <rules/NBT.h>
 
-class ListTag extends NamedTag implements \ArrayAccess, \Countable{
+class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/** @var int */
 	private $tagType;
+	/** @var \SplDoublyLinkedList|NamedTag[] */
+	protected $value;
 
 	/**
 	 * ListTag constructor.
@@ -50,52 +52,22 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 	 */
 	public function &getValue() : array{
 		$value = [];
-		foreach($this as $k => $v){
-			if($v instanceof NamedTag){
-				$value[$k] = $v;
-			}
+		foreach($this->value as $k => $v){
+			$value[$k] = $v;
 		}
 
 		return $value;
 	}
 
 	/**
-	 * @param NamedTag[] $value
+	 * Returns an array of tag values inserted into this list. ArrayAccess-implementing tags are returned as themselves
+	 * (such as ListTag and CompoundTag) and others are returned as primitive values or arrays.
 	 *
-	 * @throws \TypeError
+	 * @return array
 	 */
-	public function setValue($value) : void{
-		if(is_array($value)){
-			foreach($value as $name => $tag){
-				if($tag instanceof NamedTag){
-					$this->{$name} = $tag;
-				}else{
-					throw new \TypeError("ListTag members must be NamedTags, got " . gettype($tag) . " in given array");
-				}
-			}
-		}else{
-			throw new \TypeError("ListTag value must be NamedTag[], " . gettype($value) . " given");
-		}
-	}
-
-	public function getCount(){
-		$count = 0;
-		foreach($this as $tag){
-			if($tag instanceof NamedTag){
-				++$count;
-			}
-		}
-
-		return $count;
-	}
-
 	public function getAllValues() : array{
 		$result = [];
-		foreach($this as $tag){
-			if(!($tag instanceof NamedTag)){
-				continue;
-			}
-
+		foreach($this->value as $tag){
 			if($tag instanceof \ArrayAccess){
 				$result[] = $tag;
 			}else{
@@ -106,8 +78,35 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 		return $result;
 	}
 
-	public function offsetExists($offset){
-		return isset($this->{$offset});
+	/**
+	 * @param NamedTag[] $value
+	 *
+	 * @throws \TypeError
+	 */
+	public function setValue($value) : void{
+		if(is_array($value)){
+			$newValue = new \SplDoublyLinkedList();
+			foreach($value as $tag){
+				if($tag instanceof NamedTag){
+					$newValue->push($tag);
+				}else{
+					throw new \TypeError("ListTag members must be NamedTags, got " . gettype($tag) . " in given array");
+				}
+			}
+
+			$this->value = $newValue;
+		}else{
+			throw new \TypeError("ListTag value must be NamedTag[], " . gettype($value) . " given");
+		}
+	}
+
+	/**
+	 * @param int $offset
+	 *
+	 * @return bool
+	 */
+	public function offsetExists($offset) : bool{
+		return isset($this->value[$offset]);
 	}
 
 	/**
@@ -116,56 +115,199 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 	 * @return CompoundTag|ListTag|mixed
 	 */
 	public function offsetGet($offset){
-		if(isset($this->{$offset}) and $this->{$offset} instanceof NamedTag){
-			if($this->{$offset} instanceof \ArrayAccess){
-				return $this->{$offset};
-			}else{
-				return $this->{$offset}->getValue();
-			}
+		/** @var NamedTag|null $value */
+		$value = $this->value[$offset] ?? null;
+
+		if($value instanceof \ArrayAccess){
+			return $value;
+		}elseif($value !== null){
+			return $value->getValue();
 		}
 
 		return null;
 	}
 
-	public function offsetSet($offset, $value){
+	/**
+	 * @param int|null       $offset
+	 * @param NamedTag|mixed $value
+	 *
+	 * @throws \TypeError
+	 */
+	public function offsetSet($offset, $value) : void{
 		if($value instanceof NamedTag){
-			$this->{$offset} = $value;
-		}elseif($this->{$offset} instanceof NamedTag){
-			$this->{$offset}->setValue($value);
+			$this->value[$offset] = $value;
+		}elseif($this->value[$offset] instanceof NamedTag){
+			$this->value[$offset]->setValue($value);
 		}
 	}
 
-	public function offsetUnset($offset){
-		unset($this->{$offset});
+	/**
+	 * @param int $offset
+	 */
+	public function offsetUnset($offset) : void{
+		unset($this->value[$offset]);
 	}
 
-	public function count($mode = COUNT_NORMAL){
-		$count = 0;
-		for($i = 0; isset($this->{$i}); $i++){
-			if($mode === COUNT_RECURSIVE and $this->{$i} instanceof \Countable){
-				$count += count($this->{$i});
-			}else{
-				$count++;
-			}
-		}
+	/**
+	 * @return int
+	 */
+	public function count() : int{
+		return $this->value->count();
+	}
 
-		return $count;
+	/**
+	 * @return int
+	 */
+	public function getCount() : int{
+		return $this->value->count();
+	}
+
+	/**
+	 * Appends the specified tag to the end of the list.
+	 *
+	 * @param NamedTag $tag
+	 */
+	public function push(NamedTag $tag) : void{
+		$this->value->push($tag);
+	}
+
+	/**
+	 * Removes the last tag from the list and returns it.
+	 *
+	 * @return NamedTag
+	 */
+	public function pop() : NamedTag{
+		return $this->value->pop();
+	}
+
+	/**
+	 * Adds the specified tag to the start of the list.
+	 *
+	 * @param NamedTag $tag
+	 */
+	public function unshift(NamedTag $tag) : void{
+		$this->value->unshift($tag);
+	}
+
+	/**
+	 * Removes the first tag from the list and returns it.
+	 *
+	 * @return NamedTag
+	 */
+	public function shift() : NamedTag{
+		return $this->value->shift();
+	}
+
+	/**
+	 * Inserts a tag into the list between existing tags, at the specified offset. Later values in the list are moved up
+	 * by 1 position.
+	 *
+	 * @param int      $offset
+	 * @param NamedTag $tag
+	 *
+	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
+	 */
+	public function insert(int $offset, NamedTag $tag){
+		$this->value->add($offset, $tag);
+	}
+
+	/**
+	 * Removes a value from the list. All later tags in the list are moved down by 1 position.
+	 *
+	 * @param int $offset
+	 */
+	public function remove(int $offset) : void{
+		unset($this->value[$offset]);
+	}
+
+	/**
+	 * Returns the tag at the specified offset.
+	 *
+	 * @param int $offset
+	 *
+	 * @return NamedTag
+	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
+	 */
+	public function get(int $offset) : NamedTag{
+		return $this->value[$offset];
+	}
+
+	/**
+	 * Returns the element in the first position of the list, without removing it.
+	 *
+	 * @return NamedTag
+	 */
+	public function first() : NamedTag{
+		return $this->value->bottom();
+	}
+
+	/**
+	 * Returns the element in the last position in the list (the end), without removing it.
+	 *
+	 * @return NamedTag
+	 */
+	public function last() : NamedTag{
+		return $this->value->top();
+	}
+
+	/**
+	 * Overwrites the tag at the specified offset.
+	 *
+	 * @param int      $offset
+	 * @param NamedTag $tag
+	 *
+	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
+	 */
+	public function set(int $offset, NamedTag $tag) : void{
+		$this->value[$offset] = $tag;
+	}
+
+	/**
+	 * Returns whether a tag exists at the specified offset.
+	 *
+	 * @param int $offset
+	 *
+	 * @return bool
+	 */
+	public function isset(int $offset) : bool{
+		return isset($this->value[$offset]);
+	}
+
+	/**
+	 * Returns whether there are any tags in the list.
+	 *
+	 * @return bool
+	 */
+	public function empty() : bool{
+		return $this->value->isEmpty();
 	}
 
 	public function getType() : int{
 		return NBT::TAG_List;
 	}
 
-	public function setTagType(int $type){
-		$this->tagType = $type;
-	}
-
+	/**
+	 * Returns the type of tag contained in this list.
+	 *
+	 * @return int
+	 */
 	public function getTagType() : int{
 		return $this->tagType;
 	}
 
+	/**
+	 * Sets the type of tag that can be added to this list. If TAG_End is used, the type will be auto-detected from the
+	 * first tag added to the list.
+	 *
+	 * @param int $type
+	 * @throws \LogicException if the list is not empty
+	 */
+	public function setTagType(int $type){
+		$this->tagType = $type;
+	}
+
 	public function read(NBTStream $nbt) : void{
-		$this->value = [];
+		$this->value = new \SplDoublyLinkedList();
 		$this->tagType = $nbt->getByte();
 		$size = $nbt->getInt();
 
@@ -174,7 +316,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 			for($i = 0; $i < $size and !$nbt->feof(); ++$i){
 				$tag = clone $tagBase;
 				$tag->read($nbt);
-				$this->{$i} = $tag;
+				$this->value->push($tag);
 			}
 		}elseif($size !== 0){
 			throw new \UnexpectedValueException("Unexpected non-empty list of TAG_End");
@@ -184,48 +326,69 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 	public function write(NBTStream $nbt) : void{
 		if($this->tagType === NBT::TAG_End){ //previously empty list, try detecting type from tag children
 			$id = NBT::TAG_End;
-			foreach($this as $tag){
-				if($tag instanceof NamedTag){
-					if($id === NBT::TAG_End){
-						$id = $tag->getType();
-					}elseif($id !== $tag->getType()){
-						return; //TODO: throw exception?
-					}
+			foreach($this->value as $tag){
+				if($id === NBT::TAG_End){
+					$id = $tag->getType();
+				}elseif($id !== $tag->getType()){
+					return; //TODO: throw exception?
 				}
 			}
 			$this->tagType = $id;
 		}
 
 		$nbt->putByte($this->tagType);
-
-		/** @var NamedTag[] $tags */
-		$tags = [];
-		foreach($this as $tag){
-			if($tag instanceof NamedTag){
-				$tags[] = $tag;
-			}
-		}
-		$nbt->putInt(count($tags));
-		foreach($tags as $tag){
+		$nbt->putInt($this->value->count());
+		/** @var NamedTag $tag */
+		foreach($this->value as $tag){
 			$tag->write($nbt);
 		}
 	}
 
 	public function __toString(){
 		$str = get_class($this) . "{\n";
-		foreach($this as $tag){
-			if($tag instanceof NamedTag){
-				$str .= get_class($tag) . ":" . $tag->__toString() . "\n";
-			}
+		/** @var NamedTag $tag */
+		foreach($this->value as $tag){
+			$str .= get_class($tag) . ":" . $tag->__toString() . "\n";
 		}
 		return $str . "}";
 	}
 
 	public function __clone(){
-		foreach($this as $key => $tag){
-			if($tag instanceof NamedTag){
-				$this->{$key} = clone $tag;
-			}
+		$new = new \SplDoublyLinkedList();
+
+		foreach($this->value as $tag){
+			$new->push(clone $tag);
 		}
+
+		$this->value = $new;
+	}
+
+	public function next() : void{
+		$this->value->next();
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function valid() : bool{
+		return $this->value->valid();
+	}
+
+	/**
+	 * @return NamedTag|null
+	 */
+	public function current() : ?NamedTag{
+		return $this->value->current();
+	}
+
+	/**
+	 * @return int
+	 */
+	public function key() : int{
+		return (int) $this->value->key();
+	}
+
+	public function rewind() : void{
+		$this->value->rewind();
 	}
 }
