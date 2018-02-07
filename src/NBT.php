@@ -130,7 +130,7 @@ abstract class NBT{
 			return false;
 		}
 
-		foreach($tag1->getValue() as $k => $v){
+		foreach($tag1 as $k => $v){
 
 			$other = $tag2->getTag($k);
 			if($other === null or !($other instanceof $v)){

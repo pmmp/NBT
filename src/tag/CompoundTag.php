@@ -28,7 +28,7 @@ use pocketmine\nbt\NBTStream;
 
 #include <rules/NBT.h>
 
-class CompoundTag extends NamedTag implements \ArrayAccess{
+class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 	/** @var NamedTag[] */
 	protected $value = [];
 
@@ -454,5 +454,25 @@ class CompoundTag extends NamedTag implements \ArrayAccess{
 		foreach($this->value as $key => $tag){
 			$this->value[$key] = clone $tag;
 		}
+	}
+
+	public function next(){
+		return next($this->value);
+	}
+
+	public function valid(){
+		return key($this->value) !== null;
+	}
+
+	public function key(){
+		return key($this->value);
+	}
+
+	public function current(){
+		return current($this->value);
+	}
+
+	public function rewind(){
+		reset($this->value);
 	}
 }
