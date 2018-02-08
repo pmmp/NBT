@@ -63,13 +63,16 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 	 */
 	public function setValue($value) : void{
 		if(is_array($value)){
+			$newValue = [];
 			foreach($value as $name => $tag){
 				if($tag instanceof NamedTag){
-					$this->value[$tag->__name] = $tag;
+					$newValue[$tag->__name] = $tag;
 				}else{
 					throw new \TypeError("CompoundTag members must be NamedTags, got " . gettype($tag) . " in given array");
 				}
 			}
+
+			$this->value = $newValue; //don't overwrite until we type-checked everything
 		}else{
 			throw new \TypeError("CompoundTag value must be NamedTag[], " . gettype($value) . " given");
 		}
