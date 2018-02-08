@@ -41,8 +41,6 @@ use pocketmine\nbt\tag\StringTag;
 
 abstract class NBT{
 
-	public const LITTLE_ENDIAN = 0;
-	public const BIG_ENDIAN = 1;
 	public const TAG_End = 0;
 	public const TAG_Byte = 1;
 	public const TAG_Short = 2;
