@@ -24,16 +24,20 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 
-abstract class NamedTag extends Tag{
+use pocketmine\nbt\NBTStream;
+
+abstract class NamedTag{
 	/** @var string */
 	protected $__name;
+
+	protected $value;
 
 	/**
 	 * @param string $name
 	 * @param mixed  $value
 	 */
 	public function __construct(string $name = "", $value = null){
-		$this->__name = ($name === null or $name === false) ? "" : $name;
+		$this->__name = $name;
 		if($value !== null){
 			$this->setValue($value);
 		}
@@ -51,5 +55,23 @@ abstract class NamedTag extends Tag{
 	 */
 	public function setName(string $name) : void{
 		$this->__name = $name;
+	}
+
+	public function &getValue(){
+		return $this->value;
+	}
+
+	abstract public function getType() : int;
+
+	public function setValue($value) : void{
+		$this->value = $value;
+	}
+
+	abstract public function write(NBTStream $nbt) : void;
+
+	abstract public function read(NBTStream $nbt) : void;
+
+	public function __toString(){
+		return (string) $this->value;
 	}
 }

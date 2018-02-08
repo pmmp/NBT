@@ -393,11 +393,11 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 
 
 	public function offsetExists($offset){
-		return isset($this->value[$offset]) and $this->value[$offset] instanceof Tag;
+		return isset($this->value[$offset]) and $this->value[$offset] instanceof NamedTag;
 	}
 
 	public function offsetGet($offset){
-		if(isset($this->value[$offset]) and $this->value[$offset] instanceof Tag){
+		if(isset($this->value[$offset]) and $this->value[$offset] instanceof NamedTag){
 			if($this->value[$offset] instanceof \ArrayAccess){
 				return $this->value[$offset];
 			}else{
@@ -411,9 +411,9 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 	}
 
 	public function offsetSet($offset, $value){
-		if($value instanceof Tag){
+		if($value instanceof NamedTag){
 			$this->value[$offset] = $value;
-		}elseif(isset($this->value[$offset]) and $this->value[$offset] instanceof Tag){
+		}elseif(isset($this->value[$offset]) and $this->value[$offset] instanceof NamedTag){
 			$this->value[$offset]->setValue($value);
 		}
 	}
@@ -430,19 +430,17 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 		$this->value = [];
 		do{
 			$tag = $nbt->readTag();
-			if($tag instanceof NamedTag and $tag->__name !== ""){
+			if($tag !== null and $tag->__name !== ""){
 				$this->value[$tag->__name] = $tag;
 			}
-		}while(!($tag instanceof EndTag) and !$nbt->feof());
+		}while($tag !== null and !$nbt->feof());
 	}
 
 	public function write(NBTStream $nbt) : void{
 		foreach($this->value as $tag){
-			if(!($tag instanceof EndTag)){
-				$nbt->writeTag($tag);
-			}
+			$nbt->writeTag($tag);
 		}
-		$nbt->writeTag(new EndTag);
+		$nbt->writeEnd();
 	}
 
 	public function __toString(){

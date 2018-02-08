@@ -30,15 +30,14 @@ use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\DoubleTag;
-use pocketmine\nbt\tag\EndTag;
 use pocketmine\nbt\tag\FloatTag;
 use pocketmine\nbt\tag\IntArrayTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\LongTag;
+use pocketmine\nbt\tag\NamedTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
-use pocketmine\nbt\tag\Tag;
 
 abstract class NBT{
 
@@ -60,12 +59,10 @@ abstract class NBT{
 	/**
 	 * @param int $type
 	 *
-	 * @return Tag
+	 * @return NamedTag
 	 */
-	public static function createTag(int $type) : Tag{
+	public static function createTag(int $type) : NamedTag{
 		switch($type){
-			case self::TAG_End:
-				return new EndTag();
 			case self::TAG_Byte:
 				return new ByteTag();
 			case self::TAG_Short:
@@ -99,7 +96,7 @@ abstract class NBT{
 		}
 
 		foreach($tag1 as $k => $v){
-			if(!($v instanceof Tag)){
+			if(!($v instanceof NamedTag)){
 				continue;
 			}
 

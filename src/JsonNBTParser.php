@@ -81,10 +81,8 @@ class JsonNBTParser{
 			$value = self::readValue($str, $offset, $type);
 
 			$tag = NBT::createTag($type);
-			if($tag instanceof NamedTag){
-				$tag->setValue($value);
-				$data[$key] = $tag;
-			}
+			$tag->setValue($value);
+			$data[$key] = $tag;
 
 			$key++;
 		}
@@ -115,11 +113,9 @@ class JsonNBTParser{
 			$value = self::readValue($str, $offset, $type);
 
 			$tag = NBT::createTag($type);
-			if($tag instanceof NamedTag){
-				$tag->setName($key);
-				$tag->setValue($value);
-				$data[$key] = $tag;
-			}
+			$tag->setName($key);
+			$tag->setValue($value);
+			$data[$key] = $tag;
 		}
 
 		return $data;

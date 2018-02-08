@@ -25,14 +25,12 @@ namespace pocketmine\nbt;
 
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\EndTag;
 use pocketmine\nbt\tag\FloatTag;
 use pocketmine\nbt\tag\IntArrayTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\NamedTag;
 use pocketmine\nbt\tag\StringTag;
-use pocketmine\nbt\tag\Tag;
 #ifndef COMPILE
 use pocketmine\utils\Binary;
 #endif
@@ -76,10 +74,18 @@ abstract class NBTStream{
 		$this->offset = 0;
 		$this->buffer = $buffer;
 		$this->data = $this->readTag();
+
+		if($this->data === null){
+			throw new \InvalidArgumentException("Found TAG_End at the start of buffer");
+		}
+
 		if($doMultiple and $this->offset < strlen($this->buffer)){
 			$this->data = [$this->data];
 			do{
-				$this->data[] = $this->readTag();
+				$tag = $this->readTag();
+				if($tag !== null){
+					$this->data[] = $tag;
+				}
 			}while($this->offset < strlen($this->buffer));
 		}
 		$this->buffer = "";
@@ -118,28 +124,33 @@ abstract class NBTStream{
 		return false;
 	}
 
-	public function readTag() : Tag{
+	public function readTag() : ?NamedTag{
 		if($this->feof()){
-			return new EndTag();
+			return null;
 		}
 
 		$tagType = $this->getByte();
-		$tag = NBT::createTag($tagType);
-
-		if($tag instanceof NamedTag){
-			$tag->setName($this->getString());
-			$tag->read($this);
+		if($tagType === NBT::TAG_End){
+			return null;
 		}
+
+		$tag = NBT::createTag($tagType);
+		$tag->setName($this->getString());
+		$tag->read($this);
 
 		return $tag;
 	}
 
-	public function writeTag(Tag $tag) : void{
+	public function writeTag(NamedTag $tag) : void{
 		$this->putByte($tag->getType());
 		if($tag instanceof NamedTag){
 			$this->putString($tag->getName());
 		}
 		$tag->write($this);
+	}
+
+	public function writeEnd() : void{
+		$this->putByte(NBT::TAG_End);
 	}
 
 	public function getByte() : int{
@@ -200,7 +211,7 @@ abstract class NBTStream{
 		return $data;
 	}
 
-	private static function toArray(array &$data, Tag $tag) : void{
+	private static function toArray(array &$data, NamedTag $tag) : void{
 		/** @var CompoundTag[]|ListTag[]|IntArrayTag[] $tag */
 		foreach($tag as $key => $value){
 			if($value instanceof CompoundTag or $value instanceof ListTag or $value instanceof IntArrayTag){
@@ -226,7 +237,7 @@ abstract class NBTStream{
 		return null;
 	}
 
-	private static function fromArray(Tag $tag, array $data, callable $guesser) : void{
+	private static function fromArray(NamedTag $tag, array $data, callable $guesser) : void{
 		foreach($data as $key => $value){
 			if(is_array($value)){
 				$isNumeric = true;
@@ -243,7 +254,7 @@ abstract class NBTStream{
 				self::fromArray($tag->{$key}, $value, $guesser);
 			}else{
 				$v = call_user_func($guesser, $key, $value);
-				if($v instanceof Tag){
+				if($v instanceof NamedTag){
 					$tag{$key} = $v;
 				}
 			}

@@ -51,7 +51,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 	public function &getValue() : array{
 		$value = [];
 		foreach($this as $k => $v){
-			if($v instanceof Tag){
+			if($v instanceof NamedTag){
 				$value[$k] = $v;
 			}
 		}
@@ -81,7 +81,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 	public function getCount(){
 		$count = 0;
 		foreach($this as $tag){
-			if($tag instanceof Tag){
+			if($tag instanceof NamedTag){
 				++$count;
 			}
 		}
@@ -116,7 +116,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 	 * @return CompoundTag|ListTag|mixed
 	 */
 	public function offsetGet($offset){
-		if(isset($this->{$offset}) and $this->{$offset} instanceof Tag){
+		if(isset($this->{$offset}) and $this->{$offset} instanceof NamedTag){
 			if($this->{$offset} instanceof \ArrayAccess){
 				return $this->{$offset};
 			}else{
@@ -128,9 +128,9 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 	}
 
 	public function offsetSet($offset, $value){
-		if($value instanceof Tag){
+		if($value instanceof NamedTag){
 			$this->{$offset} = $value;
-		}elseif($this->{$offset} instanceof Tag){
+		}elseif($this->{$offset} instanceof NamedTag){
 			$this->{$offset}->setValue($value);
 		}
 	}
@@ -169,11 +169,15 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 		$this->tagType = $nbt->getByte();
 		$size = $nbt->getInt();
 
-		$tagBase = NBT::createTag($this->tagType);
-		for($i = 0; $i < $size and !$nbt->feof(); ++$i){
-			$tag = clone $tagBase;
-			$tag->read($nbt);
-			$this->{$i} = $tag;
+		if($this->tagType !== NBT::TAG_End){
+			$tagBase = NBT::createTag($this->tagType);
+			for($i = 0; $i < $size and !$nbt->feof(); ++$i){
+				$tag = clone $tagBase;
+				$tag->read($nbt);
+				$this->{$i} = $tag;
+			}
+		}elseif($size !== 0){
+			throw new \UnexpectedValueException("Unexpected non-empty list of TAG_End");
 		}
 	}
 
@@ -181,7 +185,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 		if($this->tagType === NBT::TAG_End){ //previously empty list, try detecting type from tag children
 			$id = NBT::TAG_End;
 			foreach($this as $tag){
-				if($tag instanceof Tag and !($tag instanceof EndTag)){
+				if($tag instanceof NamedTag){
 					if($id === NBT::TAG_End){
 						$id = $tag->getType();
 					}elseif($id !== $tag->getType()){
@@ -194,10 +198,10 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 
 		$nbt->putByte($this->tagType);
 
-		/** @var Tag[] $tags */
+		/** @var NamedTag[] $tags */
 		$tags = [];
 		foreach($this as $tag){
-			if($tag instanceof Tag){
+			if($tag instanceof NamedTag){
 				$tags[] = $tag;
 			}
 		}
@@ -210,7 +214,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 	public function __toString(){
 		$str = get_class($this) . "{\n";
 		foreach($this as $tag){
-			if($tag instanceof Tag){
+			if($tag instanceof NamedTag){
 				$str .= get_class($tag) . ":" . $tag->__toString() . "\n";
 			}
 		}
@@ -219,7 +223,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable{
 
 	public function __clone(){
 		foreach($this as $key => $tag){
-			if($tag instanceof Tag){
+			if($tag instanceof NamedTag){
 				$this->{$key} = clone $tag;
 			}
 		}
