@@ -397,7 +397,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 	 * @return bool
 	 */
 	public function offsetExists($offset){
-		return isset($this->value[$offset]) and $this->value[$offset] instanceof NamedTag;
+		return isset($this->value[$offset]);
 	}
 
 	/**
@@ -406,7 +406,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 	 * @return mixed|null|\ArrayAccess
 	 */
 	public function offsetGet($offset){
-		if(isset($this->value[$offset]) and $this->value[$offset] instanceof NamedTag){
+		if(isset($this->value[$offset])){
 			if($this->value[$offset] instanceof \ArrayAccess){
 				return $this->value[$offset];
 			}else{
@@ -426,7 +426,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 	public function offsetSet($offset, $value){
 		if($value instanceof NamedTag){
 			$this->value[$offset] = $value;
-		}elseif(isset($this->value[$offset]) and $this->value[$offset] instanceof NamedTag){
+		}elseif(isset($this->value[$offset])){
 			$this->value[$offset]->setValue($value);
 		}
 	}

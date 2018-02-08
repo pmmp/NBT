@@ -143,9 +143,7 @@ abstract class NBTStream{
 
 	public function writeTag(NamedTag $tag) : void{
 		$this->putByte($tag->getType());
-		if($tag instanceof NamedTag){
-			$this->putString($tag->getName());
-		}
+		$this->putString($tag->getName());
 		$tag->write($this);
 	}
 
