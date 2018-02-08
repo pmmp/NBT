@@ -391,11 +391,20 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 	}
 
 
-
+	/**
+	 * @param string $offset
+	 *
+	 * @return bool
+	 */
 	public function offsetExists($offset){
 		return isset($this->value[$offset]) and $this->value[$offset] instanceof NamedTag;
 	}
 
+	/**
+	 * @param string $offset
+	 *
+	 * @return mixed|null|\ArrayAccess
+	 */
 	public function offsetGet($offset){
 		if(isset($this->value[$offset]) and $this->value[$offset] instanceof NamedTag){
 			if($this->value[$offset] instanceof \ArrayAccess){
@@ -410,6 +419,10 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 		return null;
 	}
 
+	/**
+	 * @param string         $offset
+	 * @param NamedTag|mixed $value
+	 */
 	public function offsetSet($offset, $value){
 		if($value instanceof NamedTag){
 			$this->value[$offset] = $value;
@@ -457,23 +470,32 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 		}
 	}
 
-	public function next(){
-		return next($this->value);
+	public function next() : void{
+		next($this->value);
 	}
 
-	public function valid(){
+	/**
+	 * @return bool
+	 */
+	public function valid() : bool{
 		return key($this->value) !== null;
 	}
 
-	public function key(){
+	/**
+	 * @return string|null
+	 */
+	public function key() : ?string{
 		return key($this->value);
 	}
 
-	public function current(){
-		return current($this->value);
+	/**
+	 * @return NamedTag|null
+	 */
+	public function current() : ?NamedTag{
+		return current($this->value) ?: null;
 	}
 
-	public function rewind(){
+	public function rewind() : void{
 		reset($this->value);
 	}
 }
