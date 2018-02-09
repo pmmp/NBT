@@ -140,7 +140,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 		if($value instanceof NamedTag){
 			$this->checkTagType($value);
 			$this->value[$offset] = $value;
-		}elseif($this->value[$offset] instanceof NamedTag){
+		}elseif(isset($this->value[$offset])){
 			$this->value[$offset]->setValue($value);
 		}
 	}
