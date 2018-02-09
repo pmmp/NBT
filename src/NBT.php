@@ -34,6 +34,7 @@ use pocketmine\nbt\tag\FloatTag;
 use pocketmine\nbt\tag\IntArrayTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
+use pocketmine\nbt\tag\LongArrayTag;
 use pocketmine\nbt\tag\LongTag;
 use pocketmine\nbt\tag\NamedTag;
 use pocketmine\nbt\tag\ShortTag;
@@ -84,6 +85,8 @@ abstract class NBT{
 				return new CompoundTag();
 			case self::TAG_IntArray:
 				return new IntArrayTag();
+			case self::TAG_LongArray:
+				return new LongArrayTag();
 			default:
 				throw new \InvalidArgumentException("Unknown NBT tag type $type");
 		}
