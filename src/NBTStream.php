@@ -209,6 +209,10 @@ abstract class NBTStream{
 
 	abstract public function putIntArray(array $array) : void;
 
+	abstract public function getLongArray() : array;
+
+	abstract public function putLongArray(array $array) : void;
+
 
 
 	public function getArray() : array{

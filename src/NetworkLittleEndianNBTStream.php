@@ -75,4 +75,21 @@ class NetworkLittleEndianNBTStream extends LittleEndianNBTStream{
 			$this->putInt($v); //varint
 		}
 	}
+
+	public function getLongArray() : array{
+		$len = $this->getInt(); //varint
+		$ret = [];
+		for($i = 0; $i < $len; ++$i){
+			$ret[] = $this->getLong(); //varlong
+		}
+
+		return $ret;
+	}
+
+	public function putLongArray(array $array) : void{
+		$this->putInt(count($array)); //varint
+		foreach($array as $v){
+			$this->putLong($v); //varlong
+		}
+	}
 }

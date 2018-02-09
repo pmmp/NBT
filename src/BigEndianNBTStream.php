@@ -84,4 +84,14 @@ class BigEndianNBTStream extends NBTStream{
 		$this->putInt(count($array));
 		$this->put(pack("N*", ...$array));
 	}
+
+	public function getLongArray() : array{
+		$len = $this->getInt();
+		return array_values(unpack("J*", $this->get($len * 8)));
+	}
+
+	public function putLongArray(array $array) : void{
+		$this->putInt(count($array));
+		$this->put(pack("J*", ...$array));
+	}
 }

@@ -296,6 +296,17 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	}
 
 	/**
+	 * @param string     $name
+	 * @param int[]|null $default
+	 * @param bool       $badTagDefault
+	 *
+	 * @return int[]
+	 */
+	public function getLongArray(string $name, ?array $default = null, bool $badTagDefault = false) : array{
+		return $this->getTagValue($name, LongArrayTag::class, $default, $badTagDefault);
+	}
+
+	/**
 	 * Sets the value of the child tag at the specified offset, creating it if it does not exist. If the child tag
 	 * exists and the value is of the wrong type, an exception will be thrown.
 	 *
@@ -399,6 +410,14 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 		$this->setTagValue($name, IntArrayTag::class, $value, $force);
 	}
 
+	/**
+	 * @param string $name
+	 * @param int[]  $value
+	 * @param bool   $force
+	 */
+	public function setLongArray(string $name, array $value, bool $force = false) : void{
+		$this->setTagValue($name, LongArrayTag::class, $value, $force);
+	}
 
 	/**
 	 * @param string $offset

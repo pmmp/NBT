@@ -84,4 +84,14 @@ class LittleEndianNBTStream extends NBTStream{
 		$this->putInt(count($array));
 		$this->put(pack("V*", ...$array));
 	}
+
+	public function getLongArray() : array{
+		$len = $this->getInt();
+		return array_values(unpack("P*", $this->get($len * 8)));
+	}
+
+	public function putLongArray(array $array) : void{
+		$this->putInt(count($array));
+		$this->put(pack("P*", ...$array));
+	}
 }
