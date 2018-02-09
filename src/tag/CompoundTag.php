@@ -422,8 +422,13 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 	/**
 	 * @param string         $offset
 	 * @param NamedTag|mixed $value
+	 *
+	 * @throws \InvalidArgumentException if offset is null
 	 */
 	public function offsetSet($offset, $value){
+		if($offset === null){
+			throw new \InvalidArgumentException("Array access push syntax is not supported");
+		}
 		if($value instanceof NamedTag){
 			$this->value[$offset] = $value;
 		}elseif(isset($this->value[$offset])){
