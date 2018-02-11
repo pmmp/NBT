@@ -192,8 +192,16 @@ abstract class NBTStream{
 		return $this->get($this->getShort());
 	}
 
+	/**
+	 * @param string $v
+	 * @throws \InvalidArgumentException if the string is too long
+	 */
 	public function putString(string $v) : void{
-		$this->putShort(strlen($v));
+		$len = strlen($v);
+		if($len > 32767){
+			throw new \InvalidArgumentException("NBT strings cannot be longer than 32767 bytes, got $len bytes");
+		}
+		$this->putShort($len);
 		$this->put($v);
 	}
 
