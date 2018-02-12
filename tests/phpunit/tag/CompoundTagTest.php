@@ -74,5 +74,24 @@ class CompoundTagTest extends TestCase{
 		$tag[] = new StringTag("test", "tag");
 	}
 
+	/**
+	 * Cloning a CompoundTag should clone all of its children
+	 *
+	 * @throws \Exception
+	 */
+	public function testClone() : void{
+		$tag = new CompoundTag();
+		$tag->setString("hello", "world");
+		$tag->setFloat("float", 5.5);
+		$tag->setTag(new ListTag("list"));
+
+		$tag2 = clone $tag;
+		self::assertEquals($tag->getCount(), $tag2->getCount());
+
+		foreach($tag2 as $name => $child){
+			self::assertNotSame($child, $tag->getTag($name));
+		}
+	}
+
 	//TODO: add more tests
 }

@@ -92,4 +92,24 @@ class ListTagTest extends TestCase{
 
 		$list->setTagType(NBT::TAG_Compound);
 	}
+
+
+	/**
+	 * Cloning a list should clone all of its children
+	 *
+	 * @throws \Exception
+	 */
+	public function testClone() : void{
+		$tag = new ListTag();
+		for($i = 0; $i < 5; ++$i){
+			$tag->push(new StringTag("", "hi"));
+		}
+
+		$tag2 = clone $tag;
+		self::assertEquals($tag->getCount(), $tag2->getCount());
+
+		foreach($tag2 as $index => $child){
+			self::assertNotSame($child, $tag->get($index));
+		}
+	}
 }
