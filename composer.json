@@ -12,6 +12,11 @@
             "pocketmine\\nbt\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "pocketmine\\nbt\\": "tests/phpunit/"
+        }
+    },
     "repositories": [
         {
             "type": "vcs",
