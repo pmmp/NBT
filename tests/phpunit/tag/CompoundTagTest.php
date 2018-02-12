@@ -64,5 +64,15 @@ class CompoundTagTest extends TestCase{
 		self::assertCount(3, $tag);
 	}
 
+	/**
+	 * $tag[] = $value is not allowed on CompoundTags
+	 */
+	public function testAppendSyntax() : void{
+		$this->expectException(\InvalidArgumentException::class);
+
+		$tag = new CompoundTag();
+		$tag[] = new StringTag("test", "tag");
+	}
+
 	//TODO: add more tests
 }
