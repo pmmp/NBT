@@ -68,6 +68,9 @@ class StringTag extends NamedTag{
 		if(!is_string($value)){
 			throw new \TypeError("StringTag value must be of type string, " . gettype($value) . " given");
 		}
+		if(strlen($value) > 32767){
+			throw new \InvalidArgumentException("StringTag cannot hold more than 32767 bytes, got string of length " . strlen($value));
+		}
 		parent::setValue($value);
 	}
 }
