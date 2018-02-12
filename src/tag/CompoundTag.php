@@ -471,7 +471,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 
 	public function __clone(){
 		foreach($this->value as $key => $tag){
-			$this->value[$key] = clone $tag;
+			$this->value[$key] = $tag->safeClone();
 		}
 	}
 

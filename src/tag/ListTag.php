@@ -373,7 +373,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 		$new = new \SplDoublyLinkedList();
 
 		foreach($this->value as $tag){
-			$new->push(clone $tag);
+			$new->push($tag->safeClone());
 		}
 
 		$this->value = $new;

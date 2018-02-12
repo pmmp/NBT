@@ -93,5 +93,19 @@ class CompoundTagTest extends TestCase{
 		}
 	}
 
+	/**
+	 * Cloning a tag with a cyclic dependency should throw an exception
+	 */
+	public function testRecursiveClone() : void{
+		//create recursive dependency
+		$tag = new CompoundTag();
+		$child = new CompoundTag("child");
+		$child->setTag($tag);
+		$tag->setTag($child);
+
+		$this->expectException(\RuntimeException::class);
+		clone $tag; //recursive dependency, throw exception
+	}
+
 	//TODO: add more tests
 }

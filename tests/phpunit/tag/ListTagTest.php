@@ -112,4 +112,18 @@ class ListTagTest extends TestCase{
 			self::assertNotSame($child, $tag->get($index));
 		}
 	}
+
+	/**
+	 * Cloning a tag with a cyclic dependency should throw an exception
+	 */
+	public function testRecursiveClone() : void{
+		//create recursive dependency
+		$tag = new ListTag();
+		$child = new ListTag();
+		$child->push($tag);
+		$tag->push($child);
+
+		$this->expectException(\RuntimeException::class);
+		clone $tag; //recursive dependency, throw exception
+	}
 }

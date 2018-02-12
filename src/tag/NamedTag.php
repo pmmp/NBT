@@ -33,6 +33,12 @@ abstract class NamedTag{
 	protected $value;
 
 	/**
+	 * Used for recursive cloning protection when cloning tags with child tags.
+	 * @var bool
+	 */
+	protected $cloning = false;
+
+	/**
 	 * @param string $name
 	 * @param mixed  $value
 	 */
@@ -73,5 +79,26 @@ abstract class NamedTag{
 
 	public function __toString(){
 		return (string) $this->value;
+	}
+
+	/**
+	 * Clones this tag safely, detecting recursive dependencies which would otherwise cause an infinite cloning loop.
+	 * Used for cloning tags in tags that have children.
+	 *
+	 * @return NamedTag
+	 * @throws \RuntimeException if a recursive dependency was detected
+	 */
+	public function safeClone() : NamedTag{
+		if($this->cloning){
+			throw new \RuntimeException("Recursive NBT tag dependency detected");
+		}
+		$this->cloning = true;
+
+		$retval = clone $this;
+
+		$this->cloning = false;
+		$retval->cloning = false;
+
+		return $retval;
 	}
 }
