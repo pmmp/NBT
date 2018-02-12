@@ -9,5 +9,9 @@ before_script:
 script:
  - ./tests/run-tests.sh
 
+cache:
+ directories:
+  - vendor
+
 notifications:
  email: false
