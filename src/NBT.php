@@ -89,29 +89,28 @@ abstract class NBT{
 	}
 
 	public static function matchList(ListTag $tag1, ListTag $tag2) : bool{
-		if($tag1->getName() !== $tag2->getName() or $tag1->getCount() !== $tag2->getCount()){
+		if($tag1->getName() !== $tag2->getName() or $tag1->count() !== $tag2->count()){
 			return false;
 		}
 
 		foreach($tag1 as $k => $v){
-			if(!($v instanceof NamedTag)){
-				continue;
-			}
-
-			if(!isset($tag2->{$k}) or !($tag2->{$k} instanceof $v)){
+			$other = $tag2->get($k);
+			if($other === null or !($other instanceof $v)){
 				return false;
 			}
 
 			if($v instanceof CompoundTag){
-				if(!self::matchTree($v, $tag2->{$k})){
+				/** @var CompoundTag $other */
+				if(!self::matchTree($v, $other)){
 					return false;
 				}
 			}elseif($v instanceof ListTag){
-				if(!self::matchList($v, $tag2->{$k})){
+				/** @var ListTag $other */
+				if(!self::matchList($v, $other)){
 					return false;
 				}
 			}else{
-				if($v->getValue() !== $tag2->{$k}->getValue()){
+				if($v->getValue() !== $other->getValue()){
 					return false;
 				}
 			}
