@@ -29,6 +29,7 @@ use pocketmine\nbt\NBTStream;
 #include <rules/NBT.h>
 
 class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
+	use NoDynamicFieldsTrait;
 
 	/** @var int */
 	private $tagType;

@@ -29,6 +29,8 @@ use pocketmine\nbt\NBTStream;
 #include <rules/NBT.h>
 
 class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
+	use NoDynamicFieldsTrait;
+
 	/** @var NamedTag[] */
 	protected $value = [];
 
