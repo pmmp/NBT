@@ -126,4 +126,78 @@ class ListTagTest extends TestCase{
 		$this->expectException(\RuntimeException::class);
 		clone $tag; //recursive dependency, throw exception
 	}
+
+	/**
+	 * Tags should be able to be added to lists using the $list[] = $tag syntax
+	 *
+	 * @throws \Exception
+	 */
+	public function testArrayPushTag() : void{
+		$list = new ListTag();
+
+		$array = [];
+		for($i = 0; $i < 5; ++$i){
+			$child = new StringTag("", "test");
+			$list[] = $child;
+			$array[] = $child;
+		}
+
+		foreach($array as $i => $tag){
+			self::assertSame($tag, $list->get($i));
+		}
+	}
+
+	/**
+	 * Appending a primitive value to a tag using $list[] = $value should throw an exception
+	 */
+	public function testArrayPushPrimitiveValue() : void{
+		$this->expectException(\OutOfRangeException::class);
+
+		$list = new ListTag("", [], NBT::TAG_String);
+		$list[] = "hello";
+	}
+
+	/**
+	 * Verify that $list[$offset] = $tag works on offsets that do exist
+	 * @throws \Exception
+	 */
+	public function testOffsetSetTag() : void{
+		$list = new ListTag("", [
+			new StringTag("", "hello"),
+			new StringTag("", "world")
+		], NBT::TAG_String);
+
+		$list[0] = new StringTag("", "thinking");
+		$list[1] = new StringTag("", "harder");
+
+		self::assertEquals("thinking", $list->get(0)->getValue());
+		self::assertEquals("harder", $list->get(1)->getValue());
+	}
+
+	/**
+	 * Verify that $list[$offset] = $primitiveValue works on offsets that do exist
+	 * @throws \Exception
+	 */
+	public function testOffsetSetPrimitive() : void{
+		$list = new ListTag("", [
+			new StringTag("", "hello"),
+			new StringTag("", "world")
+		], NBT::TAG_String);
+
+		$list[0] = "thinking";
+		$list[1] = "harder";
+
+		self::assertEquals("thinking", $list->get(0)->getValue());
+		self::assertEquals("harder", $list->get(1)->getValue());
+	}
+
+	/**
+	 * Setting a primitive value using $list[$offset] = $value should throw an exception when no tag exists
+	 */
+	public function testOffsetSetPrimitiveNoTag() : void{
+		$this->expectException(\OutOfRangeException::class);
+
+		$list = new ListTag("", [], NBT::TAG_String);
+		$list[0] = "hello";
+	}
 }
