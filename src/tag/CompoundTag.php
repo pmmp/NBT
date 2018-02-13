@@ -424,6 +424,8 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 	 * @param NamedTag|mixed $value
 	 *
 	 * @throws \InvalidArgumentException if offset is null
+	 * @throws \TypeError if given a primitive value which is not compatible with the tag at the given offset
+	 * @throws \OutOfRangeException if setting a primitive value at an offset that doesn't exist in the list
 	 */
 	public function offsetSet($offset, $value){
 		if($offset === null){

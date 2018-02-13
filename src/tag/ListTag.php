@@ -134,7 +134,10 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	 * @param int|null       $offset
 	 * @param NamedTag|mixed $value
 	 *
-	 * @throws \TypeError
+	 * @throws \TypeError if an incompatible tag type is given
+	 * @throws \TypeError if a primitive value is given which is not compatible with the tag type
+	 * @throws \OutOfRangeException if setting a primitive value at an offset that doesn't exist in the list
+	 * @throws \OutOfRangeException if attempting to append a primitive value
 	 */
 	public function offsetSet($offset, $value) : void{
 		if($value instanceof NamedTag){
