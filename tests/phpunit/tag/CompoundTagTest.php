@@ -107,5 +107,14 @@ class CompoundTagTest extends TestCase{
 		clone $tag; //recursive dependency, throw exception
 	}
 
+	public function testCountable() : void{
+		$tag = new CompoundTag();
+		for($i = 0; $i < 5; ++$i){
+			$tag->setString("hello$i", "hello$i");
+		}
+
+		self::assertEquals(5, count($tag)); //don't use assertCount() because that allows iterators, which we don't want
+	}
+
 	//TODO: add more tests
 }

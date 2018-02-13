@@ -28,7 +28,7 @@ use pocketmine\nbt\NBTStream;
 
 #include <rules/NBT.h>
 
-class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
+class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countable{
 	use NoDynamicFieldsTrait;
 
 	/** @var NamedTag[] */
@@ -42,6 +42,13 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 	 */
 	public function __construct(string $name = "", array $value = []){
 		parent::__construct($name, $value);
+	}
+
+	/**
+	 * @return int
+	 */
+	public function count() : int{
+		return count($this->value);
 	}
 
 	/**
