@@ -79,14 +79,14 @@ abstract class NBTStream{
 			throw new \InvalidArgumentException("Found TAG_End at the start of buffer");
 		}
 
-		if($doMultiple and $this->offset < strlen($this->buffer)){
+		if($doMultiple and !$this->feof()){
 			$this->data = [$this->data];
 			do{
 				$tag = $this->readTag();
 				if($tag !== null){
 					$this->data[] = $tag;
 				}
-			}while($this->offset < strlen($this->buffer));
+			}while(!$this->feof());
 		}
 		$this->buffer = "";
 	}
