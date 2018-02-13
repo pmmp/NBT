@@ -140,7 +140,14 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 		if($value instanceof NamedTag){
 			$this->checkTagType($value);
 			$this->value[$offset] = $value;
-		}elseif(isset($this->value[$offset])){
+		}else{
+			if($offset === null){
+				throw new \OutOfRangeException("Cannot append non-tag value to ListTag");
+			}
+			if(!isset($this->value[$offset])){
+				throw new \OutOfRangeException("Cannot set non-tag value, no tag exists at offset $offset");
+			}
+
 			$this->value[$offset]->setValue($value);
 		}
 	}

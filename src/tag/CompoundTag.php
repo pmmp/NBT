@@ -431,7 +431,11 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator{
 		}
 		if($value instanceof NamedTag){
 			$this->value[$offset] = $value;
-		}elseif(isset($this->value[$offset])){
+		}else{
+			if(!isset($this->value[$offset])){
+				throw new \OutOfRangeException("Cannot set non-tag value, no tag exists at offset $offset");
+			}
+
 			$this->value[$offset]->setValue($value);
 		}
 	}
