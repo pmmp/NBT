@@ -101,4 +101,28 @@ abstract class NamedTag{
 
 		return $retval;
 	}
+
+	/**
+	 * Compares this NamedTag to the given NamedTag and determines whether or not they are equal, based on name, type
+	 * and value.
+	 *
+	 * @param NamedTag $that
+	 *
+	 * @return bool
+	 */
+	public function equals(NamedTag $that) : bool{
+		return $this->__name === $that->__name and $this->equalsValue($that);
+	}
+
+	/**
+	 * Compares this NamedTag to the given NamedTag and determines whether they are equal, based on type and value only.
+	 * Complex tag types should override this to provide proper value comparison.
+	 *
+	 * @param NamedTag $that
+	 *
+	 * @return bool
+	 */
+	protected function equalsValue(NamedTag $that) : bool{
+		return $that instanceof $this and $this->getValue() === $that->getValue();
+	}
 }

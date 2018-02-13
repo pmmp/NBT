@@ -518,4 +518,19 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	public function rewind() : void{
 		reset($this->value);
 	}
+
+	protected function equalsValue(NamedTag $that) : bool{
+		if(!($that instanceof $this) or $this->count() !== $that->count()){
+			return false;
+		}
+
+		foreach($this as $k => $v){
+			$other = $that->getTag($k);
+			if($other === null or !$v->equals($other)){
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

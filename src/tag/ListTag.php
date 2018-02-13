@@ -418,4 +418,19 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	public function rewind() : void{
 		$this->value->rewind();
 	}
+
+	protected function equalsValue(NamedTag $that) : bool{
+		if(!($that instanceof $this) or $this->count() !== $that->count()){
+			return false;
+		}
+
+		foreach($this as $k => $v){
+			$other = $that->get($k);
+			if($other === null or !$v->equalsValue($other)){ //ListTag members don't have names, don't bother checking it
+				return false;
+			}
+		}
+
+		return true;
+	}
 }
