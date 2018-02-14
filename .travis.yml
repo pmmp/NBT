@@ -4,6 +4,7 @@ php:
  - 7.2
 
 before_script:
+ - if [ -n "$GITHUB_ACCESS_TOKEN" ]; then composer config github-oauth.github.com ${GITHUB_ACCESS_TOKEN}; fi;
  - composer install --prefer-dist
 
 script:
