@@ -116,5 +116,37 @@ class CompoundTagTest extends TestCase{
 		self::assertEquals(5, count($tag)); //don't use assertCount() because that allows iterators, which we don't want
 	}
 
+	/**
+	 * Different object trees of tags should be considered the same if they hold the same data
+	 * @throws \Exception
+	 */
+	public function testEquals() : void{
+		$random = mt_rand();
+		$prepare = function() use($random) : CompoundTag{
+			$tag = new CompoundTag("yummy");
+
+			for($i = 0; $i < 10; ++$i){
+				$tag->setTag(new CompoundTag("child$i", [
+					new StringTag("test"),
+					new IntArrayTag("array", array_fill(0, 25, $random)),
+					new ListTag("list", [
+						new ByteTag("", 1),
+						new ByteTag("", 2)
+					])
+				]));
+			}
+
+			return $tag;
+		};
+
+		$tag1 = $prepare();
+		$tag2 = $prepare();
+
+		self::assertTrue($tag1->equals($tag2));
+
+		$tag2->getCompoundTag("child9")->setFloat("hello", 1.0);
+		self::assertNotTrue($tag1->equals($tag2));
+	}
+
 	//TODO: add more tests
 }
