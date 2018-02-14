@@ -350,15 +350,19 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 		$this->tagType = $nbt->getByte();
 		$size = $nbt->getInt();
 
-		if($this->tagType !== NBT::TAG_End){
+		if($size > 0){
+			if($this->tagType === NBT::TAG_End){
+				throw new \UnexpectedValueException("Unexpected non-empty list of TAG_End");
+			}
+
 			$tagBase = NBT::createTag($this->tagType);
 			for($i = 0; $i < $size and !$nbt->feof(); ++$i){
 				$tag = clone $tagBase;
 				$tag->read($nbt);
 				$this->value->push($tag);
 			}
-		}elseif($size !== 0){
-			throw new \UnexpectedValueException("Unexpected non-empty list of TAG_End");
+		}else{
+			$this->tagType = NBT::TAG_End; //Some older NBT implementations used TAG_Byte for empty lists.
 		}
 	}
 
