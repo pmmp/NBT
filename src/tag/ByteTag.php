@@ -55,7 +55,7 @@ class ByteTag extends NamedTag{
 	/**
 	 * @return int
 	 */
-	public function &getValue() : int{
+	public function getValue() : int{
 		return parent::getValue();
 	}
 

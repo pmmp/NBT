@@ -61,7 +61,7 @@ class IntArrayTag extends NamedTag{
 	/**
 	 * @return int[]
 	 */
-	public function &getValue() : array{
+	public function getValue() : array{
 		return parent::getValue();
 	}
 

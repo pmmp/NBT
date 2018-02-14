@@ -63,7 +63,7 @@ abstract class NamedTag{
 		$this->__name = $name;
 	}
 
-	public function &getValue(){
+	public function getValue(){
 		return $this->value;
 	}
 

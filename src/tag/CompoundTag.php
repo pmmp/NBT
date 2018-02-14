@@ -61,7 +61,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	/**
 	 * @return NamedTag[]
 	 */
-	public function &getValue(){
+	public function getValue(){
 		return $this->value;
 	}
 

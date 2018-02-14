@@ -55,7 +55,7 @@ class DoubleTag extends NamedTag{
 	/**
 	 * @return float
 	 */
-	public function &getValue() : float{
+	public function getValue() : float{
 		return parent::getValue();
 	}
 

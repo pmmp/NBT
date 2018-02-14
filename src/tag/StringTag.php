@@ -55,7 +55,7 @@ class StringTag extends NamedTag{
 	/**
 	 * @return string
 	 */
-	public function &getValue() : string{
+	public function getValue() : string{
 		return parent::getValue();
 	}
 

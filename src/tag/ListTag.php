@@ -51,7 +51,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	/**
 	 * @return NamedTag[]
 	 */
-	public function &getValue() : array{
+	public function getValue() : array{
 		$value = [];
 		foreach($this->value as $k => $v){
 			$value[$k] = $v;
