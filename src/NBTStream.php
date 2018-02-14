@@ -42,8 +42,8 @@ use pocketmine\utils\Binary;
  */
 abstract class NBTStream{
 
-	public $buffer;
-	public $offset;
+	public $buffer = "";
+	public $offset = 0;
 	private $data;
 
 	public function get($len) : string{
@@ -63,11 +63,6 @@ abstract class NBTStream{
 
 	public function feof() : bool{
 		return !isset($this->buffer{$this->offset});
-	}
-
-	public function __construct(){
-		$this->offset = 0;
-		$this->buffer = "";
 	}
 
 	public function read(string $buffer, bool $doMultiple = false) : void{
