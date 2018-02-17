@@ -65,7 +65,15 @@ abstract class NBTStream{
 		return !isset($this->buffer{$this->offset});
 	}
 
-	public function read(string $buffer, bool $doMultiple = false) : void{
+	/**
+	 * Decodes NBT from the given binary string and returns it.
+	 *
+	 * @param string $buffer
+	 * @param bool   $doMultiple Whether to keep reading after the first tag if there are more bytes in the buffer
+	 *
+	 * @return NamedTag|NamedTag[]
+	 */
+	public function read(string $buffer, bool $doMultiple = false){
 		$this->offset = 0;
 		$this->buffer = $buffer;
 		$this->data = $this->readTag();
@@ -84,25 +92,37 @@ abstract class NBTStream{
 			}while(!$this->feof());
 		}
 		$this->buffer = "";
-	}
 
-	public function readCompressed(string $buffer) : void{
-		$this->read(zlib_decode($buffer));
+		return $this->data;
 	}
 
 	/**
+	 * Decodes NBT from the given compressed binary string and returns it. Anything decodable by zlib_decode() can be
+	 * processed.
+	 *
+	 * @param string $buffer
+	 *
+	 * @return NamedTag|NamedTag[]
+	 */
+	public function readCompressed(string $buffer){
+		return $this->read(zlib_decode($buffer));
+	}
+
+	/**
+	 * @param NamedTag|NamedTag[] $data
+	 *
 	 * @return bool|string
 	 */
-	public function write(){
+	public function write($data){
 		$this->offset = 0;
 		$this->buffer = "";
 
-		if($this->data instanceof CompoundTag){
-			$this->writeTag($this->data);
+		if($data instanceof CompoundTag){
+			$this->writeTag($data);
 
 			return $this->buffer;
-		}elseif(is_array($this->data)){
-			foreach($this->data as $tag){
+		}elseif(is_array($data)){
+			foreach($data as $tag){
 				$this->writeTag($tag);
 			}
 			return $this->buffer;
@@ -111,8 +131,15 @@ abstract class NBTStream{
 		return false;
 	}
 
-	public function writeCompressed(int $compression = ZLIB_ENCODING_GZIP, int $level = 7){
-		if(($write = $this->write()) !== false){
+	/**
+	 * @param NamedTag|NamedTag[] $data
+	 * @param int                 $compression
+	 * @param int                 $level
+	 *
+	 * @return bool|string
+	 */
+	public function writeCompressed($data, int $compression = ZLIB_ENCODING_GZIP, int $level = 7){
+		if(($write = $this->write($data)) !== false){
 			return zlib_encode($write, $compression, $level);
 		}
 
