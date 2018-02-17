@@ -226,8 +226,14 @@ abstract class NBTStream{
 		$this->put($v);
 	}
 
+	/**
+	 * @return int[]
+	 */
 	abstract public function getIntArray() : array;
 
+	/**
+	 * @param int[] $array
+	 */
 	abstract public function putIntArray(array $array) : void;
 
 
