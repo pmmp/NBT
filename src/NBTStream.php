@@ -44,7 +44,6 @@ abstract class NBTStream{
 
 	public $buffer = "";
 	public $offset = 0;
-	private $data;
 
 	public function get($len) : string{
 		if($len < 0){
@@ -76,24 +75,24 @@ abstract class NBTStream{
 	public function read(string $buffer, bool $doMultiple = false){
 		$this->offset = 0;
 		$this->buffer = $buffer;
-		$this->data = $this->readTag();
+		$data = $this->readTag();
 
-		if($this->data === null){
+		if($data === null){
 			throw new \InvalidArgumentException("Found TAG_End at the start of buffer");
 		}
 
 		if($doMultiple and !$this->feof()){
-			$this->data = [$this->data];
+			$data = [$data];
 			do{
 				$tag = $this->readTag();
 				if($tag !== null){
-					$this->data[] = $tag;
+					$data[] = $tag;
 				}
 			}while(!$this->feof());
 		}
 		$this->buffer = "";
 
-		return $this->data;
+		return $data;
 	}
 
 	/**
@@ -232,19 +231,23 @@ abstract class NBTStream{
 	abstract public function putIntArray(array $array) : void;
 
 
-
-	public function getArray() : array{
-		$data = [];
-		self::toArray($data, $this->data);
-		return $data;
+	/**
+	 * @param CompoundTag $data
+	 *
+	 * @return array
+	 */
+	public static function toArray(CompoundTag $data) : array{
+		$array = [];
+		self::tagToArray($array, $data);
+		return $array;
 	}
 
-	private static function toArray(array &$data, NamedTag $tag) : void{
+	private static function tagToArray(array &$data, NamedTag $tag) : void{
 		/** @var CompoundTag[]|ListTag[]|IntArrayTag[] $tag */
 		foreach($tag as $key => $value){
 			if($value instanceof CompoundTag or $value instanceof ListTag or $value instanceof IntArrayTag){
 				$data[$key] = [];
-				self::toArray($data[$key], $value);
+				self::tagToArray($data[$key], $value);
 			}else{
 				$data[$key] = $value->getValue();
 			}
@@ -265,7 +268,7 @@ abstract class NBTStream{
 		return null;
 	}
 
-	private static function fromArray(NamedTag $tag, array $data, callable $guesser) : void{
+	private static function tagFromArray(NamedTag $tag, array $data, callable $guesser) : void{
 		foreach($data as $key => $value){
 			if(is_array($value)){
 				$isNumeric = true;
@@ -279,7 +282,7 @@ abstract class NBTStream{
 					}
 				}
 				$tag{$key} = $isNumeric ? ($isIntArray ? new IntArrayTag($key, []) : new ListTag($key, [])) : new CompoundTag($key, []);
-				self::fromArray($tag->{$key}, $value, $guesser);
+				self::tagFromArray($tag->{$key}, $value, $guesser);
 			}else{
 				$v = call_user_func($guesser, $key, $value);
 				if($v instanceof NamedTag){
@@ -289,22 +292,15 @@ abstract class NBTStream{
 		}
 	}
 
-	public function setArray(array $data, callable $guesser = null) : void{
-		$this->data = new CompoundTag("", []);
-		self::fromArray($this->data, $data, $guesser ?? [self::class, "fromArrayGuesser"]);
-	}
-
 	/**
-	 * @return CompoundTag|array
+	 * @param array         $data
+	 * @param callable|null $guesser
+	 *
+	 * @return CompoundTag
 	 */
-	public function getData(){
-		return $this->data;
-	}
-
-	/**
-	 * @param CompoundTag|array $data
-	 */
-	public function setData($data) : void{
-		$this->data = $data;
+	public static function fromArray(array $data, callable $guesser = null) : CompoundTag{
+		$tag = new CompoundTag("", []);
+		self::tagFromArray($tag, $data, $guesser ?? [self::class, "fromArrayGuesser"]);
+		return $tag;
 	}
 }
