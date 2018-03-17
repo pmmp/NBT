@@ -4,7 +4,7 @@
     "type": "library",
     "require": {
         "php": ">=7.2.0",
-        "pocketmine/pocketmine-binaryutils": "dev-master#8bb34e771fee69abcc5482d17d2fa0b4f0e15a5e"
+        "pocketmine/binaryutils": "dev-master#8bb34e771fee69abcc5482d17d2fa0b4f0e15a5e"
     },
     "license": "LGPL-3.0",
     "autoload": {
@@ -20,7 +20,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/pmmp/PocketMine-BinaryUtils"
+            "url": "https://github.com/pmmp/BinaryUtils"
         }
     ]
 }
