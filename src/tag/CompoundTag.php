@@ -476,12 +476,12 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 		$nbt->writeEnd();
 	}
 
-	public function __toString(){
-		$str = get_class($this) . "{\n";
+	public function toString(int $indentation = 0) : string{
+		$str = str_repeat("  ", $indentation) . get_class($this) . "{\n";
 		foreach($this->value as $tag){
-			$str .= get_class($tag) . ":" . $tag->__toString() . "\n";
+			$str .= $tag->toString($indentation + 1) . "\n";
 		}
-		return $str . "}";
+		return $str . str_repeat("  ", $indentation) . "}";
 	}
 
 	public function __clone(){

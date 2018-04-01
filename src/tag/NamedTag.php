@@ -78,7 +78,11 @@ abstract class NamedTag{
 	abstract public function read(NBTStream $nbt) : void;
 
 	public function __toString(){
-		return (string) $this->value;
+		return $this->toString();
+	}
+
+	public function toString(int $indentation = 0) : string{
+		return str_repeat("  ", $indentation) . get_class($this) . ": " . ($this->__name !== "" ? "name='$this->__name', " : "") . "value='" . (string) $this->value . "'";
 	}
 
 	/**

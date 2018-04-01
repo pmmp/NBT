@@ -52,10 +52,8 @@ class IntArrayTag extends NamedTag{
 		$nbt->putIntArray($this->value);
 	}
 
-	public function __toString(){
-		$str = get_class($this) . "{\n";
-		$str .= implode(", ", $this->value);
-		return $str . "}";
+	public function toString(int $indentation = 0) : string{
+		return str_repeat("  ", $indentation) . get_class($this) . ": " . ($this->__name !== "" ? "name='$this->__name', " : "") . "value=[" . implode(",", $this->value) . "]";
 	}
 
 	/**
