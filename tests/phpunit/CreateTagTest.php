@@ -40,7 +40,7 @@ class CreateTagTest extends TestCase{
 		 * @var string $name
 		 */
 		foreach($consts as $name => $value){
-			if(strpos($name, "TAG_") === 0 and $name !== "TAG_End"){
+			if(strpos($name, "TAG_") === 0 and $name !== "TAG_End" and is_int($value)){
 				/** @var int $value */
 
 				try{
