@@ -33,8 +33,6 @@ class ByteArrayTag extends NamedTag{
 	private $value;
 
 	/**
-	 * ByteArrayTag constructor.
-	 *
 	 * @param string $name
 	 * @param string $value
 	 */

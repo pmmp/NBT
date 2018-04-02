@@ -33,8 +33,6 @@ class DoubleTag extends NamedTag{
 	private $value;
 
 	/**
-	 * DoubleTag constructor.
-	 *
 	 * @param string $name
 	 * @param float  $value
 	 */

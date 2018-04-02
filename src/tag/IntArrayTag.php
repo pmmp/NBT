@@ -33,8 +33,6 @@ class IntArrayTag extends NamedTag{
 	private $value;
 
 	/**
-	 * IntArrayTag constructor.
-	 *
 	 * @param string $name
 	 * @param int[]  $value
 	 */

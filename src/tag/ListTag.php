@@ -37,8 +37,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	private $value;
 
 	/**
-	 * ListTag constructor.
-	 *
 	 * @param string     $name
 	 * @param NamedTag[] $value
 	 * @param int        $tagType

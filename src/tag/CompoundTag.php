@@ -35,8 +35,6 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	private $value = [];
 
 	/**
-	 * CompoundTag constructor.
-	 *
 	 * @param string     $name
 	 * @param NamedTag[] $value
 	 */

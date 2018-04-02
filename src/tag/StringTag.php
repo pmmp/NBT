@@ -33,8 +33,6 @@ class StringTag extends NamedTag{
 	private $value;
 
 	/**
-	 * StringTag constructor.
-	 *
 	 * @param string $name
 	 * @param string $value
 	 */

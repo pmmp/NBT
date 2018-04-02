@@ -33,8 +33,6 @@ class FloatTag extends NamedTag{
 	private $value;
 
 	/**
-	 * FloatTag constructor.
-	 *
 	 * @param string $name
 	 * @param float  $value
 	 */

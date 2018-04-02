@@ -33,8 +33,6 @@ class ShortTag extends NamedTag{
 	private $value;
 
 	/**
-	 * ShortTag constructor.
-	 *
 	 * @param string $name
 	 * @param int    $value
 	 */

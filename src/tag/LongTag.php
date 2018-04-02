@@ -33,8 +33,6 @@ class LongTag extends NamedTag{
 	private $value;
 
 	/**
-	 * LongTag constructor.
-	 *
 	 * @param string $name
 	 * @param int    $value
 	 */
