@@ -29,6 +29,8 @@ use pocketmine\nbt\NBTStream;
 #include <rules/NBT.h>
 
 class DoubleTag extends NamedTag{
+	/** @var float */
+	private $value;
 
 	/**
 	 * DoubleTag constructor.
@@ -37,7 +39,8 @@ class DoubleTag extends NamedTag{
 	 * @param float  $value
 	 */
 	public function __construct(string $name = "", float $value = 0.0){
-		parent::__construct($name, $value);
+		parent::__construct($name);
+		$this->value = $value;
 	}
 
 	public function getType() : int{
@@ -56,18 +59,6 @@ class DoubleTag extends NamedTag{
 	 * @return float
 	 */
 	public function getValue() : float{
-		return parent::getValue();
-	}
-
-	/**
-	 * @param float $value
-	 *
-	 * @throws \TypeError
-	 */
-	public function setValue($value) : void{
-		if(!is_float($value) and !is_int($value)){
-			throw new \TypeError("DoubleTag value must be of type double, " . gettype($value) . " given");
-		}
-		parent::setValue((float) $value);
+		return $this->value;
 	}
 }

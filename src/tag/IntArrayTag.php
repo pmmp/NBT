@@ -29,6 +29,8 @@ use pocketmine\nbt\NBTStream;
 #include <rules/NBT.h>
 
 class IntArrayTag extends NamedTag{
+	/** @var int[] */
+	private $value;
 
 	/**
 	 * IntArrayTag constructor.
@@ -37,7 +39,13 @@ class IntArrayTag extends NamedTag{
 	 * @param int[]  $value
 	 */
 	public function __construct(string $name = "", array $value = []){
-		parent::__construct($name, $value);
+		parent::__construct($name);
+
+		assert(count(array_filter($value, function($v){
+			return !is_int($v);
+		})) === 0);
+
+		$this->value = $value;
 	}
 
 	public function getType() : int{
@@ -60,22 +68,6 @@ class IntArrayTag extends NamedTag{
 	 * @return int[]
 	 */
 	public function getValue() : array{
-		return parent::getValue();
-	}
-
-	/**
-	 * @param int[] $value
-	 *
-	 * @throws \TypeError
-	 */
-	public function setValue($value) : void{
-		if(!is_array($value)){
-			throw new \TypeError("IntArrayTag value must be of type int[], " . gettype($value) . " given");
-		}
-		assert(count(array_filter($value, function($v){
-			return !is_int($v);
-		})) === 0);
-
-		parent::setValue($value);
+		return $this->value;
 	}
 }

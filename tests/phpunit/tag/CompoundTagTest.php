@@ -48,22 +48,6 @@ class CompoundTagTest extends TestCase{
 		self::assertEquals(10, $count);
 	}
 
-	public function testSetValue() : void{
-		$tag = new CompoundTag();
-		for($i = 0; $i < 10; ++$i){
-			$tag->setString("hello$i", "$i");
-		}
-		self::assertCount(10, $tag);
-
-
-		$newValue = [];
-		for($i = 0; $i < 3; ++$i){
-			$newValue[] = new StringTag("test$i", "$i");
-		}
-		$tag->setValue($newValue);
-		self::assertCount(3, $tag);
-	}
-
 	/**
 	 * $tag[] = $value is not allowed on CompoundTags
 	 */

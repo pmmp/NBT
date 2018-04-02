@@ -29,6 +29,8 @@ use pocketmine\nbt\NBTStream;
 #include <rules/NBT.h>
 
 class StringTag extends NamedTag{
+	/** @var string */
+	private $value;
 
 	/**
 	 * StringTag constructor.
@@ -37,7 +39,11 @@ class StringTag extends NamedTag{
 	 * @param string $value
 	 */
 	public function __construct(string $name = "", string $value = ""){
-		parent::__construct($name, $value);
+		parent::__construct($name);
+		if(strlen($value) > 32767){
+			throw new \InvalidArgumentException("StringTag cannot hold more than 32767 bytes, got string of length " . strlen($value));
+		}
+		$this->value = $value;
 	}
 
 	public function getType() : int{
@@ -56,21 +62,6 @@ class StringTag extends NamedTag{
 	 * @return string
 	 */
 	public function getValue() : string{
-		return parent::getValue();
-	}
-
-	/**
-	 * @param string $value
-	 *
-	 * @throws \TypeError
-	 */
-	public function setValue($value) : void{
-		if(!is_string($value)){
-			throw new \TypeError("StringTag value must be of type string, " . gettype($value) . " given");
-		}
-		if(strlen($value) > 32767){
-			throw new \InvalidArgumentException("StringTag cannot hold more than 32767 bytes, got string of length " . strlen($value));
-		}
-		parent::setValue($value);
+		return $this->value;
 	}
 }

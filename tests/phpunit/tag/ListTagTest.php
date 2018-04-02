@@ -148,10 +148,10 @@ class ListTagTest extends TestCase{
 	}
 
 	/**
-	 * Appending a primitive value to a tag using $list[] = $value should throw an exception
+	 * Non-NamedTag values cannot be assigned by array-access any more
 	 */
 	public function testArrayPushPrimitiveValue() : void{
-		$this->expectException(\OutOfRangeException::class);
+		$this->expectException(\TypeError::class);
 
 		$list = new ListTag("", [], NBT::TAG_String);
 		$list[] = "hello";
@@ -175,27 +175,24 @@ class ListTagTest extends TestCase{
 	}
 
 	/**
-	 * Verify that $list[$offset] = $primitiveValue works on offsets that do exist
+	 * Non-NamedTag values cannot be assigned by array-access any more
 	 * @throws \Exception
 	 */
 	public function testOffsetSetPrimitive() : void{
+		$this->expectException(\TypeError::class);
 		$list = new ListTag("", [
 			new StringTag("", "hello"),
 			new StringTag("", "world")
 		], NBT::TAG_String);
 
 		$list[0] = "thinking";
-		$list[1] = "harder";
-
-		self::assertEquals("thinking", $list->get(0)->getValue());
-		self::assertEquals("harder", $list->get(1)->getValue());
 	}
 
 	/**
-	 * Setting a primitive value using $list[$offset] = $value should throw an exception when no tag exists
+	 * Non-NamedTag values cannot be assigned by array-access any more
 	 */
 	public function testOffsetSetPrimitiveNoTag() : void{
-		$this->expectException(\OutOfRangeException::class);
+		$this->expectException(\TypeError::class);
 
 		$list = new ListTag("", [], NBT::TAG_String);
 		$list[0] = "hello";

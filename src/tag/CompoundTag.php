@@ -32,7 +32,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	use NoDynamicFieldsTrait;
 
 	/** @var NamedTag[] */
-	protected $value = [];
+	private $value = [];
 
 	/**
 	 * CompoundTag constructor.
@@ -41,7 +41,11 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * @param NamedTag[] $value
 	 */
 	public function __construct(string $name = "", array $value = []){
-		parent::__construct($name, $value);
+		parent::__construct($name);
+
+		foreach($value as $tag){
+			$this->setTag($tag);
+		}
 	}
 
 	/**
@@ -63,28 +67,6 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 */
 	public function getValue(){
 		return $this->value;
-	}
-
-	/**
-	 * @param NamedTag[] $value
-	 *
-	 * @throws \TypeError
-	 */
-	public function setValue($value) : void{
-		if(is_array($value)){
-			$newValue = [];
-			foreach($value as $name => $tag){
-				if($tag instanceof NamedTag){
-					$newValue[$tag->__name] = $tag;
-				}else{
-					throw new \TypeError("CompoundTag members must be NamedTags, got " . gettype($tag) . " in given array");
-				}
-			}
-
-			$this->value = $newValue; //don't overwrite until we type-checked everything
-		}else{
-			throw new \TypeError("CompoundTag value must be NamedTag[], " . gettype($value) . " given");
-		}
 	}
 
 	/*
@@ -134,11 +116,18 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 
 	/**
 	 * Sets the specified NamedTag as a child tag of the CompoundTag at the offset specified by the tag's name. If a tag
-	 * already exists at the offset, it will be overwritten with the new one.
+	 * already exists at the offset and the types do not match, an exception will be thrown unless $force is true.
 	 *
 	 * @param NamedTag $tag
+	 * @param bool     $force
 	 */
-	public function setTag(NamedTag $tag) : void{
+	public function setTag(NamedTag $tag, bool $force = false) : void{
+		if(!$force){
+			$existing = $this->value[$tag->__name] ?? null;
+			if($existing !== null and !($tag instanceof $existing)){
+				throw new \RuntimeException("Cannot set tag at \"$tag->__name\": tried to overwrite " . get_class($existing) . " with " . get_class($tag));
+			}
+		}
 		$this->value[$tag->__name] = $tag;
 	}
 
@@ -295,27 +284,8 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 		return $this->getTagValue($name, IntArrayTag::class, $default, $badTagDefault);
 	}
 
-	/**
-	 * Sets the value of the child tag at the specified offset, creating it if it does not exist. If the child tag
-	 * exists and the value is of the wrong type, an exception will be thrown.
-	 *
-	 * @param string $name Name of the tag to set
-	 * @param string $tagClass Class that extends NamedTag
-	 * @param mixed  $value Value to set. This should be compatible with the specified tag type.
-	 * @param bool   $force Force set the value even if the existing tag is not the correct type (overwrite the old tag)
-	 */
-	public function setTagValue(string $name, string $tagClass, $value, bool $force) : void{
-		assert(is_a($tagClass, NamedTag::class, true));
-		$tag = $this->getTag($name, $force ? NamedTag::class : $tagClass);
-		if($tag instanceof $tagClass){
-			$tag->setValue($value);
-		}else{
-			$this->setTag(new $tagClass($name, $value));
-		}
-	}
-
 	/*
-	 * The following methods are wrappers around setTagValue() with type safety.
+	 * The following methods are wrappers around setTag() which create appropriate tag objects on the fly.
 	 */
 
 	/**
@@ -324,7 +294,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * @param bool   $force
 	 */
 	public function setByte(string $name, int $value, bool $force = false) : void{
-		$this->setTagValue($name, ByteTag::class, $value, $force);
+		$this->setTag(new ByteTag($name, $value), $force);
 	}
 
 	/**
@@ -333,7 +303,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * @param bool   $force
 	 */
 	public function setShort(string $name, int $value, bool $force = false) : void{
-		$this->setTagValue($name, ShortTag::class, $value, $force);
+		$this->setTag(new ShortTag($name, $value), $force);
 	}
 
 	/**
@@ -342,7 +312,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * @param bool   $force
 	 */
 	public function setInt(string $name, int $value, bool $force = false) : void{
-		$this->setTagValue($name, IntTag::class, $value, $force);
+		$this->setTag(new IntTag($name, $value), $force);
 	}
 
 	/**
@@ -351,7 +321,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * @param bool   $force
 	 */
 	public function setLong(string $name, int $value, bool $force = false) : void{
-		$this->setTagValue($name, LongTag::class, $value, $force);
+		$this->setTag(new LongTag($name, $value), $force);
 	}
 
 	/**
@@ -360,7 +330,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * @param bool   $force
 	 */
 	public function setFloat(string $name, float $value, bool $force = false) : void{
-		$this->setTagValue($name, FloatTag::class, $value, $force);
+		$this->setTag(new FloatTag($name, $value), $force);
 	}
 
 	/**
@@ -369,7 +339,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * @param bool   $force
 	 */
 	public function setDouble(string $name, float $value, bool $force = false) : void{
-		$this->setTagValue($name, DoubleTag::class, $value, $force);
+		$this->setTag(new DoubleTag($name, $value), $force);
 	}
 
 	/**
@@ -378,7 +348,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * @param bool   $force
 	 */
 	public function setByteArray(string $name, string $value, bool $force = false) : void{
-		$this->setTagValue($name, ByteArrayTag::class, $value, $force);
+		$this->setTag(new ByteArrayTag($name, $value), $force);
 	}
 
 	/**
@@ -387,7 +357,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * @param bool   $force
 	 */
 	public function setString(string $name, string $value, bool $force = false) : void{
-		$this->setTagValue($name, StringTag::class, $value, $force);
+		$this->setTag(new StringTag($name, $value), $force);
 	}
 
 	/**
@@ -396,7 +366,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * @param bool   $force
 	 */
 	public function setIntArray(string $name, array $value, bool $force = false) : void{
-		$this->setTagValue($name, IntArrayTag::class, $value, $force);
+		$this->setTag(new IntArrayTag($name, $value), $force);
 	}
 
 
@@ -429,25 +399,23 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	}
 
 	/**
-	 * @param string         $offset
-	 * @param NamedTag|mixed $value
+	 * @param string   $offset
+	 * @param NamedTag $value
 	 *
 	 * @throws \InvalidArgumentException if offset is null
-	 * @throws \TypeError if given a primitive value which is not compatible with the tag at the given offset
-	 * @throws \OutOfRangeException if setting a primitive value at an offset that doesn't exist in the list
+	 * @throws \TypeError if $value is not a NamedTag object
 	 */
 	public function offsetSet($offset, $value){
 		if($offset === null){
 			throw new \InvalidArgumentException("Array access push syntax is not supported");
 		}
 		if($value instanceof NamedTag){
+			if($offset !== $value->getName()){
+				throw new \UnexpectedValueException("Given tag has a name which does not match the offset given (offset: \"$offset\", tag name: \"" . $value->getName() . "\")");
+			}
 			$this->value[$offset] = $value;
 		}else{
-			if(!isset($this->value[$offset])){
-				throw new \OutOfRangeException("Cannot set non-tag value, no tag exists at offset $offset");
-			}
-
-			$this->value[$offset]->setValue($value);
+			throw new \TypeError("Value set by ArrayAccess must be an instance of " . NamedTag::class . ", got " . (is_object($value) ? " instance of " . get_class($value) : gettype($value)));
 		}
 	}
 

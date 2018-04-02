@@ -29,6 +29,8 @@ use pocketmine\nbt\NBTStream;
 #include <rules/NBT.h>
 
 class ByteArrayTag extends NamedTag{
+	/** @var string */
+	private $value;
 
 	/**
 	 * ByteArrayTag constructor.
@@ -37,7 +39,8 @@ class ByteArrayTag extends NamedTag{
 	 * @param string $value
 	 */
 	public function __construct(string $name = "", string $value = ""){
-		parent::__construct($name, $value);
+		parent::__construct($name);
+		$this->value = $value;
 	}
 
 	public function getType() : int{
@@ -57,18 +60,6 @@ class ByteArrayTag extends NamedTag{
 	 * @return string
 	 */
 	public function getValue() : string{
-		return parent::getValue();
-	}
-
-	/**
-	 * @param string $value
-	 *
-	 * @throws \TypeError
-	 */
-	public function setValue($value) : void{
-		if(!is_string($value)){
-			throw new \TypeError("ByteArrayTag value must be of type string, " . gettype($value) . " given");
-		}
-		parent::setValue($value);
+		return $this->value;
 	}
 }

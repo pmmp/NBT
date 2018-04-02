@@ -29,6 +29,8 @@ use pocketmine\nbt\NBTStream;
 #include <rules/NBT.h>
 
 class ByteTag extends NamedTag{
+	/** @var int */
+	private $value;
 
 	/**
 	 * ByteTag constructor.
@@ -37,7 +39,11 @@ class ByteTag extends NamedTag{
 	 * @param int    $value
 	 */
 	public function __construct(string $name = "", int $value = 0){
-		parent::__construct($name, $value);
+		parent::__construct($name);
+		if($value < -128 or $value > 127){
+			throw new \InvalidArgumentException("Value $value is too large!");
+		}
+		$this->value = $value;
 	}
 
 	public function getType() : int{
@@ -56,20 +62,6 @@ class ByteTag extends NamedTag{
 	 * @return int
 	 */
 	public function getValue() : int{
-		return parent::getValue();
-	}
-
-	/**
-	 * @param int $value
-	 *
-	 * @throws \TypeError
-	 */
-	public function setValue($value) : void{
-		if(!is_int($value)){
-			throw new \TypeError("ByteTag value must be of type int, " . gettype($value) . " given");
-		}elseif($value < -(2 ** 7) or $value > ((2 ** 7) - 1)){
-			throw new \InvalidArgumentException("Value $value is too large!");
-		}
-		parent::setValue($value);
+		return $this->value;
 	}
 }

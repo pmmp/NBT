@@ -34,7 +34,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	/** @var int */
 	private $tagType;
 	/** @var \SplDoublyLinkedList|NamedTag[] */
-	protected $value;
+	private $value;
 
 	/**
 	 * ListTag constructor.
@@ -44,8 +44,13 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	 * @param int        $tagType
 	 */
 	public function __construct(string $name = "", array $value = [], int $tagType = NBT::TAG_End){
+		parent::__construct($name);
+
 		$this->tagType = $tagType;
-		parent::__construct($name, $value);
+		$this->value = new \SplDoublyLinkedList();
+		foreach($value as $tag){
+			$this->push($tag);
+		}
 	}
 
 	/**
@@ -80,31 +85,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	}
 
 	/**
-	 * @param NamedTag[] $value
-	 *
-	 * @throws \TypeError
-	 */
-	public function setValue($value) : void{
-		if(is_array($value)){
-			$oldType = $this->tagType;
-			$newValue = new \SplDoublyLinkedList();
-			foreach($value as $tag){
-				if($tag instanceof NamedTag){
-					$this->checkTagType($tag);
-					$newValue->push($tag);
-				}else{
-					$this->tagType = $oldType;
-					throw new \TypeError("ListTag members must be NamedTags, got " . gettype($tag) . " in given array");
-				}
-			}
-
-			$this->value = $newValue;
-		}else{
-			throw new \TypeError("ListTag value must be NamedTag[], " . gettype($value) . " given");
-		}
-	}
-
-	/**
 	 * @param int $offset
 	 *
 	 * @return bool
@@ -132,27 +112,18 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	}
 
 	/**
-	 * @param int|null       $offset
-	 * @param NamedTag|mixed $value
+	 * @param int|null $offset
+	 * @param NamedTag $value
 	 *
 	 * @throws \TypeError if an incompatible tag type is given
-	 * @throws \TypeError if a primitive value is given which is not compatible with the tag type
-	 * @throws \OutOfRangeException if setting a primitive value at an offset that doesn't exist in the list
-	 * @throws \OutOfRangeException if attempting to append a primitive value
+	 * @throws \TypeError if $value is not a NamedTag object
 	 */
 	public function offsetSet($offset, $value) : void{
 		if($value instanceof NamedTag){
 			$this->checkTagType($value);
 			$this->value[$offset] = $value;
 		}else{
-			if($offset === null){
-				throw new \OutOfRangeException("Cannot append non-tag value to ListTag");
-			}
-			if(!isset($this->value[$offset])){
-				throw new \OutOfRangeException("Cannot set non-tag value, no tag exists at offset $offset");
-			}
-
-			$this->value[$offset]->setValue($value);
+			throw new \TypeError("Value set by ArrayAccess must be an instance of " . NamedTag::class . ", got " . (is_object($value) ? " instance of " . get_class($value) : gettype($value)));
 		}
 	}
 

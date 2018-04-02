@@ -29,13 +29,19 @@ use pocketmine\nbt\NBTStream;
 #include <rules/NBT.h>
 
 class IntTag extends NamedTag{
+	/** @var int */
+	private $value;
 
 	/**
 	 * @param string $name
 	 * @param int    $value
 	 */
 	public function __construct(string $name = "", int $value = 0){
-		parent::__construct($name, $value);
+		parent::__construct($name);
+		if($value < -0x80000000 or $value > 0x7fffffff){
+			throw new \InvalidArgumentException("Value $value is too large!");
+		}
+		$this->value = $value;
 	}
 
 	public function getType() : int{
@@ -54,20 +60,6 @@ class IntTag extends NamedTag{
 	 * @return int
 	 */
 	public function getValue() : int{
-		return parent::getValue();
-	}
-
-	/**
-	 * @param int $value
-	 *
-	 * @throws \TypeError
-	 */
-	public function setValue($value) : void{
-		if(!is_int($value)){
-			throw new \TypeError("IntTag value must be of type int, " . gettype($value) . " given");
-		}elseif($value < -(2 ** 31) or $value > ((2 ** 31) - 1)){
-			throw new \InvalidArgumentException("Value $value is too large!");
-		}
-		parent::setValue($value);
+		return $this->value;
 	}
 }

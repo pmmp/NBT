@@ -30,8 +30,6 @@ abstract class NamedTag{
 	/** @var string */
 	protected $__name;
 
-	protected $value;
-
 	/**
 	 * Used for recursive cloning protection when cloning tags with child tags.
 	 * @var bool
@@ -40,13 +38,9 @@ abstract class NamedTag{
 
 	/**
 	 * @param string $name
-	 * @param mixed  $value
 	 */
-	public function __construct(string $name = "", $value = null){
+	public function __construct(string $name = ""){
 		$this->__name = $name;
-		if($value !== null){
-			$this->setValue($value);
-		}
 	}
 
 	/**
@@ -63,15 +57,9 @@ abstract class NamedTag{
 		$this->__name = $name;
 	}
 
-	public function getValue(){
-		return $this->value;
-	}
+	abstract public function getValue();
 
 	abstract public function getType() : int;
-
-	public function setValue($value) : void{
-		$this->value = $value;
-	}
 
 	abstract public function write(NBTStream $nbt) : void;
 
@@ -82,7 +70,7 @@ abstract class NamedTag{
 	}
 
 	public function toString(int $indentation = 0) : string{
-		return str_repeat("  ", $indentation) . get_class($this) . ": " . ($this->__name !== "" ? "name='$this->__name', " : "") . "value='" . (string) $this->value . "'";
+		return str_repeat("  ", $indentation) . get_class($this) . ": " . ($this->__name !== "" ? "name='$this->__name', " : "") . "value='" . (string) $this->getValue() . "'";
 	}
 
 	/**

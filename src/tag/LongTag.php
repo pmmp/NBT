@@ -29,6 +29,8 @@ use pocketmine\nbt\NBTStream;
 #include <rules/NBT.h>
 
 class LongTag extends NamedTag{
+	/** @var int */
+	private $value;
 
 	/**
 	 * LongTag constructor.
@@ -37,7 +39,8 @@ class LongTag extends NamedTag{
 	 * @param int    $value
 	 */
 	public function __construct(string $name = "", int $value = 0){
-		parent::__construct($name, $value);
+		parent::__construct($name);
+		$this->value = $value;
 	}
 
 	public function getType() : int{
@@ -56,18 +59,6 @@ class LongTag extends NamedTag{
 	 * @return int
 	 */
 	public function getValue() : int{
-		return parent::getValue();
-	}
-
-	/**
-	 * @param int $value
-	 *
-	 * @throws \TypeError
-	 */
-	public function setValue($value) : void{
-		if(!is_int($value)){
-			throw new \TypeError("LongTag value must be of type int, " . gettype($value) . " given");
-		}
-		parent::setValue($value);
+		return $this->value;
 	}
 }
