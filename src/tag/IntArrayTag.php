@@ -41,9 +41,15 @@ class IntArrayTag extends NamedTag{
 	public function __construct(string $name = "", array $value = []){
 		parent::__construct($name);
 
-		assert(count(array_filter($value, function($v){
-			return !is_int($v);
-		})) === 0);
+		\assert((function() use(&$value){
+			foreach($value as $v){
+				if(!is_int($v)){
+					return false;
+				}
+			}
+
+			return true;
+		})());
 
 		$this->value = $value;
 	}
