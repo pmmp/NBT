@@ -4,7 +4,8 @@
     "type": "library",
     "require": {
         "php": ">=7.2.0",
-        "pocketmine/binaryutils": "0.0.1"
+        "php-64bit": "*",
+        "pocketmine/binaryutils": "dev-master#c824ac67eeeb6899c2a9ec91a769eb9ed6e3f595"
     },
     "license": "LGPL-3.0",
     "autoload": {
