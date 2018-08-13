@@ -132,5 +132,20 @@ class CompoundTagTest extends TestCase{
 		self::assertNotTrue($tag1->equals($tag2));
 	}
 
+	public function testMerge() : void{
+		$t1 = new CompoundTag("", [
+			new StringTag("test1", "test1"),
+			new IntTag("test2", 2)
+		]);
+		$t2 = new CompoundTag("", [
+			new StringTag("test1", "replacement")
+		]);
+
+		$merged = $t1->merge($t2);
+		self::assertSame("replacement", $merged->getString("test1"));
+		self::assertCount(2, $merged);
+		self::assertEquals(2, $merged->getInt("test2"));
+	}
+
 	//TODO: add more tests
 }

@@ -499,4 +499,24 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 
 		return true;
 	}
+
+	/**
+	 * Returns a copy of this CompoundTag with values from the given CompoundTag merged into it. Tags that exist both in
+	 * this tag and the other will be overwritten by the tag in the other.
+	 *
+	 * This deep-clones all tags.
+	 *
+	 * @param CompoundTag $other
+	 *
+	 * @return CompoundTag
+	 */
+	public function merge(CompoundTag $other) : CompoundTag{
+		$new = clone $this;
+
+		foreach($other as $namedTag){
+			$new->setTag(clone $namedTag);
+		}
+
+		return $new;
+	}
 }
