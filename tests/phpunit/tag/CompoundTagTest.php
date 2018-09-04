@@ -147,5 +147,23 @@ class CompoundTagTest extends TestCase{
 		self::assertEquals(2, $merged->getInt("test2"));
 	}
 
+	public function testNumericStringKeys() : void{
+		$t = new CompoundTag();
+		for($i = 0; $i < 10; ++$i){
+			$t->setTag(new StringTag("$i", "$i"));
+		}
+
+		for($i = 0; $i < 10; ++$i){
+			self::assertTrue($t->hasTag("$i"));
+		}
+
+		$check = 0;
+		foreach($t as $k => $namedTag){
+			self::assertTrue(is_string($k));
+			self::assertSame("$check", $k); //must be identical, don't coerce key
+			$check++;
+		}
+	}
+
 	//TODO: add more tests
 }

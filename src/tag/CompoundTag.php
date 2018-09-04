@@ -471,7 +471,15 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * @return string|null
 	 */
 	public function key() : ?string{
-		return key($this->value);
+		$k = key($this->value);
+		if(is_int($k)){
+			/* PHP arrays are idiotic and cast keys like "1" to int(1)
+			 * TODO: perhaps we should consider using a \Ds\Map for this?
+			 */
+			$k = (string) $k;
+		}
+
+		return $k;
 	}
 
 	/**
