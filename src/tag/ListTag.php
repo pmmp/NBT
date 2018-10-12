@@ -345,7 +345,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	}
 
 	public function toString(int $indentation = 0) : string{
-		$str = str_repeat("  ", $indentation) . get_class($this) . "{\n";
+		$str = str_repeat("  ", $indentation) . get_class($this) . ": " . ($this->__name !== "" ? "name='$this->__name', " : "") . "value={\n";
 		/** @var NamedTag $tag */
 		foreach($this->value as $tag){
 			$str .= $tag->toString($indentation + 1) . "\n";
