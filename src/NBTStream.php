@@ -68,81 +68,103 @@ abstract class NBTStream{
 	 * Decodes NBT from the given binary string and returns it.
 	 *
 	 * @param string $buffer
-	 * @param bool   $doMultiple Whether to keep reading after the first tag if there are more bytes in the buffer
 	 *
-	 * @return NamedTag|NamedTag[]
+	 * @return CompoundTag
 	 */
-	public function read(string $buffer, bool $doMultiple = false){
+	public function read(string $buffer) : CompoundTag{
 		$this->offset = 0;
 		$this->buffer = $buffer;
 		$data = $this->readTag();
-
-		if($data === null){
-			throw new \InvalidArgumentException("Found TAG_End at the start of buffer");
-		}
-
-		if($doMultiple and !$this->feof()){
-			$data = [$data];
-			do{
-				$tag = $this->readTag();
-				if($tag !== null){
-					$data[] = $tag;
-				}
-			}while(!$this->feof());
-		}
 		$this->buffer = "";
 
+		if(!($data instanceof CompoundTag)){
+			throw new \InvalidArgumentException("Expected TAG_Compound at the start of buffer");
+		}
+
 		return $data;
+	}
+
+	/**
+	 * Decodes a list of TAG_Compound into objects and returns them.
+	 *
+	 * TODO: This is only necessary because we don't have a streams API worth mentioning. Get rid of this in the future.
+	 *
+	 * @param string $buffer
+	 *
+	 * @return CompoundTag[]
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public function readMultiple(string $buffer) : array{
+		$this->offset = 0;
+		$this->buffer = $buffer;
+
+		$retval = [];
+
+		while(!$this->feof()){
+			$next = $this->readTag();
+			if(!($next instanceof CompoundTag)){
+				throw new \InvalidArgumentException("Expected only TAG_Compound in multiple NBT buffer");
+			}
+			$retval[] = $next;
+		}
+
+		$this->buffer = "";
+
+		return $retval;
 	}
 
 	/**
 	 * Decodes NBT from the given compressed binary string and returns it. Anything decodable by zlib_decode() can be
 	 * processed.
 	 *
+	 * TODO: This is only necessary because we don't have a streams API worth mentioning. Get rid of this in the future.
+	 *
 	 * @param string $buffer
 	 *
-	 * @return NamedTag|NamedTag[]
+	 * @return CompoundTag
 	 */
-	public function readCompressed(string $buffer){
+	public function readCompressed(string $buffer) : CompoundTag{
 		return $this->read(zlib_decode($buffer));
 	}
 
 	/**
-	 * @param NamedTag|NamedTag[] $data
+	 * @param CompoundTag $data
 	 *
-	 * @return bool|string
+	 * @return string
 	 */
-	public function write($data){
+	public function write(CompoundTag $data) : string{
 		$this->offset = 0;
 		$this->buffer = "";
 
-		if($data instanceof CompoundTag){
-			$this->writeTag($data);
-
-			return $this->buffer;
-		}elseif(is_array($data)){
-			foreach($data as $tag){
-				$this->writeTag($tag);
-			}
-			return $this->buffer;
-		}
-
-		return false;
+		$this->writeTag($data);
+		return $this->buffer;
 	}
 
 	/**
-	 * @param NamedTag|NamedTag[] $data
-	 * @param int                 $compression
-	 * @param int                 $level
+	 * @param CompoundTag[] $data
+	 *
+	 * @return string
+	 */
+	public function writeMultiple(array $data) : string{
+		$this->offset = 0;
+		$this->buffer = "";
+
+		foreach($data as $tag){
+			$this->writeTag($tag);
+		}
+		return $this->buffer;
+	}
+
+	/**
+	 * @param CompoundTag $data
+	 * @param int         $compression
+	 * @param int         $level
 	 *
 	 * @return bool|string
 	 */
-	public function writeCompressed($data, int $compression = ZLIB_ENCODING_GZIP, int $level = 7){
-		if(($write = $this->write($data)) !== false){
-			return zlib_encode($write, $compression, $level);
-		}
-
-		return false;
+	public function writeCompressed(CompoundTag $data, int $compression = ZLIB_ENCODING_GZIP, int $level = 7){
+		return zlib_encode($this->write($data), $compression, $level);
 	}
 
 	public function readTag() : ?NamedTag{
