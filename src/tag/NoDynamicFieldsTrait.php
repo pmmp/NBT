@@ -25,23 +25,23 @@ namespace pocketmine\nbt\tag;
 
 trait NoDynamicFieldsTrait{
 
-	private function throw() : void{
-		throw new \RuntimeException("Dynamic field access on " . \get_class($this) . " is no longer supported");
+	private function throw(string $field) : void{
+		throw new \RuntimeException("Cannot access dynamic field \"$field\": Dynamic field access on " . \get_class($this) . " is no longer supported");
 	}
 
 	public function __get($name){
-		$this->throw();
+		$this->throw($name);
 	}
 
 	public function __set($name, $value){
-		$this->throw();
+		$this->throw($name);
 	}
 
 	public function __isset($name){
-		$this->throw();
+		$this->throw($name);
 	}
 
 	public function __unset($name){
-		$this->throw();
+		$this->throw($name);
 	}
 }
