@@ -5,6 +5,7 @@
     "require": {
         "php": ">=7.2.0",
         "php-64bit": "*",
+        "ext-zlib": "*",
         "pocketmine/binaryutils": "^0.1.0"
     },
     "license": "LGPL-3.0",
