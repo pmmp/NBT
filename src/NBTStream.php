@@ -23,14 +23,8 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
-use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\FloatTag;
-use pocketmine\nbt\tag\IntArrayTag;
-use pocketmine\nbt\tag\IntTag;
-use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\NamedTag;
-use pocketmine\nbt\tag\StringTag;
 #ifndef COMPILE
 use pocketmine\utils\Binary;
 #endif
@@ -257,78 +251,4 @@ abstract class NBTStream{
 	 * @param int[] $array
 	 */
 	abstract public function putIntArray(array $array) : void;
-
-
-	/**
-	 * @param CompoundTag $data
-	 *
-	 * @return array
-	 */
-	public static function toArray(CompoundTag $data) : array{
-		$array = [];
-		self::tagToArray($array, $data);
-		return $array;
-	}
-
-	private static function tagToArray(array &$data, NamedTag $tag) : void{
-		/** @var CompoundTag[]|ListTag[]|IntArrayTag[] $tag */
-		foreach($tag as $key => $value){
-			if($value instanceof CompoundTag or $value instanceof ListTag or $value instanceof IntArrayTag){
-				$data[$key] = [];
-				self::tagToArray($data[$key], $value);
-			}else{
-				$data[$key] = $value->getValue();
-			}
-		}
-	}
-
-	public static function fromArrayGuesser(string $key, $value) : ?NamedTag{
-		if(is_int($value)){
-			return new IntTag($key, $value);
-		}elseif(is_float($value)){
-			return new FloatTag($key, $value);
-		}elseif(is_string($value)){
-			return new StringTag($key, $value);
-		}elseif(is_bool($value)){
-			return new ByteTag($key, $value ? 1 : 0);
-		}
-
-		return null;
-	}
-
-	private static function tagFromArray(NamedTag $tag, array $data, callable $guesser) : void{
-		foreach($data as $key => $value){
-			if(is_array($value)){
-				$isNumeric = true;
-				$isIntArray = true;
-				foreach($value as $k => $v){
-					if(!is_numeric($k)){
-						$isNumeric = false;
-						break;
-					}elseif(!is_int($v)){
-						$isIntArray = false;
-					}
-				}
-				$tag{$key} = $isNumeric ? ($isIntArray ? new IntArrayTag($key, []) : new ListTag($key, [])) : new CompoundTag($key, []);
-				self::tagFromArray($tag->{$key}, $value, $guesser);
-			}else{
-				$v = call_user_func($guesser, $key, $value);
-				if($v instanceof NamedTag){
-					$tag{$key} = $v;
-				}
-			}
-		}
-	}
-
-	/**
-	 * @param array         $data
-	 * @param callable|null $guesser
-	 *
-	 * @return CompoundTag
-	 */
-	public static function fromArray(array $data, callable $guesser = null) : CompoundTag{
-		$tag = new CompoundTag("", []);
-		self::tagFromArray($tag, $data, $guesser ?? [self::class, "fromArrayGuesser"]);
-		return $tag;
-	}
 }
