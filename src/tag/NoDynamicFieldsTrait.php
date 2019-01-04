@@ -23,10 +23,12 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt\tag;
 
+use function get_class;
+
 trait NoDynamicFieldsTrait{
 
 	private function throw(string $field) : void{
-		throw new \RuntimeException("Cannot access dynamic field \"$field\": Dynamic field access on " . \get_class($this) . " is no longer supported");
+		throw new \RuntimeException("Cannot access dynamic field \"$field\": Dynamic field access on " . get_class($this) . " is no longer supported");
 	}
 
 	public function __get($name){
