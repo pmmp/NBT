@@ -25,6 +25,8 @@ namespace pocketmine\nbt\tag;
 
 
 use pocketmine\nbt\NBTStream;
+use function get_class;
+use function str_repeat;
 
 abstract class NamedTag{
 	/** @var string */

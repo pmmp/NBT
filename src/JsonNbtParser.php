@@ -34,6 +34,11 @@ use pocketmine\nbt\tag\NamedTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\utils\BinaryStream;
+use function is_numeric;
+use function strpos;
+use function strtolower;
+use function substr;
+use function trim;
 
 class JsonNbtParser{
 

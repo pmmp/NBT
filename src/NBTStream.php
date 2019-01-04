@@ -25,6 +25,10 @@ namespace pocketmine\nbt;
 
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\NamedTag;
+use function strlen;
+use function substr;
+use function zlib_decode;
+use function zlib_encode;
 #ifndef COMPILE
 use pocketmine\utils\Binary;
 #endif
