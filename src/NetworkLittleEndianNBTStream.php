@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
+use function count;
+use function strlen;
 #ifndef COMPILE
 use pocketmine\utils\Binary;
 #endif

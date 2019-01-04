@@ -31,6 +31,17 @@ use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\NamedTag;
 use pocketmine\nbt\tag\StringTag;
+use function call_user_func;
+use function is_array;
+use function is_bool;
+use function is_float;
+use function is_int;
+use function is_numeric;
+use function is_string;
+use function strlen;
+use function substr;
+use function zlib_decode;
+use function zlib_encode;
 #ifndef COMPILE
 use pocketmine\utils\Binary;
 #endif

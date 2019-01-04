@@ -25,6 +25,18 @@ namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NBTStream;
+use function assert;
+use function count;
+use function current;
+use function get_class;
+use function gettype;
+use function is_a;
+use function is_int;
+use function is_object;
+use function key;
+use function next;
+use function reset;
+use function str_repeat;
 
 #include <rules/NBT.h>
 
