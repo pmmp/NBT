@@ -24,7 +24,8 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 
-use pocketmine\nbt\NBTStream;
+use pocketmine\nbt\NbtStreamReader;
+use pocketmine\nbt\NbtStreamWriter;
 use function get_class;
 use function str_repeat;
 
@@ -63,9 +64,14 @@ abstract class NamedTag{
 
 	abstract public function getType() : int;
 
-	abstract public function write(NBTStream $nbt) : void;
+	abstract public function write(NbtStreamWriter $writer) : void;
 
-	abstract public function read(NBTStream $nbt) : void;
+	/**
+	 * @param NbtStreamReader $reader
+	 * @throws \UnexpectedValueException
+	 * @throws \OutOfBoundsException
+	 */
+	abstract public function read(NbtStreamReader $reader) : void;
 
 	public function __toString(){
 		return $this->toString();

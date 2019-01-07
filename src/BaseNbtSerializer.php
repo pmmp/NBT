@@ -25,41 +25,21 @@ namespace pocketmine\nbt;
 
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\NamedTag;
+use pocketmine\utils\Binary;
+use pocketmine\utils\BinaryStream;
 use function strlen;
-use function substr;
 use function zlib_decode;
 use function zlib_encode;
-#ifndef COMPILE
-use pocketmine\utils\Binary;
-#endif
-
-#include <rules/NBT.h>
 
 /**
  * Base Named Binary Tag encoder/decoder
  */
-abstract class NBTStream{
+abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
+	/** @var BinaryStream */
+	protected $buffer;
 
-	public $buffer = "";
-	public $offset = 0;
-
-	public function get($len) : string{
-		if($len < 0){
-			$this->offset = strlen($this->buffer) - 1;
-			return "";
-		}elseif($len === true){
-			return substr($this->buffer, $this->offset);
-		}
-
-		return $len === 1 ? $this->buffer{$this->offset++} : substr($this->buffer, ($this->offset += $len) - $len, $len);
-	}
-
-	public function put(string $v) : void{
-		$this->buffer .= $v;
-	}
-
-	public function feof() : bool{
-		return !isset($this->buffer{$this->offset});
+	public function __construct(){
+		$this->buffer = new BinaryStream();
 	}
 
 	/**
@@ -71,10 +51,9 @@ abstract class NBTStream{
 	 * @throws \UnexpectedValueException
 	 */
 	public function read(string $buffer) : CompoundTag{
-		$this->offset = 0;
-		$this->buffer = $buffer;
+		$this->buffer->setBuffer($buffer);
 		$data = $this->readTag();
-		$this->buffer = "";
+		$this->buffer->reset();
 
 		if(!($data instanceof CompoundTag)){
 			throw new \UnexpectedValueException("Expected TAG_Compound at the start of buffer");
@@ -94,12 +73,11 @@ abstract class NBTStream{
 	 * @throws \UnexpectedValueException
 	 */
 	public function readMultiple(string $buffer) : array{
-		$this->offset = 0;
-		$this->buffer = $buffer;
+		$this->buffer->setBuffer($buffer);
 
 		$retval = [];
 
-		while(!$this->feof()){
+		while(!$this->buffer->feof()){
 			$next = $this->readTag();
 			if(!($next instanceof CompoundTag)){
 				throw new \UnexpectedValueException("Expected only TAG_Compound in multiple NBT buffer");
@@ -107,7 +85,7 @@ abstract class NBTStream{
 			$retval[] = $next;
 		}
 
-		$this->buffer = "";
+		$this->buffer->reset();
 
 		return $retval;
 	}
@@ -133,11 +111,10 @@ abstract class NBTStream{
 	 * @return string
 	 */
 	public function write(CompoundTag $data) : string{
-		$this->offset = 0;
-		$this->buffer = "";
+		$this->buffer->reset();
 
 		$this->writeTag($data);
-		return $this->buffer;
+		return $this->buffer->getBuffer();
 	}
 
 	/**
@@ -146,13 +123,11 @@ abstract class NBTStream{
 	 * @return string
 	 */
 	public function writeMultiple(array $data) : string{
-		$this->offset = 0;
-		$this->buffer = "";
-
+		$this->buffer->reset();
 		foreach($data as $tag){
 			$this->writeTag($tag);
 		}
-		return $this->buffer;
+		return $this->buffer->getBuffer();
 	}
 
 	/**
@@ -171,89 +146,63 @@ abstract class NBTStream{
 	 * @throws \UnexpectedValueException
 	 */
 	public function readTag() : ?NamedTag{
-		$tagType = $this->getByte();
+		$tagType = $this->readByte();
 		if($tagType === NBT::TAG_End){
 			return null;
 		}
 
 		$tag = NBT::createTag($tagType);
-		$tag->setName($this->getString());
+		$tag->setName($this->readString());
 		$tag->read($this);
 
 		return $tag;
 	}
 
 	public function writeTag(NamedTag $tag) : void{
-		$this->putByte($tag->getType());
-		$this->putString($tag->getName());
+		$this->writeByte($tag->getType());
+		$this->writeString($tag->getName());
 		$tag->write($this);
 	}
 
 	public function writeEnd() : void{
-		$this->putByte(NBT::TAG_End);
+		$this->writeByte(NBT::TAG_End);
 	}
 
-	public function getByte() : int{
-		return Binary::readByte($this->get(1));
+	public function readByte() : int{
+		return $this->buffer->getByte();
 	}
 
-	public function getSignedByte() : int{
-		return Binary::readSignedByte($this->get(1));
+	public function readSignedByte() : int{
+		return Binary::signByte($this->buffer->getByte());
 	}
 
-	public function putByte(int $v) : void{
-		$this->buffer .= Binary::writeByte($v);
+	public function writeByte(int $v) : void{
+		$this->buffer->putByte($v);
 	}
 
-	abstract public function getShort() : int;
+	public function readByteArray() : string{
+		return $this->buffer->get($this->readInt());
+	}
 
-	abstract public function getSignedShort() : int;
+	public function writeByteArray(string $v) : void{
+		$this->writeInt(strlen($v)); //TODO: overflow
+		$this->buffer->put($v);
+	}
 
-	abstract public function putShort(int $v) : void;
-
-
-	abstract public function getInt() : int;
-
-	abstract public function putInt(int $v) : void;
-
-	abstract public function getLong() : int;
-
-	abstract public function putLong(int $v) : void;
-
-
-	abstract public function getFloat() : float;
-
-	abstract public function putFloat(float $v) : void;
-
-
-	abstract public function getDouble() : float;
-
-	abstract public function putDouble(float $v) : void;
-
-	public function getString() : string{
-		return $this->get($this->getShort());
+	public function readString() : string{
+		return $this->buffer->get($this->readShort());
 	}
 
 	/**
 	 * @param string $v
 	 * @throws \InvalidArgumentException if the string is too long
 	 */
-	public function putString(string $v) : void{
+	public function writeString(string $v) : void{
 		$len = strlen($v);
 		if($len > 32767){
 			throw new \InvalidArgumentException("NBT strings cannot be longer than 32767 bytes, got $len bytes");
 		}
-		$this->putShort($len);
-		$this->put($v);
+		$this->writeShort($len);
+		$this->buffer->put($v);
 	}
-
-	/**
-	 * @return int[]
-	 */
-	abstract public function getIntArray() : array;
-
-	/**
-	 * @param int[] $array
-	 */
-	abstract public function putIntArray(array $array) : void;
 }

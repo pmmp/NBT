@@ -24,9 +24,8 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\NBTStream;
-
-#include <rules/NBT.h>
+use pocketmine\nbt\NbtStreamReader;
+use pocketmine\nbt\NbtStreamWriter;
 
 class ShortTag extends NamedTag{
 	/** @var int */
@@ -48,12 +47,12 @@ class ShortTag extends NamedTag{
 		return NBT::TAG_Short;
 	}
 
-	public function read(NBTStream $nbt) : void{
-		$this->value = $nbt->getSignedShort();
+	public function read(NbtStreamReader $reader) : void{
+		$this->value = $reader->readSignedShort();
 	}
 
-	public function write(NBTStream $nbt) : void{
-		$nbt->putShort($this->value);
+	public function write(NbtStreamWriter $writer) : void{
+		$writer->writeShort($this->value);
 	}
 
 	/**

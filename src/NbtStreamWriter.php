@@ -21,41 +21,42 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\nbt\tag;
+namespace pocketmine\nbt;
 
-use pocketmine\nbt\NBT;
-use pocketmine\nbt\NbtStreamReader;
-use pocketmine\nbt\NbtStreamWriter;
+use pocketmine\nbt\tag\NamedTag;
 
-class DoubleTag extends NamedTag{
-	/** @var float */
-	private $value;
+/**
+ * @internal
+ */
+interface NbtStreamWriter{
 
-	/**
-	 * @param string $name
-	 * @param float  $value
-	 */
-	public function __construct(string $name = "", float $value = 0.0){
-		parent::__construct($name);
-		$this->value = $value;
-	}
+	public function writeTag(NamedTag $tag) : void;
 
-	public function getType() : int{
-		return NBT::TAG_Double;
-	}
+	public function writeEnd() : void;
 
-	public function read(NbtStreamReader $reader) : void{
-		$this->value = $reader->readDouble();
-	}
+	public function writeByte(int $v) : void;
 
-	public function write(NbtStreamWriter $writer) : void{
-		$writer->writeDouble($this->value);
-	}
+	public function writeShort(int $v) : void;
+
+	public function writeInt(int $v) : void;
+
+	public function writeLong(int $v) : void;
+
+	public function writeFloat(float $v) : void;
+
+	public function writeDouble(float $v) : void;
+
+	public function writeByteArray(string $v) : void;
 
 	/**
-	 * @return float
+	 * @param string $v
+	 *
+	 * @throws \InvalidArgumentException if the string is too long
 	 */
-	public function getValue() : float{
-		return $this->value;
-	}
+	public function writeString(string $v) : void;
+
+	/**
+	 * @param int[] $array
+	 */
+	public function writeIntArray(array $array) : void;
 }

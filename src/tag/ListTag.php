@@ -24,13 +24,12 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\NBTStream;
+use pocketmine\nbt\NbtStreamReader;
+use pocketmine\nbt\NbtStreamWriter;
 use function get_class;
 use function gettype;
 use function is_object;
 use function str_repeat;
-
-#include <rules/NBT.h>
 
 class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	use NoDynamicFieldsTrait;
@@ -318,10 +317,10 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 		}
 	}
 
-	public function read(NBTStream $nbt) : void{
+	public function read(NbtStreamReader $reader) : void{
 		$this->value = new \SplDoublyLinkedList();
-		$this->tagType = $nbt->getByte();
-		$size = $nbt->getInt();
+		$this->tagType = $reader->readByte();
+		$size = $reader->readInt();
 
 		if($size > 0){
 			if($this->tagType === NBT::TAG_End){
@@ -331,7 +330,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 			$tagBase = NBT::createTag($this->tagType);
 			for($i = 0; $i < $size; ++$i){
 				$tag = clone $tagBase;
-				$tag->read($nbt);
+				$tag->read($reader);
 				$this->value->push($tag);
 			}
 		}else{
@@ -339,12 +338,12 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 		}
 	}
 
-	public function write(NBTStream $nbt) : void{
-		$nbt->putByte($this->tagType);
-		$nbt->putInt($this->value->count());
+	public function write(NbtStreamWriter $writer) : void{
+		$writer->writeByte($this->tagType);
+		$writer->writeInt($this->value->count());
 		/** @var NamedTag $tag */
 		foreach($this->value as $tag){
-			$tag->write($nbt);
+			$tag->write($writer);
 		}
 	}
 

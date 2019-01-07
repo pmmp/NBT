@@ -24,14 +24,13 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\NBTStream;
+use pocketmine\nbt\NbtStreamReader;
+use pocketmine\nbt\NbtStreamWriter;
 use function assert;
 use function get_class;
 use function implode;
 use function is_int;
 use function str_repeat;
-
-#include <rules/NBT.h>
 
 class IntArrayTag extends NamedTag{
 	/** @var int[] */
@@ -61,12 +60,12 @@ class IntArrayTag extends NamedTag{
 		return NBT::TAG_IntArray;
 	}
 
-	public function read(NBTStream $nbt) : void{
-		$this->value = $nbt->getIntArray();
+	public function read(NbtStreamReader $reader) : void{
+		$this->value = $reader->readIntArray();
 	}
 
-	public function write(NBTStream $nbt) : void{
-		$nbt->putIntArray($this->value);
+	public function write(NbtStreamWriter $writer) : void{
+		$writer->writeIntArray($this->value);
 	}
 
 	public function toString(int $indentation = 0) : string{

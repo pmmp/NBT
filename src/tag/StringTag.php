@@ -24,10 +24,9 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\NBTStream;
+use pocketmine\nbt\NbtStreamReader;
+use pocketmine\nbt\NbtStreamWriter;
 use function strlen;
-
-#include <rules/NBT.h>
 
 class StringTag extends NamedTag{
 	/** @var string */
@@ -49,12 +48,12 @@ class StringTag extends NamedTag{
 		return NBT::TAG_String;
 	}
 
-	public function read(NBTStream $nbt) : void{
-		$this->value = $nbt->getString();
+	public function read(NbtStreamReader $reader) : void{
+		$this->value = $reader->readString();
 	}
 
-	public function write(NBTStream $nbt) : void{
-		$nbt->putString($this->value);
+	public function write(NbtStreamWriter $writer) : void{
+		$writer->writeString($this->value);
 	}
 
 	/**
