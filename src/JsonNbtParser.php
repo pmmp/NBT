@@ -159,7 +159,7 @@ class JsonNbtParser{
 	 * @param string       $name
 	 *
 	 * @return NamedTag
-	 * @throws \Exception
+	 * @throws \UnexpectedValueException
 	 */
 	private static function readValue(BinaryStream $stream, string $name = "") : NamedTag{
 		$value = "";
@@ -210,7 +210,7 @@ class JsonNbtParser{
 
 				}elseif($c === "{"){ //start of compound tag
 					if($value !== ""){
-						throw new \Exception("Syntax error: unexpected compound start at offset $offset (enclose in double quotes for literal)");
+						throw new \UnexpectedValueException("Syntax error: unexpected compound start at offset $offset (enclose in double quotes for literal)");
 					}
 
 					$retval = self::parseCompound($stream, $name);
@@ -218,7 +218,7 @@ class JsonNbtParser{
 
 				}elseif($c === "["){ //start of list tag - TODO: arrays
 					if($value !== ""){
-						throw new \Exception("Syntax error: unexpected list start at offset $offset (enclose in double quotes for literal)");
+						throw new \UnexpectedValueException("Syntax error: unexpected list start at offset $offset (enclose in double quotes for literal)");
 					}
 
 					$retval = self::parseList($stream, $name);
@@ -235,7 +235,7 @@ class JsonNbtParser{
 		}
 
 		if($value === ""){
-			throw new \Exception("Syntax error: empty value at offset $offset");
+			throw new \UnexpectedValueException("Syntax error: empty value at offset $offset");
 		}
 		if(!$foundEnd){
 			throw new \UnexpectedValueException("Syntax error: unexpected end of stream at offset $offset");
