@@ -157,10 +157,6 @@ abstract class NBTStream{
 	}
 
 	public function readTag() : ?NamedTag{
-		if($this->feof()){
-			return null;
-		}
-
 		$tagType = $this->getByte();
 		if($tagType === NBT::TAG_End){
 			return null;
