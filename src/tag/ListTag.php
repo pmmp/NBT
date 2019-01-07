@@ -329,7 +329,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 			}
 
 			$tagBase = NBT::createTag($this->tagType);
-			for($i = 0; $i < $size and !$nbt->feof(); ++$i){
+			for($i = 0; $i < $size; ++$i){
 				$tag = clone $tagBase;
 				$tag->read($nbt);
 				$this->value->push($tag);

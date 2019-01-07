@@ -444,7 +444,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 			if($tag !== null and $tag->__name !== ""){
 				$this->value[$tag->__name] = $tag;
 			}
-		}while($tag !== null and !$nbt->feof());
+		}while($tag !== null);
 	}
 
 	public function write(NBTStream $nbt) : void{
