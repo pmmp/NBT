@@ -31,7 +31,7 @@ use function gettype;
 use function is_object;
 use function str_repeat;
 
-class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
+final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	use NoDynamicFieldsTrait;
 
 	/** @var int */

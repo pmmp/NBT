@@ -27,7 +27,7 @@ use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 
-class DoubleTag extends NamedTag{
+final class DoubleTag extends NamedTag{
 	/** @var float */
 	private $value;
 

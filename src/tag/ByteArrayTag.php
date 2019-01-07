@@ -27,7 +27,7 @@ use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 
-class ByteArrayTag extends NamedTag{
+final class ByteArrayTag extends NamedTag{
 	/** @var string */
 	private $value;
 

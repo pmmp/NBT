@@ -32,7 +32,7 @@ use function implode;
 use function is_int;
 use function str_repeat;
 
-class IntArrayTag extends NamedTag{
+final class IntArrayTag extends NamedTag{
 	/** @var int[] */
 	private $value;
 

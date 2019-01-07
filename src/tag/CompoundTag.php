@@ -39,7 +39,7 @@ use function next;
 use function reset;
 use function str_repeat;
 
-class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countable{
+final class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countable{
 	use NoDynamicFieldsTrait;
 
 	/** @var NamedTag[] */
