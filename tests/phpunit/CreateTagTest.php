@@ -46,7 +46,7 @@ class CreateTagTest extends TestCase{
 				try{
 					$tag = NBT::createTag($value);
 					self::assertEquals($value, $tag->getType());
-				}catch(\InvalidArgumentException $e){
+				}catch(\UnexpectedValueException $e){
 					self::assertTrue(false, "Could not create tag of type $name");
 				}
 			}

@@ -68,6 +68,7 @@ abstract class NBTStream{
 	 * @param string $buffer
 	 *
 	 * @return CompoundTag
+	 * @throws \UnexpectedValueException
 	 */
 	public function read(string $buffer) : CompoundTag{
 		$this->offset = 0;
@@ -76,7 +77,7 @@ abstract class NBTStream{
 		$this->buffer = "";
 
 		if(!($data instanceof CompoundTag)){
-			throw new \InvalidArgumentException("Expected TAG_Compound at the start of buffer");
+			throw new \UnexpectedValueException("Expected TAG_Compound at the start of buffer");
 		}
 
 		return $data;
@@ -90,8 +91,7 @@ abstract class NBTStream{
 	 * @param string $buffer
 	 *
 	 * @return CompoundTag[]
-	 *
-	 * @throws \InvalidArgumentException
+	 * @throws \UnexpectedValueException
 	 */
 	public function readMultiple(string $buffer) : array{
 		$this->offset = 0;
@@ -102,7 +102,7 @@ abstract class NBTStream{
 		while(!$this->feof()){
 			$next = $this->readTag();
 			if(!($next instanceof CompoundTag)){
-				throw new \InvalidArgumentException("Expected only TAG_Compound in multiple NBT buffer");
+				throw new \UnexpectedValueException("Expected only TAG_Compound in multiple NBT buffer");
 			}
 			$retval[] = $next;
 		}
@@ -121,6 +121,7 @@ abstract class NBTStream{
 	 * @param string $buffer
 	 *
 	 * @return CompoundTag
+	 * @throws \UnexpectedValueException
 	 */
 	public function readCompressed(string $buffer) : CompoundTag{
 		return $this->read(zlib_decode($buffer));
@@ -165,6 +166,10 @@ abstract class NBTStream{
 		return zlib_encode($this->write($data), $compression, $level);
 	}
 
+	/**
+	 * @return NamedTag|null
+	 * @throws \UnexpectedValueException
+	 */
 	public function readTag() : ?NamedTag{
 		if($this->feof()){
 			return null;
