@@ -81,4 +81,14 @@ class JsonNbtParserTest extends TestCase{
 		$tag = JsonNbtParser::parseJson("{TestString:\"  TEST  minecraft:stone  \"}");
 		self::assertSame("  TEST  minecraft:stone  ", $tag->getString("TestString"));
 	}
+
+	public function testDuplicateCompoundKeysSameType() : void{
+		$this->expectExceptionMessage("duplicate compound leaf node");
+		JsonNbtParser::parseJson("{Test:hi,Test:hi}");
+	}
+
+	public function testDuplicateCompoundKeysDifferentType() : void{
+		$this->expectExceptionMessage("duplicate compound leaf node");
+		JsonNbtParser::parseJson("{Test:hi,Test:1}");
+	}
 }

@@ -26,6 +26,7 @@ namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
+use pocketmine\utils\BinaryDataException;
 use function get_class;
 use function str_repeat;
 
@@ -68,8 +69,7 @@ abstract class NamedTag{
 
 	/**
 	 * @param NbtStreamReader $reader
-	 * @throws \UnexpectedValueException
-	 * @throws \OutOfBoundsException
+	 * @throws BinaryDataException
 	 */
 	abstract public function read(NbtStreamReader $reader) : void;
 

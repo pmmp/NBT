@@ -26,6 +26,7 @@ namespace pocketmine\nbt;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\NamedTag;
 use pocketmine\utils\Binary;
+use pocketmine\utils\BinaryDataException;
 use pocketmine\utils\BinaryStream;
 use function strlen;
 use function zlib_decode;
@@ -48,15 +49,19 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @param string $buffer
 	 *
 	 * @return CompoundTag
-	 * @throws \UnexpectedValueException
+	 * @throws NbtDataException
 	 */
 	public function read(string $buffer) : CompoundTag{
 		$this->buffer->setBuffer($buffer);
-		$data = $this->readTag();
+		try{
+			$data = $this->readTag();
+		}catch(BinaryDataException $e){
+			throw new NbtDataException($e->getMessage(), 0, $e);
+		}
 		$this->buffer->reset();
 
 		if(!($data instanceof CompoundTag)){
-			throw new \UnexpectedValueException("Expected TAG_Compound at the start of buffer");
+			throw new NbtDataException("Expected TAG_Compound at the start of buffer");
 		}
 
 		return $data;
@@ -70,7 +75,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @param string $buffer
 	 *
 	 * @return CompoundTag[]
-	 * @throws \UnexpectedValueException
+	 * @throws NbtDataException
 	 */
 	public function readMultiple(string $buffer) : array{
 		$this->buffer->setBuffer($buffer);
@@ -78,9 +83,13 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 		$retval = [];
 
 		while(!$this->buffer->feof()){
-			$next = $this->readTag();
+			try{
+				$next = $this->readTag();
+			}catch(BinaryDataException $e){
+				throw new NbtDataException($e->getMessage(), 0, $e);
+			}
 			if(!($next instanceof CompoundTag)){
-				throw new \UnexpectedValueException("Expected only TAG_Compound in multiple NBT buffer");
+				throw new NbtDataException("Expected only TAG_Compound in multiple NBT buffer");
 			}
 			$retval[] = $next;
 		}
@@ -99,10 +108,14 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @param string $buffer
 	 *
 	 * @return CompoundTag
-	 * @throws \UnexpectedValueException
+	 * @throws NbtDataException
 	 */
 	public function readCompressed(string $buffer) : CompoundTag{
-		return $this->read(zlib_decode($buffer));
+		$raw = @zlib_decode($buffer); //silence useless warning
+		if($raw === false){
+			throw new NbtDataException("Failed to decompress NBT data");
+		}
+		return $this->read($raw);
 	}
 
 	/**
@@ -143,7 +156,9 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 
 	/**
 	 * @return NamedTag|null
-	 * @throws \UnexpectedValueException
+	 *
+	 * @throws BinaryDataException
+	 * @throws NbtDataException
 	 */
 	public function readTag() : ?NamedTag{
 		$tagType = $this->readByte();

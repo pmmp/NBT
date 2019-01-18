@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\nbt;
 
 use pocketmine\nbt\tag\NamedTag;
+use pocketmine\utils\BinaryDataException;
 
 /**
  * @internal
@@ -32,85 +33,73 @@ interface NbtStreamReader{
 
 	/**
 	 * @return NamedTag|null
-	 * @throws \OutOfBoundsException
-	 * @throws \UnexpectedValueException
+	 * @throws BinaryDataException
 	 */
 	public function readTag() : ?NamedTag;
 
 	/**
 	 * @return int
-	 * @throws \OutOfBoundsException
-	 * @throws \UnexpectedValueException
+	 * @throws BinaryDataException
 	 */
 	public function readByte() : int;
 
 	/**
 	 * @return int
-	 * @throws \OutOfBoundsException
-	 * @throws \UnexpectedValueException
+	 * @throws BinaryDataException
 	 */
 	public function readSignedByte() : int;
 
 	/**
 	 * @return int
-	 * @throws \OutOfBoundsException
-	 * @throws \UnexpectedValueException
+	 * @throws BinaryDataException
 	 */
 	public function readShort() : int;
 
 	/**
 	 * @return int
-	 * @throws \OutOfBoundsException
-	 * @throws \UnexpectedValueException
+	 * @throws BinaryDataException
 	 */
 	public function readSignedShort() : int;
 
 	/**
 	 * @return int
-	 * @throws \OutOfBoundsException
-	 * @throws \UnexpectedValueException
+	 * @throws BinaryDataException
 	 */
 	public function readInt() : int;
 
 	/**
 	 * @return int
-	 * @throws \OutOfBoundsException
-	 * @throws \UnexpectedValueException
+	 * @throws BinaryDataException
 	 */
 	public function readLong() : int;
 
 	/**
 	 * @return float
-	 * @throws \OutOfBoundsException
-	 * @throws \UnexpectedValueException
+	 * @throws BinaryDataException
 	 */
 	public function readFloat() : float;
 
 	/**
 	 * @return float
-	 * @throws \OutOfBoundsException
-	 * @throws \UnexpectedValueException
+	 * @throws BinaryDataException
 	 */
 	public function readDouble() : float;
 
 	/**
 	 * @return string
-	 * @throws \OutOfBoundsException
-	 * @throws \UnexpectedValueException
+	 * @throws BinaryDataException
 	 */
 	public function readByteArray() : string;
 
 	/**
 	 * @return string
-	 * @throws \OutOfBoundsException
-	 * @throws \UnexpectedValueException
+	 * @throws BinaryDataException
 	 */
 	public function readString() : string;
 
 	/**
 	 * @return int[]
-	 * @throws \OutOfBoundsException
-	 * @throws \UnexpectedValueException
+	 * @throws BinaryDataException
 	 */
 	public function readIntArray() : array;
 }

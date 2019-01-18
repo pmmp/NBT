@@ -58,7 +58,7 @@ abstract class NBT{
 	 * @param int $type
 	 *
 	 * @return NamedTag
-	 * @throws \UnexpectedValueException
+	 * @throws NbtDataException
 	 */
 	public static function createTag(int $type) : NamedTag{
 		switch($type){
@@ -85,7 +85,7 @@ abstract class NBT{
 			case self::TAG_IntArray:
 				return new IntArrayTag();
 			default:
-				throw new \UnexpectedValueException("Unknown NBT tag type $type");
+				throw new NbtDataException("Unknown NBT tag type $type");
 		}
 	}
 }

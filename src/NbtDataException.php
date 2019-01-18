@@ -23,33 +23,6 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
-use PHPUnit\Framework\TestCase;
+class NbtDataException extends \RuntimeException{
 
-class CreateTagTest extends TestCase{
-
-	/**
-	 * Tests that all tags with declared constants in NBT can be created (with the exception of TAG_End)
-	 *
-	 * @throws \Exception
-	 * @throws \ReflectionException
-	 */
-	public function testCreateTags() : void{
-		$consts = (new \ReflectionClass(NBT::class))->getConstants();
-
-		/**
-		 * @var string $name
-		 */
-		foreach($consts as $name => $value){
-			if(strpos($name, "TAG_") === 0 and $name !== "TAG_End" and is_int($value)){
-				/** @var int $value */
-
-				try{
-					$tag = NBT::createTag($value);
-					self::assertEquals($value, $tag->getType());
-				}catch(NbtDataException $e){
-					self::assertTrue(false, "Could not create tag of type $name");
-				}
-			}
-		}
-	}
 }
