@@ -148,9 +148,9 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @param int         $compression
 	 * @param int         $level
 	 *
-	 * @return bool|string
+	 * @return string
 	 */
-	public function writeCompressed(CompoundTag $data, int $compression = ZLIB_ENCODING_GZIP, int $level = 7){
+	public function writeCompressed(CompoundTag $data, int $compression = ZLIB_ENCODING_GZIP, int $level = 7) : string{
 		return zlib_encode($this->write($data), $compression, $level);
 	}
 
