@@ -80,11 +80,12 @@ abstract class NBTStream{
 	 *
 	 * @param string $buffer
 	 * @param bool   $doMultiple Whether to keep reading after the first tag if there are more bytes in the buffer
+	 * @param int    &$offset
 	 *
 	 * @return NamedTag|NamedTag[]
 	 */
-	public function read(string $buffer, bool $doMultiple = false){
-		$this->offset = 0;
+	public function read(string $buffer, bool $doMultiple = false, int &$offset = 0){
+		$this->offset = &$offset;
 		$this->buffer = $buffer;
 		$data = $this->readTag();
 
