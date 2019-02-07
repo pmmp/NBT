@@ -29,6 +29,7 @@ use pocketmine\nbt\NbtStreamWriter;
 use pocketmine\utils\BinaryDataException;
 use function get_class;
 use function str_repeat;
+use function strlen;
 
 abstract class NamedTag{
 	/** @var string */
@@ -42,8 +43,12 @@ abstract class NamedTag{
 
 	/**
 	 * @param string $name
+	 * @throws \InvalidArgumentException if the name is too long
 	 */
 	public function __construct(string $name = ""){
+		if(strlen($name) > 32767){
+			throw new \InvalidArgumentException("Tag name cannot be more than 32767 bytes, got length " . strlen($name));
+		}
 		$this->__name = $name;
 	}
 

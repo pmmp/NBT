@@ -47,17 +47,19 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * Decodes NBT from the given binary string and returns it.
 	 *
 	 * @param string $buffer
+	 * @param int    &$offset
 	 *
 	 * @return CompoundTag
 	 * @throws NbtDataException
 	 */
-	public function read(string $buffer) : CompoundTag{
-		$this->buffer->setBuffer($buffer);
+	public function read(string $buffer, int &$offset = 0) : CompoundTag{
+		$this->buffer->setBuffer($buffer, $offset);
 		try{
 			$data = $this->readTag();
 		}catch(BinaryDataException $e){
 			throw new NbtDataException($e->getMessage(), 0, $e);
 		}
+		$offset = $this->buffer->getOffset();
 		$this->buffer->reset();
 
 		if(!($data instanceof CompoundTag)){
