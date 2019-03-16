@@ -70,7 +70,7 @@ class ListTagTest extends TestCase{
 		$list = new ListTag("test3", [], NBT::TAG_String);
 
 		$list->setTagType(NBT::TAG_Compound);
-		$list->push(new CompoundTag());
+		$list->push(new CompoundTag(""));
 		self::assertCount(1, $list);
 
 		$list->shift(); //empty the list
@@ -100,7 +100,7 @@ class ListTagTest extends TestCase{
 	 * @throws \Exception
 	 */
 	public function testClone() : void{
-		$tag = new ListTag();
+		$tag = new ListTag("");
 		for($i = 0; $i < 5; ++$i){
 			$tag->push(new StringTag("", "hi"));
 		}
@@ -118,8 +118,8 @@ class ListTagTest extends TestCase{
 	 */
 	public function testRecursiveClone() : void{
 		//create recursive dependency
-		$tag = new ListTag();
-		$child = new ListTag();
+		$tag = new ListTag("");
+		$child = new ListTag("");
 		$child->push($tag);
 		$tag->push($child);
 
@@ -133,7 +133,7 @@ class ListTagTest extends TestCase{
 	 * @throws \Exception
 	 */
 	public function testArrayPushTag() : void{
-		$list = new ListTag();
+		$list = new ListTag("");
 
 		$array = [];
 		for($i = 0; $i < 5; ++$i){

@@ -47,8 +47,8 @@ final class ByteTag extends NamedTag{
 		return NBT::TAG_Byte;
 	}
 
-	public function read(NbtStreamReader $reader) : void{
-		$this->value = $reader->readSignedByte();
+	public static function read(string $name, NbtStreamReader $reader) : NamedTag{
+		return new self($name, $reader->readSignedByte());
 	}
 
 	public function write(NbtStreamWriter $writer) : void{

@@ -168,11 +168,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 			return null;
 		}
 
-		$tag = NBT::createTag($tagType);
-		$tag->setName($this->readString());
-		$tag->read($this);
-
-		return $tag;
+		return NBT::createTag($tagType, $this->readString(), $this);
 	}
 
 	public function writeTag(NamedTag $tag) : void{

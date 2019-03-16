@@ -35,7 +35,7 @@ final class LongTag extends NamedTag{
 	 * @param string $name
 	 * @param int    $value
 	 */
-	public function __construct(string $name = "", int $value = 0){
+	public function __construct(string $name, int $value){
 		parent::__construct($name);
 		$this->value = $value;
 	}
@@ -44,8 +44,8 @@ final class LongTag extends NamedTag{
 		return NBT::TAG_Long;
 	}
 
-	public function read(NbtStreamReader $reader) : void{
-		$this->value = $reader->readLong();
+	public static function read(string $name, NbtStreamReader $reader) : NamedTag{
+		return new self($name, $reader->readLong());
 	}
 
 	public function write(NbtStreamWriter $writer) : void{

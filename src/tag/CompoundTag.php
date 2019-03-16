@@ -49,7 +49,7 @@ final class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Co
 	 * @param string     $name
 	 * @param NamedTag[] $value
 	 */
-	public function __construct(string $name = "", array $value = []){
+	public function __construct(string $name, array $value = []){
 		parent::__construct($name);
 
 		foreach($value as $tag){
@@ -436,14 +436,15 @@ final class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Co
 		return NBT::TAG_Compound;
 	}
 
-	public function read(NbtStreamReader $reader) : void{
-		$this->value = [];
+	public static function read(string $name, NbtStreamReader $reader) : NamedTag{
+		$value = [];
 		do{
 			$tag = $reader->readTag();
 			if($tag !== null and $tag->__name !== ""){
-				$this->value[$tag->__name] = $tag;
+				$value[$tag->__name] = $tag;
 			}
 		}while($tag !== null);
+		return new self($name, $value);
 	}
 
 	public function write(NbtStreamWriter $writer) : void{

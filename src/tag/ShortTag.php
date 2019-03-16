@@ -35,7 +35,7 @@ final class ShortTag extends NamedTag{
 	 * @param string $name
 	 * @param int    $value
 	 */
-	public function __construct(string $name = "", int $value = 0){
+	public function __construct(string $name, int $value){
 		parent::__construct($name);
 		if($value < -0x8000 or $value > 0x7fff){
 			throw new \InvalidArgumentException("Value $value is too large!");
@@ -47,8 +47,8 @@ final class ShortTag extends NamedTag{
 		return NBT::TAG_Short;
 	}
 
-	public function read(NbtStreamReader $reader) : void{
-		$this->value = $reader->readSignedShort();
+	public static function read(string $name, NbtStreamReader $reader) : NamedTag{
+		return new self($name, $reader->readSignedShort());
 	}
 
 	public function write(NbtStreamWriter $writer) : void{

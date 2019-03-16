@@ -44,7 +44,7 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 	 * @param NamedTag[] $value
 	 * @param int        $tagType
 	 */
-	public function __construct(string $name = "", array $value = [], int $tagType = NBT::TAG_End){
+	public function __construct(string $name, array $value = [], int $tagType = NBT::TAG_End){
 		parent::__construct($name);
 
 		$this->tagType = $tagType;
@@ -312,30 +312,29 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 			if($this->tagType === NBT::TAG_End){
 				$this->tagType = $type;
 			}else{
-				throw new \TypeError("Invalid tag of type " . get_class($tag) . " assigned to ListTag, expected " . get_class(NBT::createTag($this->tagType)));
+				//TODO: reintroduce type info
+				throw new \TypeError("Invalid tag of type " . get_class($tag) . " assigned to ListTag");
 			}
 		}
 	}
 
-	public function read(NbtStreamReader $reader) : void{
-		$this->value = new \SplDoublyLinkedList();
-		$this->tagType = $reader->readByte();
+	public static function read(string $name, NbtStreamReader $reader) : NamedTag{
+		$value = [];
+		$tagType = $reader->readByte();
 		$size = $reader->readInt();
 
 		if($size > 0){
-			if($this->tagType === NBT::TAG_End){
+			if($tagType === NBT::TAG_End){
 				throw new \UnexpectedValueException("Unexpected non-empty list of TAG_End");
 			}
 
-			$tagBase = NBT::createTag($this->tagType);
 			for($i = 0; $i < $size; ++$i){
-				$tag = clone $tagBase;
-				$tag->read($reader);
-				$this->value->push($tag);
+				$value[] = NBT::createTag($tagType, "", $reader);
 			}
 		}else{
-			$this->tagType = NBT::TAG_End; //Some older NBT implementations used TAG_Byte for empty lists.
+			$tagType = NBT::TAG_End; //Some older NBT implementations used TAG_Byte for empty lists.
 		}
+		return new self($name, $value, $tagType);
 	}
 
 	public function write(NbtStreamWriter $writer) : void{

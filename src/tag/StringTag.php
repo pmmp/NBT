@@ -36,7 +36,7 @@ final class StringTag extends NamedTag{
 	 * @param string $name
 	 * @param string $value
 	 */
-	public function __construct(string $name = "", string $value = ""){
+	public function __construct(string $name, string $value){
 		parent::__construct($name);
 		if(strlen($value) > 32767){
 			throw new \InvalidArgumentException("StringTag cannot hold more than 32767 bytes, got string of length " . strlen($value));
@@ -48,8 +48,8 @@ final class StringTag extends NamedTag{
 		return NBT::TAG_String;
 	}
 
-	public function read(NbtStreamReader $reader) : void{
-		$this->value = $reader->readString();
+	public static function read(string $name, NbtStreamReader $reader) : NamedTag{
+		return new self($name, $reader->readString());
 	}
 
 	public function write(NbtStreamWriter $writer) : void{

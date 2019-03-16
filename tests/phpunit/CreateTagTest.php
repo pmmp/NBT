@@ -24,32 +24,42 @@ declare(strict_types=1);
 namespace pocketmine\nbt;
 
 use PHPUnit\Framework\TestCase;
+use pocketmine\nbt\tag\ByteArrayTag;
+use pocketmine\nbt\tag\ByteTag;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\DoubleTag;
+use pocketmine\nbt\tag\FloatTag;
+use pocketmine\nbt\tag\IntArrayTag;
+use pocketmine\nbt\tag\IntTag;
+use pocketmine\nbt\tag\ListTag;
+use pocketmine\nbt\tag\LongTag;
+use pocketmine\nbt\tag\ShortTag;
+use pocketmine\nbt\tag\StringTag;
 
 class CreateTagTest extends TestCase{
 
 	/**
-	 * Tests that all tags with declared constants in NBT can be created (with the exception of TAG_End)
+	 * Test that all known tag types can be deserialized
 	 *
 	 * @throws \Exception
-	 * @throws \ReflectionException
 	 */
 	public function testCreateTags() : void{
-		$consts = (new \ReflectionClass(NBT::class))->getConstants();
+		$root = new CompoundTag("compound", [
+			new ByteTag("byte", 1),
+			new ShortTag("short", 1),
+			new IntTag("int", 1),
+			new LongTag("long", 1),
+			new FloatTag("float", 1),
+			new DoubleTag("double", 1),
+			new ByteArrayTag("bytearray", "\x01"),
+			new StringTag("string", "string"),
+			new ListTag("list", [new ByteTag("")]),
+			new IntArrayTag("intarray", [1])
+		]);
 
-		/**
-		 * @var string $name
-		 */
-		foreach($consts as $name => $value){
-			if(strpos($name, "TAG_") === 0 and $name !== "TAG_End" and is_int($value)){
-				/** @var int $value */
+		$dat = (new BigEndianNbtSerializer())->write($root);
+		$root2 = (new BigEndianNbtSerializer())->read($dat);
 
-				try{
-					$tag = NBT::createTag($value);
-					self::assertEquals($value, $tag->getType());
-				}catch(NbtDataException $e){
-					self::assertTrue(false, "Could not create tag of type $name");
-				}
-			}
-		}
+		self::assertTrue($root->equals($root2));
 	}
 }

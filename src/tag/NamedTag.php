@@ -43,9 +43,10 @@ abstract class NamedTag{
 
 	/**
 	 * @param string $name
+	 *
 	 * @throws \InvalidArgumentException if the name is too long
 	 */
-	public function __construct(string $name = ""){
+	public function __construct(string $name){
 		if(strlen($name) > 32767){
 			throw new \InvalidArgumentException("Tag name cannot be more than 32767 bytes, got length " . strlen($name));
 		}
@@ -73,10 +74,16 @@ abstract class NamedTag{
 	abstract public function write(NbtStreamWriter $writer) : void;
 
 	/**
+	 * This function is abstract for the sake of gaining your attention. This needs to be added to whatever tag
+	 * deserializers exist so that this tag type can be deserialized correctly.
+	 *
+	 * @param string          $name
 	 * @param NbtStreamReader $reader
+	 *
+	 * @return NamedTag
 	 * @throws BinaryDataException
 	 */
-	abstract public function read(NbtStreamReader $reader) : void;
+	abstract public static function read(string $name, NbtStreamReader $reader) : NamedTag;
 
 	public function __toString(){
 		return $this->toString();

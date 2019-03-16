@@ -55,35 +55,37 @@ abstract class NBT{
 	public const TAG_IntArray = 11;
 
 	/**
-	 * @param int $type
+	 * @param int             $type
+	 * @param string          $name
+	 * @param NbtStreamReader $reader
 	 *
 	 * @return NamedTag
 	 * @throws NbtDataException
 	 */
-	public static function createTag(int $type) : NamedTag{
+	public static function createTag(int $type, string $name, NbtStreamReader $reader) : NamedTag{
 		switch($type){
 			case self::TAG_Byte:
-				return new ByteTag();
+				return ByteTag::read($name, $reader);
 			case self::TAG_Short:
-				return new ShortTag();
+				return ShortTag::read($name, $reader);
 			case self::TAG_Int:
-				return new IntTag();
+				return IntTag::read($name, $reader);
 			case self::TAG_Long:
-				return new LongTag();
+				return LongTag::read($name, $reader);
 			case self::TAG_Float:
-				return new FloatTag();
+				return FloatTag::read($name, $reader);
 			case self::TAG_Double:
-				return new DoubleTag();
+				return DoubleTag::read($name, $reader);
 			case self::TAG_ByteArray:
-				return new ByteArrayTag();
+				return ByteArrayTag::read($name, $reader);
 			case self::TAG_String:
-				return new StringTag();
+				return StringTag::read($name, $reader);
 			case self::TAG_List:
-				return new ListTag();
+				return ListTag::read($name, $reader);
 			case self::TAG_Compound:
-				return new CompoundTag();
+				return CompoundTag::read($name, $reader);
 			case self::TAG_IntArray:
-				return new IntArrayTag();
+				return IntArrayTag::read($name, $reader);
 			default:
 				throw new NbtDataException("Unknown NBT tag type $type");
 		}

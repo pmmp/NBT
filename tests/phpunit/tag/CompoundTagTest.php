@@ -27,7 +27,7 @@ use PHPUnit\Framework\TestCase;
 class CompoundTagTest extends TestCase{
 
 	public function testIteration() : void{
-		$tag = new CompoundTag();
+		$tag = new CompoundTag("");
 
 		for($i = 0; $i < 10; ++$i){
 			$tag->setString("hello$i", "$i");
@@ -54,7 +54,7 @@ class CompoundTagTest extends TestCase{
 	public function testAppendSyntax() : void{
 		$this->expectException(\InvalidArgumentException::class);
 
-		$tag = new CompoundTag();
+		$tag = new CompoundTag("");
 		$tag[] = new StringTag("test", "tag");
 	}
 
@@ -64,7 +64,7 @@ class CompoundTagTest extends TestCase{
 	 * @throws \Exception
 	 */
 	public function testClone() : void{
-		$tag = new CompoundTag();
+		$tag = new CompoundTag("");
 		$tag->setString("hello", "world");
 		$tag->setFloat("float", 5.5);
 		$tag->setTag(new ListTag("list"));
@@ -82,7 +82,7 @@ class CompoundTagTest extends TestCase{
 	 */
 	public function testRecursiveClone() : void{
 		//create recursive dependency
-		$tag = new CompoundTag();
+		$tag = new CompoundTag("");
 		$child = new CompoundTag("child");
 		$child->setTag($tag);
 		$tag->setTag($child);
@@ -92,7 +92,7 @@ class CompoundTagTest extends TestCase{
 	}
 
 	public function testCountable() : void{
-		$tag = new CompoundTag();
+		$tag = new CompoundTag("");
 		for($i = 0; $i < 5; ++$i){
 			$tag->setString("hello$i", "hello$i");
 		}
@@ -111,7 +111,7 @@ class CompoundTagTest extends TestCase{
 
 			for($i = 0; $i < 10; ++$i){
 				$tag->setTag(new CompoundTag("child$i", [
-					new StringTag("test"),
+					new StringTag("test", "hello"),
 					new IntArrayTag("array", array_fill(0, 25, $random)),
 					new ListTag("list", [
 						new ByteTag("", 1),
@@ -148,7 +148,7 @@ class CompoundTagTest extends TestCase{
 	}
 
 	public function testNumericStringKeys() : void{
-		$t = new CompoundTag();
+		$t = new CompoundTag("");
 		for($i = 0; $i < 10; ++$i){
 			$t->setTag(new StringTag("$i", "$i"));
 		}
