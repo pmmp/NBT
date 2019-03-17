@@ -35,7 +35,7 @@ final class ByteTag extends NamedTag{
 	 * @param string $name
 	 * @param int    $value
 	 */
-	public function __construct(string $name = "", int $value = 0){
+	public function __construct(string $name, int $value){
 		parent::__construct($name);
 		if($value < -128 or $value > 127){
 			throw new \InvalidArgumentException("Value $value is too large!");

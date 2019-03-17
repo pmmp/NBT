@@ -53,7 +53,7 @@ class CreateTagTest extends TestCase{
 			new DoubleTag("double", 1),
 			new ByteArrayTag("bytearray", "\x01"),
 			new StringTag("string", "string"),
-			new ListTag("list", [new ByteTag("")]),
+			new ListTag("list", [new ByteTag("", 0)]),
 			new IntArrayTag("intarray", [1])
 		]);
 
