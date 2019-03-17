@@ -23,17 +23,11 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt\tag;
 
-
-use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
-use pocketmine\utils\BinaryDataException;
 use function get_class;
 use function str_repeat;
-use function strlen;
 
-abstract class NamedTag{
-	/** @var string */
-	protected $__name;
+abstract class Tag{
 
 	/**
 	 * Used for recursive cloning protection when cloning tags with child tags.
@@ -41,66 +35,28 @@ abstract class NamedTag{
 	 */
 	protected $cloning = false;
 
-	/**
-	 * @param string $name
-	 *
-	 * @throws \InvalidArgumentException if the name is too long
-	 */
-	public function __construct(string $name){
-		if(strlen($name) > 32767){
-			throw new \InvalidArgumentException("Tag name cannot be more than 32767 bytes, got length " . strlen($name));
-		}
-		$this->__name = $name;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getName() : string{
-		return $this->__name;
-	}
-
-	/**
-	 * @param string $name
-	 */
-	public function setName(string $name) : void{
-		$this->__name = $name;
-	}
-
 	abstract public function getValue();
 
 	abstract public function getType() : int;
 
 	abstract public function write(NbtStreamWriter $writer) : void;
 
-	/**
-	 * This function is abstract for the sake of gaining your attention. This needs to be added to whatever tag
-	 * deserializers exist so that this tag type can be deserialized correctly.
-	 *
-	 * @param string          $name
-	 * @param NbtStreamReader $reader
-	 *
-	 * @return NamedTag
-	 * @throws BinaryDataException
-	 */
-	abstract public static function read(string $name, NbtStreamReader $reader) : NamedTag;
-
 	public function __toString(){
 		return $this->toString();
 	}
 
 	public function toString(int $indentation = 0) : string{
-		return str_repeat("  ", $indentation) . get_class($this) . ": " . ($this->__name !== "" ? "name='$this->__name', " : "") . "value='" . (string) $this->getValue() . "'";
+		return str_repeat("  ", $indentation) . get_class($this) . ": value='" . (string) $this->getValue() . "'";
 	}
 
 	/**
 	 * Clones this tag safely, detecting recursive dependencies which would otherwise cause an infinite cloning loop.
 	 * Used for cloning tags in tags that have children.
 	 *
-	 * @return NamedTag
+	 * @return Tag
 	 * @throws \RuntimeException if a recursive dependency was detected
 	 */
-	public function safeClone() : NamedTag{
+	public function safeClone() : Tag{
 		if($this->cloning){
 			throw new \RuntimeException("Recursive NBT tag dependency detected");
 		}
@@ -115,26 +71,14 @@ abstract class NamedTag{
 	}
 
 	/**
-	 * Compares this NamedTag to the given NamedTag and determines whether or not they are equal, based on name, type
-	 * and value.
-	 *
-	 * @param NamedTag $that
-	 *
-	 * @return bool
-	 */
-	public function equals(NamedTag $that) : bool{
-		return $this->__name === $that->__name and $this->equalsValue($that);
-	}
-
-	/**
-	 * Compares this NamedTag to the given NamedTag and determines whether they are equal, based on type and value only.
+	 * Compares this Tag to the given Tag and determines whether or not they are equal, based on type and value.
 	 * Complex tag types should override this to provide proper value comparison.
 	 *
-	 * @param NamedTag $that
+	 * @param Tag $that
 	 *
 	 * @return bool
 	 */
-	protected function equalsValue(NamedTag $that) : bool{
+	public function equals(Tag $that) : bool{
 		return $that instanceof $this and $this->getValue() === $that->getValue();
 	}
 }

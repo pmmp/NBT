@@ -30,17 +30,17 @@ class ByteTagTest extends TestCase{
 	public function testValue() : void{
 		$value = mt_rand(-128, 127);
 
-		$tag = new ByteTag("", $value);
+		$tag = new ByteTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
 
 	public function testTooLargeValue() : void{
 		self::expectException(\InvalidArgumentException::class);
-		new ByteTag("", 500);
+		new ByteTag(500);
 	}
 
 	public function testTooSmallValue() : void{
 		self::expectException(\InvalidArgumentException::class);
-		new ByteTag("", -129);
+		new ByteTag(-129);
 	}
 }

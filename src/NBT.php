@@ -35,9 +35,9 @@ use pocketmine\nbt\tag\IntArrayTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\LongTag;
-use pocketmine\nbt\tag\NamedTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
+use pocketmine\nbt\tag\Tag;
 
 abstract class NBT{
 
@@ -56,36 +56,35 @@ abstract class NBT{
 
 	/**
 	 * @param int             $type
-	 * @param string          $name
 	 * @param NbtStreamReader $reader
 	 *
-	 * @return NamedTag
+	 * @return Tag
 	 * @throws NbtDataException
 	 */
-	public static function createTag(int $type, string $name, NbtStreamReader $reader) : NamedTag{
+	public static function createTag(int $type, NbtStreamReader $reader) : Tag{
 		switch($type){
 			case self::TAG_Byte:
-				return ByteTag::read($name, $reader);
+				return ByteTag::read($reader);
 			case self::TAG_Short:
-				return ShortTag::read($name, $reader);
+				return ShortTag::read($reader);
 			case self::TAG_Int:
-				return IntTag::read($name, $reader);
+				return IntTag::read($reader);
 			case self::TAG_Long:
-				return LongTag::read($name, $reader);
+				return LongTag::read($reader);
 			case self::TAG_Float:
-				return FloatTag::read($name, $reader);
+				return FloatTag::read($reader);
 			case self::TAG_Double:
-				return DoubleTag::read($name, $reader);
+				return DoubleTag::read($reader);
 			case self::TAG_ByteArray:
-				return ByteArrayTag::read($name, $reader);
+				return ByteArrayTag::read($reader);
 			case self::TAG_String:
-				return StringTag::read($name, $reader);
+				return StringTag::read($reader);
 			case self::TAG_List:
-				return ListTag::read($name, $reader);
+				return ListTag::read($reader);
 			case self::TAG_Compound:
-				return CompoundTag::read($name, $reader);
+				return CompoundTag::read($reader);
 			case self::TAG_IntArray:
-				return IntArrayTag::read($name, $reader);
+				return IntArrayTag::read($reader);
 			default:
 				throw new NbtDataException("Unknown NBT tag type $type");
 		}

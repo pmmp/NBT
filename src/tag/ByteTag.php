@@ -27,16 +27,14 @@ use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 
-final class ByteTag extends NamedTag{
+final class ByteTag extends Tag{
 	/** @var int */
 	private $value;
 
 	/**
-	 * @param string $name
-	 * @param int    $value
+	 * @param int $value
 	 */
-	public function __construct(string $name, int $value){
-		parent::__construct($name);
+	public function __construct(int $value){
 		if($value < -128 or $value > 127){
 			throw new \InvalidArgumentException("Value $value is too large!");
 		}
@@ -47,8 +45,8 @@ final class ByteTag extends NamedTag{
 		return NBT::TAG_Byte;
 	}
 
-	public static function read(string $name, NbtStreamReader $reader) : NamedTag{
-		return new self($name, $reader->readSignedByte());
+	public static function read(NbtStreamReader $reader) : self{
+		return new self($reader->readSignedByte());
 	}
 
 	public function write(NbtStreamWriter $writer) : void{

@@ -31,22 +31,19 @@ use function gettype;
 use function is_object;
 use function str_repeat;
 
-final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
+final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 	use NoDynamicFieldsTrait;
 
 	/** @var int */
 	private $tagType;
-	/** @var \SplDoublyLinkedList|NamedTag[] */
+	/** @var \SplDoublyLinkedList|Tag[] */
 	private $value;
 
 	/**
-	 * @param string     $name
-	 * @param NamedTag[] $value
-	 * @param int        $tagType
+	 * @param Tag[] $value
+	 * @param int   $tagType
 	 */
-	public function __construct(string $name, array $value = [], int $tagType = NBT::TAG_End){
-		parent::__construct($name);
-
+	public function __construct(array $value = [], int $tagType = NBT::TAG_End){
 		$this->tagType = $tagType;
 		$this->value = new \SplDoublyLinkedList();
 		foreach($value as $tag){
@@ -55,7 +52,7 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 	}
 
 	/**
-	 * @return NamedTag[]
+	 * @return Tag[]
 	 */
 	public function getValue() : array{
 		$value = [];
@@ -100,7 +97,7 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 	 * @return CompoundTag|ListTag|mixed
 	 */
 	public function offsetGet($offset){
-		/** @var NamedTag|null $value */
+		/** @var Tag|null $value */
 		$value = $this->value[$offset] ?? null;
 
 		if($value instanceof \ArrayAccess){
@@ -114,17 +111,17 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 
 	/**
 	 * @param int|null $offset
-	 * @param NamedTag $value
+	 * @param Tag      $value
 	 *
 	 * @throws \TypeError if an incompatible tag type is given
-	 * @throws \TypeError if $value is not a NamedTag object
+	 * @throws \TypeError if $value is not a Tag object
 	 */
 	public function offsetSet($offset, $value) : void{
-		if($value instanceof NamedTag){
+		if($value instanceof Tag){
 			$this->checkTagType($value);
 			$this->value[$offset] = $value;
 		}else{
-			throw new \TypeError("Value set by ArrayAccess must be an instance of " . NamedTag::class . ", got " . (is_object($value) ? " instance of " . get_class($value) : gettype($value)));
+			throw new \TypeError("Value set by ArrayAccess must be an instance of " . Tag::class . ", got " . (is_object($value) ? " instance of " . get_class($value) : gettype($value)));
 		}
 	}
 
@@ -152,9 +149,9 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 	/**
 	 * Appends the specified tag to the end of the list.
 	 *
-	 * @param NamedTag $tag
+	 * @param Tag $tag
 	 */
-	public function push(NamedTag $tag) : void{
+	public function push(Tag $tag) : void{
 		$this->checkTagType($tag);
 		$this->value->push($tag);
 	}
@@ -162,18 +159,18 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 	/**
 	 * Removes the last tag from the list and returns it.
 	 *
-	 * @return NamedTag
+	 * @return Tag
 	 */
-	public function pop() : NamedTag{
+	public function pop() : Tag{
 		return $this->value->pop();
 	}
 
 	/**
 	 * Adds the specified tag to the start of the list.
 	 *
-	 * @param NamedTag $tag
+	 * @param Tag $tag
 	 */
-	public function unshift(NamedTag $tag) : void{
+	public function unshift(Tag $tag) : void{
 		$this->checkTagType($tag);
 		$this->value->unshift($tag);
 	}
@@ -181,9 +178,9 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 	/**
 	 * Removes the first tag from the list and returns it.
 	 *
-	 * @return NamedTag
+	 * @return Tag
 	 */
-	public function shift() : NamedTag{
+	public function shift() : Tag{
 		return $this->value->shift();
 	}
 
@@ -191,12 +188,12 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 	 * Inserts a tag into the list between existing tags, at the specified offset. Later values in the list are moved up
 	 * by 1 position.
 	 *
-	 * @param int      $offset
-	 * @param NamedTag $tag
+	 * @param int $offset
+	 * @param Tag $tag
 	 *
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
-	public function insert(int $offset, NamedTag $tag){
+	public function insert(int $offset, Tag $tag){
 		$this->checkTagType($tag);
 		$this->value->add($offset, $tag);
 	}
@@ -215,40 +212,40 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 	 *
 	 * @param int $offset
 	 *
-	 * @return NamedTag
+	 * @return Tag
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
-	public function get(int $offset) : NamedTag{
+	public function get(int $offset) : Tag{
 		return $this->value[$offset];
 	}
 
 	/**
 	 * Returns the element in the first position of the list, without removing it.
 	 *
-	 * @return NamedTag
+	 * @return Tag
 	 */
-	public function first() : NamedTag{
+	public function first() : Tag{
 		return $this->value->bottom();
 	}
 
 	/**
 	 * Returns the element in the last position in the list (the end), without removing it.
 	 *
-	 * @return NamedTag
+	 * @return Tag
 	 */
-	public function last() : NamedTag{
+	public function last() : Tag{
 		return $this->value->top();
 	}
 
 	/**
 	 * Overwrites the tag at the specified offset.
 	 *
-	 * @param int      $offset
-	 * @param NamedTag $tag
+	 * @param int $offset
+	 * @param Tag $tag
 	 *
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
-	public function set(int $offset, NamedTag $tag) : void{
+	public function set(int $offset, Tag $tag) : void{
 		$this->checkTagType($tag);
 		$this->value[$offset] = $tag;
 	}
@@ -301,12 +298,13 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 	}
 
 	/**
-	 * Type-checks the given NamedTag for addition to the list, updating the list tag type as appropriate.
-	 * @param NamedTag $tag
+	 * Type-checks the given Tag for addition to the list, updating the list tag type as appropriate.
+	 *
+	 * @param Tag $tag
 	 *
 	 * @throws \TypeError if the tag type is not compatible.
 	 */
-	private function checkTagType(NamedTag $tag) : void{
+	private function checkTagType(Tag $tag) : void{
 		$type = $tag->getType();
 		if($type !== $this->tagType){
 			if($this->tagType === NBT::TAG_End){
@@ -318,7 +316,7 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 		}
 	}
 
-	public static function read(string $name, NbtStreamReader $reader) : NamedTag{
+	public static function read(NbtStreamReader $reader) : self{
 		$value = [];
 		$tagType = $reader->readByte();
 		$size = $reader->readInt();
@@ -329,26 +327,26 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 			}
 
 			for($i = 0; $i < $size; ++$i){
-				$value[] = NBT::createTag($tagType, "", $reader);
+				$value[] = NBT::createTag($tagType, $reader);
 			}
 		}else{
 			$tagType = NBT::TAG_End; //Some older NBT implementations used TAG_Byte for empty lists.
 		}
-		return new self($name, $value, $tagType);
+		return new self($value, $tagType);
 	}
 
 	public function write(NbtStreamWriter $writer) : void{
 		$writer->writeByte($this->tagType);
 		$writer->writeInt($this->value->count());
-		/** @var NamedTag $tag */
+		/** @var Tag $tag */
 		foreach($this->value as $tag){
 			$tag->write($writer);
 		}
 	}
 
 	public function toString(int $indentation = 0) : string{
-		$str = str_repeat("  ", $indentation) . get_class($this) . ": " . ($this->__name !== "" ? "name='$this->__name', " : "") . "value={\n";
-		/** @var NamedTag $tag */
+		$str = str_repeat("  ", $indentation) . get_class($this) . ": value={\n";
+		/** @var Tag $tag */
 		foreach($this->value as $tag){
 			$str .= $tag->toString($indentation + 1) . "\n";
 		}
@@ -377,9 +375,9 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 	}
 
 	/**
-	 * @return NamedTag|null
+	 * @return Tag|null
 	 */
-	public function current() : ?NamedTag{
+	public function current() : ?Tag{
 		return $this->value->current();
 	}
 
@@ -394,14 +392,14 @@ final class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Itera
 		$this->value->rewind();
 	}
 
-	protected function equalsValue(NamedTag $that) : bool{
+	public function equals(Tag $that) : bool{
 		if(!($that instanceof $this) or $this->count() !== $that->count()){
 			return false;
 		}
 
 		foreach($this as $k => $v){
 			$other = $that->get($k);
-			if($other === null or !$v->equalsValue($other)){ //ListTag members don't have names, don't bother checking it
+			if($other === null or !$v->equals($other)){
 				return false;
 			}
 		}

@@ -30,7 +30,7 @@ class StringTagTest extends TestCase{
 	public function testValue() : void{
 		$value = "the quick brown fox jumped over the lazy dog";
 
-		$tag = new StringTag("", $value);
+		$tag = new StringTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
 
@@ -38,6 +38,6 @@ class StringTagTest extends TestCase{
 		self::expectException(\InvalidArgumentException::class);
 		$value = str_repeat("a", 35000);
 
-		new StringTag("", $value);
+		new StringTag($value);
 	}
 }

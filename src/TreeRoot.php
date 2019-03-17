@@ -23,34 +23,43 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
-use PHPUnit\Framework\TestCase;
-use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\ListTag;
+use function get_class;
 
-class CreateTagTest extends TestCase{
+/**
+ * This class wraps around the root CompoundTag for NBT files to avoid losing the name information.
+ */
+class TreeRoot{
+
+	/** @var CompoundTag */
+	private $root;
+	/** @var string */
+	private $name;
+
+	public function __construct(CompoundTag $root, string $name = ""){
+		$this->root = $root;
+		$this->name = $name;
+	}
 
 	/**
-	 * Test that all known tag types can be deserialized
-	 *
-	 * @throws \Exception
+	 * @return CompoundTag
 	 */
-	public function testCreateTags() : void{
-		$root = new TreeRoot(CompoundTag::create()
-			->setByte("byte", 1)
-			->setShort("short", 1)
-			->setInt("int", 1)
-			->setLong("long", 1)
-			->setFloat("float", 1)
-			->setDouble("double", 1)
-			->setByteArray("bytearray", "\x01")
-			->setString("string", "string")
-			->setTag("list", new ListTag([new ByteTag(1)]))
-			->setIntArray("intarray", [1]), "compound");
+	public function getTag() : CompoundTag{
+		return $this->root;
+	}
 
-		$dat = (new BigEndianNbtSerializer())->write($root);
-		$root2 = (new BigEndianNbtSerializer())->read($dat);
+	/**
+	 * @return string
+	 */
+	public function getName() : string{
+		return $this->name;
+	}
 
-		self::assertTrue($root->equals($root2));
+	public function equals(TreeRoot $that) : bool{
+		return $this->name === $that->name and $this->root->equals($that->root);
+	}
+
+	public function __toString(){
+		return get_class($this) . ":" . ($this->name !== "" ? " name=\"$this->name\"," : "") . " value=$this->root";
 	}
 }

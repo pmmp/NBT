@@ -29,7 +29,7 @@ class LongTagTest extends TestCase{
 	public function testValue() : void{
 		$value = mt_rand(0, 0x80000000000000);
 
-		$tag = new LongTag("", $value);
+		$tag = new LongTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
 }

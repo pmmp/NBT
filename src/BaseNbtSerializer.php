@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace pocketmine\nbt;
 
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\NamedTag;
 use pocketmine\utils\Binary;
 use pocketmine\utils\BinaryDataException;
 use pocketmine\utils\BinaryStream;
@@ -44,27 +43,40 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	/**
+	 * @return TreeRoot
+	 *
+	 * @throws BinaryDataException
+	 * @throws NbtDataException
+	 */
+	private function readRoot() : TreeRoot{
+		$type = $this->readByte();
+		if($type !== NBT::TAG_Compound){
+			throw new NbtDataException("Expected TAG_Compound at the start of buffer");
+		}
+
+		$rootName = $this->readString();
+		return new TreeRoot(CompoundTag::read($this), $rootName);
+	}
+
+	/**
 	 * Decodes NBT from the given binary string and returns it.
 	 *
 	 * @param string $buffer
 	 * @param int    &$offset
 	 *
-	 * @return CompoundTag
+	 * @return TreeRoot
 	 * @throws NbtDataException
 	 */
-	public function read(string $buffer, int &$offset = 0) : CompoundTag{
+	public function read(string $buffer, int &$offset = 0) : TreeRoot{
 		$this->buffer->setBuffer($buffer, $offset);
+
 		try{
-			$data = $this->readTag();
+			$data = $this->readRoot();
 		}catch(BinaryDataException $e){
 			throw new NbtDataException($e->getMessage(), 0, $e);
 		}
 		$offset = $this->buffer->getOffset();
 		$this->buffer->reset();
-
-		if(!($data instanceof CompoundTag)){
-			throw new NbtDataException("Expected TAG_Compound at the start of buffer");
-		}
 
 		return $data;
 	}
@@ -76,7 +88,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 *
 	 * @param string $buffer
 	 *
-	 * @return CompoundTag[]
+	 * @return TreeRoot[]
 	 * @throws NbtDataException
 	 */
 	public function readMultiple(string $buffer) : array{
@@ -86,14 +98,10 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 
 		while(!$this->buffer->feof()){
 			try{
-				$next = $this->readTag();
+				$retval[] = $this->readRoot();
 			}catch(BinaryDataException $e){
 				throw new NbtDataException($e->getMessage(), 0, $e);
 			}
-			if(!($next instanceof CompoundTag)){
-				throw new NbtDataException("Expected only TAG_Compound in multiple NBT buffer");
-			}
-			$retval[] = $next;
 		}
 
 		$this->buffer->reset();
@@ -109,10 +117,10 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 *
 	 * @param string $buffer
 	 *
-	 * @return CompoundTag
+	 * @return TreeRoot
 	 * @throws NbtDataException
 	 */
-	public function readCompressed(string $buffer) : CompoundTag{
+	public function readCompressed(string $buffer) : TreeRoot{
 		$raw = @zlib_decode($buffer); //silence useless warning
 		if($raw === false){
 			throw new NbtDataException("Failed to decompress NBT data");
@@ -120,65 +128,47 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 		return $this->read($raw);
 	}
 
+	private function writeRoot(TreeRoot $root) : void{
+		$this->writeByte(NBT::TAG_Compound);
+		$this->writeString($root->getName());
+		$root->getTag()->write($this);
+	}
+
 	/**
-	 * @param CompoundTag $data
+	 * @param TreeRoot $data
 	 *
 	 * @return string
 	 */
-	public function write(CompoundTag $data) : string{
+	public function write(TreeRoot $data) : string{
 		$this->buffer->reset();
 
-		$this->writeTag($data);
+		$this->writeRoot($data);
+
 		return $this->buffer->getBuffer();
 	}
 
 	/**
-	 * @param CompoundTag[] $data
+	 * @param TreeRoot[] $data
 	 *
 	 * @return string
 	 */
 	public function writeMultiple(array $data) : string{
 		$this->buffer->reset();
-		foreach($data as $tag){
-			$this->writeTag($tag);
+		foreach($data as $root){
+			$this->writeRoot($root);
 		}
 		return $this->buffer->getBuffer();
 	}
 
 	/**
-	 * @param CompoundTag $data
-	 * @param int         $compression
-	 * @param int         $level
+	 * @param TreeRoot $data
+	 * @param int      $compression
+	 * @param int      $level
 	 *
 	 * @return string
 	 */
-	public function writeCompressed(CompoundTag $data, int $compression = ZLIB_ENCODING_GZIP, int $level = 7) : string{
+	public function writeCompressed(TreeRoot $data, int $compression = ZLIB_ENCODING_GZIP, int $level = 7) : string{
 		return zlib_encode($this->write($data), $compression, $level);
-	}
-
-	/**
-	 * @return NamedTag|null
-	 *
-	 * @throws BinaryDataException
-	 * @throws NbtDataException
-	 */
-	public function readTag() : ?NamedTag{
-		$tagType = $this->readByte();
-		if($tagType === NBT::TAG_End){
-			return null;
-		}
-
-		return NBT::createTag($tagType, $this->readString(), $this);
-	}
-
-	public function writeTag(NamedTag $tag) : void{
-		$this->writeByte($tag->getType());
-		$this->writeString($tag->getName());
-		$tag->write($this);
-	}
-
-	public function writeEnd() : void{
-		$this->writeByte(NBT::TAG_End);
 	}
 
 	public function readByte() : int{

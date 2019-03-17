@@ -32,12 +32,11 @@ class ListTagTest extends TestCase{
 		$array = [];
 
 		for($i = 0; $i < 5; ++$i){
-			$array[] = new StringTag("", "test$i");
+			$array[] = new StringTag("test$i");
 		}
 
-		$list = new ListTag("jelly beans", $array);
+		$list = new ListTag($array);
 
-		self::assertEquals("jelly beans", $list->getName());
 		self::assertEquals(NBT::TAG_String, $list->getTagType());
 		self::assertCount(5, $list);
 	}
@@ -47,8 +46,8 @@ class ListTagTest extends TestCase{
 	 * @throws \Exception
 	 */
 	public function testTypeDetection() : void{
-		$list = new ListTag("test", [], NBT::TAG_End);
-		$list->push(new StringTag("", "works"));
+		$list = new ListTag([], NBT::TAG_End);
+		$list->push(new StringTag("works"));
 
 		self::assertEquals(NBT::TAG_String, $list->getTagType(), "Adding a tag to an empty list of TAG_End type should change its type");
 	}
@@ -59,25 +58,25 @@ class ListTagTest extends TestCase{
 	public function testAddWrongTypeEmptyList() : void{
 		$this->expectException(\TypeError::class);
 
-		$list = new ListTag("test2", [], NBT::TAG_Compound);
-		$list->push(new StringTag("", "shouldn't work"));
+		$list = new ListTag([], NBT::TAG_Compound);
+		$list->push(new StringTag("shouldn't work"));
 	}
 
 	/**
 	 * Empty lists can have their tag changed manually, no matter what type they are
 	 */
 	public function testSetEmptyListType() : void{
-		$list = new ListTag("test3", [], NBT::TAG_String);
+		$list = new ListTag([], NBT::TAG_String);
 
 		$list->setTagType(NBT::TAG_Compound);
-		$list->push(new CompoundTag(""));
+		$list->push(new CompoundTag());
 		self::assertCount(1, $list);
 
 		$list->shift(); //empty the list
 
 		//once it's empty, we can set its type again
 		$list->setTagType(NBT::TAG_Byte);
-		$list->push(new ByteTag("", 0));
+		$list->push(new ByteTag(0));
 		self::assertCount(1, $list);
 	}
 
@@ -87,8 +86,8 @@ class ListTagTest extends TestCase{
 	public function testSetNotEmptyListType() : void{
 		$this->expectException(\LogicException::class);
 
-		$list = new ListTag("test4");
-		$list->push(new StringTag("", "string"));
+		$list = new ListTag();
+		$list->push(new StringTag("string"));
 
 		$list->setTagType(NBT::TAG_Compound);
 	}
@@ -100,9 +99,9 @@ class ListTagTest extends TestCase{
 	 * @throws \Exception
 	 */
 	public function testClone() : void{
-		$tag = new ListTag("");
+		$tag = new ListTag();
 		for($i = 0; $i < 5; ++$i){
-			$tag->push(new StringTag("", "hi"));
+			$tag->push(new StringTag("hi"));
 		}
 
 		$tag2 = clone $tag;
@@ -118,8 +117,8 @@ class ListTagTest extends TestCase{
 	 */
 	public function testRecursiveClone() : void{
 		//create recursive dependency
-		$tag = new ListTag("");
-		$child = new ListTag("");
+		$tag = new ListTag();
+		$child = new ListTag();
 		$child->push($tag);
 		$tag->push($child);
 
@@ -133,11 +132,11 @@ class ListTagTest extends TestCase{
 	 * @throws \Exception
 	 */
 	public function testArrayPushTag() : void{
-		$list = new ListTag("");
+		$list = new ListTag();
 
 		$array = [];
 		for($i = 0; $i < 5; ++$i){
-			$child = new StringTag("", "test");
+			$child = new StringTag("test");
 			$list[] = $child;
 			$array[] = $child;
 		}
@@ -148,12 +147,12 @@ class ListTagTest extends TestCase{
 	}
 
 	/**
-	 * Non-NamedTag values cannot be assigned by array-access any more
+	 * Non-Tag values cannot be assigned by array-access any more
 	 */
 	public function testArrayPushPrimitiveValue() : void{
 		$this->expectException(\TypeError::class);
 
-		$list = new ListTag("", [], NBT::TAG_String);
+		$list = new ListTag([], NBT::TAG_String);
 		$list[] = "hello";
 	}
 
@@ -162,39 +161,39 @@ class ListTagTest extends TestCase{
 	 * @throws \Exception
 	 */
 	public function testOffsetSetTag() : void{
-		$list = new ListTag("", [
-			new StringTag("", "hello"),
-			new StringTag("", "world")
-		], NBT::TAG_String);
+		$list = new ListTag([
+								new StringTag("hello"),
+								new StringTag("world")
+							], NBT::TAG_String);
 
-		$list[0] = new StringTag("", "thinking");
-		$list[1] = new StringTag("", "harder");
+		$list[0] = new StringTag("thinking");
+		$list[1] = new StringTag("harder");
 
 		self::assertEquals("thinking", $list->get(0)->getValue());
 		self::assertEquals("harder", $list->get(1)->getValue());
 	}
 
 	/**
-	 * Non-NamedTag values cannot be assigned by array-access any more
+	 * Non-Tag values cannot be assigned by array-access any more
 	 * @throws \Exception
 	 */
 	public function testOffsetSetPrimitive() : void{
 		$this->expectException(\TypeError::class);
-		$list = new ListTag("", [
-			new StringTag("", "hello"),
-			new StringTag("", "world")
-		], NBT::TAG_String);
+		$list = new ListTag([
+								new StringTag("hello"),
+								new StringTag("world")
+							], NBT::TAG_String);
 
 		$list[0] = "thinking";
 	}
 
 	/**
-	 * Non-NamedTag values cannot be assigned by array-access any more
+	 * Non-Tag values cannot be assigned by array-access any more
 	 */
 	public function testOffsetSetPrimitiveNoTag() : void{
 		$this->expectException(\TypeError::class);
 
-		$list = new ListTag("", [], NBT::TAG_String);
+		$list = new ListTag([], NBT::TAG_String);
 		$list[0] = "hello";
 	}
 }

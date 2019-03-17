@@ -29,17 +29,17 @@ class IntTagTest extends TestCase{
 	public function testValue() : void{
 		$value = mt_rand();
 
-		$tag = new IntTag("", $value);
+		$tag = new IntTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
 
 	public function testTooLargeValue() : void{
 		self::expectException(\InvalidArgumentException::class);
-		new IntTag("", 2 ** 35);
+		new IntTag(2 ** 35);
 	}
 
 	public function testTooSmallValue() : void{
 		self::expectException(\InvalidArgumentException::class);
-		new IntTag("", -(2 ** 35));
+		new IntTag(-(2 ** 35));
 	}
 }

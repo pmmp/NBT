@@ -22,12 +22,13 @@
 namespace pocketmine\nbt\tag;
 
 use PHPUnit\Framework\TestCase;
+use function array_fill;
 
 
 class CompoundTagTest extends TestCase{
 
 	public function testIteration() : void{
-		$tag = new CompoundTag("");
+		$tag = new CompoundTag();
 
 		for($i = 0; $i < 10; ++$i){
 			$tag->setString("hello$i", "$i");
@@ -54,8 +55,8 @@ class CompoundTagTest extends TestCase{
 	public function testAppendSyntax() : void{
 		$this->expectException(\InvalidArgumentException::class);
 
-		$tag = new CompoundTag("");
-		$tag[] = new StringTag("test", "tag");
+		$tag = new CompoundTag();
+		$tag[] = new StringTag("tag");
 	}
 
 	/**
@@ -64,10 +65,10 @@ class CompoundTagTest extends TestCase{
 	 * @throws \Exception
 	 */
 	public function testClone() : void{
-		$tag = new CompoundTag("");
-		$tag->setString("hello", "world");
-		$tag->setFloat("float", 5.5);
-		$tag->setTag(new ListTag("list"));
+		$tag = CompoundTag::create()
+			->setString("hello", "world")
+			->setFloat("float", 5.5)
+			->setTag("list", new ListTag());
 
 		$tag2 = clone $tag;
 		self::assertEquals($tag->getCount(), $tag2->getCount());
@@ -82,17 +83,17 @@ class CompoundTagTest extends TestCase{
 	 */
 	public function testRecursiveClone() : void{
 		//create recursive dependency
-		$tag = new CompoundTag("");
-		$child = new CompoundTag("child");
-		$child->setTag($tag);
-		$tag->setTag($child);
+		$tag = new CompoundTag();
+		$child = new CompoundTag();
+		$child->setTag("parent", $tag);
+		$tag->setTag("child", $child);
 
 		$this->expectException(\RuntimeException::class);
 		clone $tag; //recursive dependency, throw exception
 	}
 
 	public function testCountable() : void{
-		$tag = new CompoundTag("");
+		$tag = new CompoundTag();
 		for($i = 0; $i < 5; ++$i){
 			$tag->setString("hello$i", "hello$i");
 		}
@@ -107,17 +108,19 @@ class CompoundTagTest extends TestCase{
 	public function testEquals() : void{
 		$random = mt_rand();
 		$prepare = function() use($random) : CompoundTag{
-			$tag = new CompoundTag("yummy");
+			$tag = new CompoundTag();
 
 			for($i = 0; $i < 10; ++$i){
-				$tag->setTag(new CompoundTag("child$i", [
-					new StringTag("test", "hello"),
-					new IntArrayTag("array", array_fill(0, 25, $random)),
-					new ListTag("list", [
-						new ByteTag("", 1),
-						new ByteTag("", 2)
-					])
-				]));
+				$tag->setTag(
+					"child$i",
+					CompoundTag::create()
+						->setString("test", "hello")
+						->setIntArray("array", array_fill(0, 25, $random))
+						->setTag("list", new ListTag([
+							new ByteTag(1),
+							new ByteTag(2)
+						]))
+				);
 			}
 
 			return $tag;
@@ -133,13 +136,11 @@ class CompoundTagTest extends TestCase{
 	}
 
 	public function testMerge() : void{
-		$t1 = new CompoundTag("", [
-			new StringTag("test1", "test1"),
-			new IntTag("test2", 2)
-		]);
-		$t2 = new CompoundTag("", [
-			new StringTag("test1", "replacement")
-		]);
+		$t1 = CompoundTag::create()
+			->setString("test1", "test1")
+			->setInt("test2", 2);
+		$t2 = CompoundTag::create()
+			->setString("test1", "replacement");
 
 		$merged = $t1->merge($t2);
 		self::assertSame("replacement", $merged->getString("test1"));
@@ -148,9 +149,9 @@ class CompoundTagTest extends TestCase{
 	}
 
 	public function testNumericStringKeys() : void{
-		$t = new CompoundTag("");
+		$t = new CompoundTag();
 		for($i = 0; $i < 10; ++$i){
-			$t->setTag(new StringTag("$i", "$i"));
+			$t->setTag("$i", new StringTag("$i"));
 		}
 
 		for($i = 0; $i < 10; ++$i){

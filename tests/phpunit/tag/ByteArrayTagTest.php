@@ -30,7 +30,7 @@ class ByteArrayTagTest extends TestCase{
 	public function testValue() : void{
 		$value = random_bytes(8192);
 
-		$tag = new ByteArrayTag("", $value);
+		$tag = new ByteArrayTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
 }

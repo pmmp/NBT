@@ -30,9 +30,9 @@ use pocketmine\nbt\tag\FloatTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\LongTag;
-use pocketmine\nbt\tag\NamedTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
+use pocketmine\nbt\tag\Tag;
 use pocketmine\utils\BinaryDataException;
 use pocketmine\utils\BinaryStream;
 use function is_numeric;
@@ -58,7 +58,7 @@ class JsonNbtParser{
 			if(($b = $stream->get(1)) !== "{"){
 				throw new NbtDataException("Syntax error: expected compound start but got '$b'");
 			}
-			$ret = self::parseCompound($stream, ""); //don't return directly, syntax needs to be validated
+			$ret = self::parseCompound($stream); //don't return directly, syntax needs to be validated
 		}catch(BinaryDataException $e){
 			throw new NbtDataException("Syntax error: " . $e->getMessage() . " at offset " . $stream->getOffset());
 		}
@@ -71,14 +71,13 @@ class JsonNbtParser{
 
 	/**
 	 * @param BinaryStream $stream
-	 * @param string       $name
 	 *
 	 * @return ListTag
 	 * @throws BinaryDataException
 	 * @throws NbtDataException
 	 */
-	private static function parseList(BinaryStream $stream, string $name = "") : ListTag{
-		$retval = new ListTag($name);
+	private static function parseList(BinaryStream $stream) : ListTag{
+		$retval = new ListTag();
 
 		if(self::skipWhitespace($stream, "]")){
 			while(!$stream->feof()){
@@ -88,7 +87,7 @@ class JsonNbtParser{
 				}
 			}
 
-			throw new NbtDataException("Syntax error: unexpected end of stream reading tag '$name'");
+			throw new NbtDataException("Syntax error: unexpected end of stream");
 		}
 
 		return $retval;
@@ -96,14 +95,13 @@ class JsonNbtParser{
 
 	/**
 	 * @param BinaryStream $stream
-	 * @param string       $name
 	 *
 	 * @return CompoundTag
 	 * @throws BinaryDataException
 	 * @throws NbtDataException
 	 */
-	private static function parseCompound(BinaryStream $stream, string $name = "") : CompoundTag{
-		$retval = new CompoundTag($name);
+	private static function parseCompound(BinaryStream $stream) : CompoundTag{
+		$retval = new CompoundTag();
 
 		if(self::skipWhitespace($stream, "}")){
 			while(!$stream->feof()){
@@ -111,14 +109,14 @@ class JsonNbtParser{
 				if($retval->hasTag($k)){
 					throw new NbtDataException("Syntax error: duplicate compound leaf node '$k'");
 				}
-				$retval->setTag(self::readValue($stream, $k));
+				$retval->setTag($k, self::readValue($stream));
 
 				if(self::readBreak($stream, "}")){
 					return $retval;
 				}
 			}
 
-			throw new NbtDataException("Syntax error: unexpected end of stream reading tag '$name'");
+			throw new NbtDataException("Syntax error: unexpected end of stream");
 		}
 
 		return $retval;
@@ -175,13 +173,12 @@ class JsonNbtParser{
 
 	/**
 	 * @param BinaryStream $stream
-	 * @param string       $name
 	 *
-	 * @return NamedTag
+	 * @return Tag
 	 * @throws BinaryDataException
 	 * @throws NbtDataException
 	 */
-	private static function readValue(BinaryStream $stream, string $name = "") : NamedTag{
+	private static function readValue(BinaryStream $stream) : Tag{
 		$value = "";
 		$inQuotes = false;
 
@@ -189,7 +186,7 @@ class JsonNbtParser{
 
 		$foundEnd = false;
 
-		/** @var NamedTag|null $retval */
+		/** @var Tag|null $retval */
 		$retval = null;
 
 		while(!$stream->feof()){
@@ -233,7 +230,7 @@ class JsonNbtParser{
 						throw new NbtDataException("Syntax error: unexpected compound start at offset $offset (enclose in double quotes for literal)");
 					}
 
-					$retval = self::parseCompound($stream, $name);
+					$retval = self::parseCompound($stream);
 					$foundEnd = true;
 
 				}elseif($c === "["){ //start of list tag - TODO: arrays
@@ -241,7 +238,7 @@ class JsonNbtParser{
 						throw new NbtDataException("Syntax error: unexpected list start at offset $offset (enclose in double quotes for literal)");
 					}
 
-					$retval = self::parseList($stream, $name);
+					$retval = self::parseList($stream);
 					$foundEnd = true;
 
 				}else{ //any other character
@@ -274,26 +271,26 @@ class JsonNbtParser{
 				$value = (float) $part;
 				switch($last){
 					case "d":
-						return new DoubleTag($name, $value);
+						return new DoubleTag($value);
 					case "f":
 					default:
-						return new FloatTag($name, $value);
+						return new FloatTag($value);
 				}
 			}else{
 				$value = (int) $part;
 				switch($last){
 					case "b":
-						return new ByteTag($name, $value);
+						return new ByteTag($value);
 					case "s":
-						return new ShortTag($name, $value);
+						return new ShortTag($value);
 					case "l":
-						return new LongTag($name, $value);
+						return new LongTag($value);
 					default:
-						return new IntTag($name, $value);
+						return new IntTag($value);
 				}
 			}
 		}else{
-			return new StringTag($name, $value);
+			return new StringTag($value);
 		}
 	}
 

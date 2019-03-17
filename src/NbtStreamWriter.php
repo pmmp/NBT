@@ -23,16 +23,10 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
-use pocketmine\nbt\tag\NamedTag;
-
 /**
  * @internal
  */
 interface NbtStreamWriter{
-
-	public function writeTag(NamedTag $tag) : void;
-
-	public function writeEnd() : void;
 
 	public function writeByte(int $v) : void;
 

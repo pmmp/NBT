@@ -30,17 +30,17 @@ class ShortTagTest extends TestCase{
 	public function testValue() : void{
 		$value = mt_rand(-0x8000, 0x7fff);
 
-		$tag = new ShortTag("", $value);
+		$tag = new ShortTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
 
 	public function testTooLargeValue() : void{
 		self::expectException(\InvalidArgumentException::class);
-		new ShortTag("", 99999);
+		new ShortTag(99999);
 	}
 
 	public function testTooSmallValue() : void{
 		self::expectException(\InvalidArgumentException::class);
-		new ShortTag("", -80000);
+		new ShortTag(-80000);
 	}
 }

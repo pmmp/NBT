@@ -30,7 +30,7 @@ class IntArrayTagTest extends TestCase{
 	public function testValue() : void{
 		$value = array_fill(0, 256, mt_rand());
 
-		$tag = new IntArrayTag("", $value);
+		$tag = new IntArrayTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
 }

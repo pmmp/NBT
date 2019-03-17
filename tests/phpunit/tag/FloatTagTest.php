@@ -30,7 +30,7 @@ class FloatTagTest extends TestCase{
 	public function testValue() : void{
 		$value = mt_rand() / mt_getrandmax();
 
-		$tag = new FloatTag("", $value);
+		$tag = new FloatTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
 }

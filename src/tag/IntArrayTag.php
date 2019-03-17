@@ -32,17 +32,14 @@ use function implode;
 use function is_int;
 use function str_repeat;
 
-final class IntArrayTag extends NamedTag{
+final class IntArrayTag extends Tag{
 	/** @var int[] */
 	private $value;
 
 	/**
-	 * @param string $name
-	 * @param int[]  $value
+	 * @param int[] $value
 	 */
-	public function __construct(string $name, array $value){
-		parent::__construct($name);
-
+	public function __construct(array $value){
 		assert((function() use(&$value){
 			foreach($value as $v){
 				if(!is_int($v)){
@@ -60,8 +57,8 @@ final class IntArrayTag extends NamedTag{
 		return NBT::TAG_IntArray;
 	}
 
-	public static function read(string $name, NbtStreamReader $reader) : NamedTag{
-		return new self($name, $reader->readIntArray());
+	public static function read(NbtStreamReader $reader) : self{
+		return new self($reader->readIntArray());
 	}
 
 	public function write(NbtStreamWriter $writer) : void{
@@ -69,7 +66,7 @@ final class IntArrayTag extends NamedTag{
 	}
 
 	public function toString(int $indentation = 0) : string{
-		return str_repeat("  ", $indentation) . get_class($this) . ": " . ($this->__name !== "" ? "name='$this->__name', " : "") . "value=[" . implode(",", $this->value) . "]";
+		return str_repeat("  ", $indentation) . get_class($this) . ": value=[" . implode(",", $this->value) . "]";
 	}
 
 	/**

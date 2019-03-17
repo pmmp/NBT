@@ -30,7 +30,7 @@ class DoubleTagTest extends TestCase{
 	public function testValue() : void{
 		$value = mt_rand() / mt_getrandmax();
 
-		$tag = new DoubleTag("", $value);
+		$tag = new DoubleTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
 }

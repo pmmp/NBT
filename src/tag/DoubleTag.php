@@ -27,16 +27,14 @@ use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 
-final class DoubleTag extends NamedTag{
+final class DoubleTag extends Tag{
 	/** @var float */
 	private $value;
 
 	/**
-	 * @param string $name
-	 * @param float  $value
+	 * @param float $value
 	 */
-	public function __construct(string $name, float $value){
-		parent::__construct($name);
+	public function __construct(float $value){
 		$this->value = $value;
 	}
 
@@ -44,8 +42,8 @@ final class DoubleTag extends NamedTag{
 		return NBT::TAG_Double;
 	}
 
-	public static function read(string $name, NbtStreamReader $reader) : NamedTag{
-		return new self($name, $reader->readDouble());
+	public static function read(NbtStreamReader $reader) : self{
+		return new self($reader->readDouble());
 	}
 
 	public function write(NbtStreamWriter $writer) : void{

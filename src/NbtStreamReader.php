@@ -23,19 +23,12 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
-use pocketmine\nbt\tag\NamedTag;
 use pocketmine\utils\BinaryDataException;
 
 /**
  * @internal
  */
 interface NbtStreamReader{
-
-	/**
-	 * @return NamedTag|null
-	 * @throws BinaryDataException
-	 */
-	public function readTag() : ?NamedTag;
 
 	/**
 	 * @return int
