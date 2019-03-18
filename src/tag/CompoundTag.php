@@ -46,14 +46,8 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	/** @var Tag[] */
 	private $value = [];
 
-	/**
-	 * @param Tag[] $value
-	 */
-	public function __construct(array $value = []){
-		self::restrictArgCount(__METHOD__, func_num_args(), 1);
-		foreach($value as $k => $tag){
-			$this->setTag($k, $tag);
-		}
+	public function __construct(){
+		self::restrictArgCount(__METHOD__, func_num_args(), 0);
 	}
 
 	/**
@@ -463,15 +457,15 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	}
 
 	public static function read(NbtStreamReader $reader) : self{
-		$value = [];
+		$result = new self;
 		for($type = $reader->readByte(); $type !== NBT::TAG_End; $type = $reader->readByte()){
 			$name = $reader->readString();
 			$tag = NBT::createTag($type, $reader);
 			if($name !== ""){ //TODO: reevaluate this condition
-				$value[$name] = $tag;
+				$result->setTag($name, $tag);
 			}
 		}
-		return new self($value);
+		return $result;
 	}
 
 	public function write(NbtStreamWriter $writer) : void{

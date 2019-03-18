@@ -169,7 +169,7 @@ class CompoundTagTest extends TestCase{
 	public function testTooManyConstructorArgs() : void{
 		$this->expectException(\ArgumentCountError::class);
 
-		new CompoundTag([], "hello");
+		new CompoundTag("hello");
 	}
 
 	//TODO: add more tests
