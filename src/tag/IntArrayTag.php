@@ -27,6 +27,7 @@ use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 use function assert;
+use function func_num_args;
 use function get_class;
 use function implode;
 use function is_int;
@@ -40,6 +41,7 @@ final class IntArrayTag extends Tag{
 	 * @param int[] $value
 	 */
 	public function __construct(array $value){
+		self::restrictArgCount(__METHOD__, func_num_args(), 1);
 		assert((function() use(&$value){
 			foreach($value as $v){
 				if(!is_int($v)){

@@ -33,4 +33,10 @@ class DoubleTagTest extends TestCase{
 		$tag = new DoubleTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
+
+	public function testTooManyConstructorArgs() : void{
+		$this->expectException(\ArgumentCountError::class);
+
+		new DoubleTag(1, "world");
+	}
 }

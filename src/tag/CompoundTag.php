@@ -29,6 +29,7 @@ use pocketmine\nbt\NbtStreamWriter;
 use function assert;
 use function count;
 use function current;
+use function func_num_args;
 use function get_class;
 use function gettype;
 use function is_a;
@@ -49,6 +50,7 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	 * @param Tag[] $value
 	 */
 	public function __construct(array $value = []){
+		self::restrictArgCount(__METHOD__, func_num_args(), 1);
 		foreach($value as $k => $tag){
 			$this->setTag($k, $tag);
 		}

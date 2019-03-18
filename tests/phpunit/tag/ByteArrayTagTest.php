@@ -33,4 +33,10 @@ class ByteArrayTagTest extends TestCase{
 		$tag = new ByteArrayTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
+
+	public function testTooManyConstructorArgs() : void{
+		$this->expectException(\ArgumentCountError::class);
+
+		new ByteArrayTag("hello", "world");
+	}
 }

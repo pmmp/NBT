@@ -26,6 +26,7 @@ namespace pocketmine\nbt\tag;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
+use function func_num_args;
 use function strlen;
 
 final class StringTag extends Tag{
@@ -36,6 +37,7 @@ final class StringTag extends Tag{
 	 * @param string $value
 	 */
 	public function __construct(string $value){
+		self::restrictArgCount(__METHOD__, func_num_args(), 1);
 		if(strlen($value) > 32767){
 			throw new \InvalidArgumentException("StringTag cannot hold more than 32767 bytes, got string of length " . strlen($value));
 		}

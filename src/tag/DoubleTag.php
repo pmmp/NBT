@@ -26,6 +26,7 @@ namespace pocketmine\nbt\tag;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
+use function func_num_args;
 
 final class DoubleTag extends Tag{
 	/** @var float */
@@ -35,6 +36,7 @@ final class DoubleTag extends Tag{
 	 * @param float $value
 	 */
 	public function __construct(float $value){
+		self::restrictArgCount(__METHOD__, func_num_args(), 1);
 		$this->value = $value;
 	}
 

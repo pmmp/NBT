@@ -43,4 +43,10 @@ class ByteTagTest extends TestCase{
 		self::expectException(\InvalidArgumentException::class);
 		new ByteTag(-129);
 	}
+
+	public function testTooManyConstructorArgs() : void{
+		$this->expectException(\ArgumentCountError::class);
+
+		new ByteTag(1, "world");
+	}
 }

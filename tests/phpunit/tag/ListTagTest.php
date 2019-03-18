@@ -196,4 +196,10 @@ class ListTagTest extends TestCase{
 		$list = new ListTag([], NBT::TAG_String);
 		$list[0] = "hello";
 	}
+
+	public function testTooManyConstructorArgs() : void{
+		$this->expectException(\ArgumentCountError::class);
+
+		new ListTag([new IntTag(1)], NBT::TAG_End, "world");
+	}
 }

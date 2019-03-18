@@ -32,4 +32,10 @@ class LongTagTest extends TestCase{
 		$tag = new LongTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
+
+	public function testTooManyConstructorArgs() : void{
+		$this->expectException(\ArgumentCountError::class);
+
+		new LongTag(1, "world");
+	}
 }

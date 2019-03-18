@@ -81,4 +81,10 @@ abstract class Tag{
 	public function equals(Tag $that) : bool{
 		return $that instanceof $this and $this->getValue() === $that->getValue();
 	}
+
+	protected static function restrictArgCount(string $func, int $haveArgs, int $wantMaxArgs) : void{
+		if($haveArgs > $wantMaxArgs){
+			throw new \ArgumentCountError("$func() expects at most $wantMaxArgs parameters, $haveArgs given");
+		}
+	}
 }

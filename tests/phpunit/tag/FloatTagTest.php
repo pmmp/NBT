@@ -33,4 +33,10 @@ class FloatTagTest extends TestCase{
 		$tag = new FloatTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
+
+	public function testTooManyConstructorArgs() : void{
+		$this->expectException(\ArgumentCountError::class);
+
+		new FloatTag(1, "world");
+	}
 }

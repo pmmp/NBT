@@ -40,4 +40,10 @@ class StringTagTest extends TestCase{
 
 		new StringTag($value);
 	}
+
+	public function testTooManyConstructorArgs() : void{
+		$this->expectException(\ArgumentCountError::class);
+
+		new StringTag("hello", "world");
+	}
 }

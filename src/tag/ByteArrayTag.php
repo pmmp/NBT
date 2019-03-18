@@ -26,6 +26,7 @@ namespace pocketmine\nbt\tag;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
+use function func_num_args;
 
 final class ByteArrayTag extends Tag{
 	/** @var string */
@@ -35,6 +36,7 @@ final class ByteArrayTag extends Tag{
 	 * @param string $value
 	 */
 	public function __construct(string $value){
+		self::restrictArgCount(__METHOD__, func_num_args(), 1);
 		$this->value = $value;
 	}
 

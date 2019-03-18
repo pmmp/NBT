@@ -26,6 +26,7 @@ namespace pocketmine\nbt\tag;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
+use function func_num_args;
 
 final class IntTag extends Tag{
 	/** @var int */
@@ -35,6 +36,7 @@ final class IntTag extends Tag{
 	 * @param int $value
 	 */
 	public function __construct(int $value){
+		self::restrictArgCount(__METHOD__, func_num_args(), 1);
 		if($value < -0x80000000 or $value > 0x7fffffff){
 			throw new \InvalidArgumentException("Value $value is too large!");
 		}

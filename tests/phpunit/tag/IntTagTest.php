@@ -42,4 +42,10 @@ class IntTagTest extends TestCase{
 		self::expectException(\InvalidArgumentException::class);
 		new IntTag(-(2 ** 35));
 	}
+
+	public function testTooManyConstructorArgs() : void{
+		$this->expectException(\ArgumentCountError::class);
+
+		new IntTag(1, "world");
+	}
 }

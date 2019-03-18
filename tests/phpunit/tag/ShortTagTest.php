@@ -43,4 +43,10 @@ class ShortTagTest extends TestCase{
 		self::expectException(\InvalidArgumentException::class);
 		new ShortTag(-80000);
 	}
+
+	public function testTooManyConstructorArgs() : void{
+		$this->expectException(\ArgumentCountError::class);
+
+		new ShortTag(1, "world");
+	}
 }

@@ -33,4 +33,10 @@ class IntArrayTagTest extends TestCase{
 		$tag = new IntArrayTag($value);
 		self::assertSame($value, $tag->getValue());
 	}
+
+	public function testTooManyConstructorArgs() : void{
+		$this->expectException(\ArgumentCountError::class);
+
+		new IntArrayTag([1], "world");
+	}
 }

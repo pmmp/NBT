@@ -26,6 +26,7 @@ namespace pocketmine\nbt\tag;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
+use function func_num_args;
 use function get_class;
 use function gettype;
 use function is_object;
@@ -44,6 +45,7 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 	 * @param int   $tagType
 	 */
 	public function __construct(array $value = [], int $tagType = NBT::TAG_End){
+		self::restrictArgCount(__METHOD__, func_num_args(), 2);
 		$this->tagType = $tagType;
 		$this->value = new \SplDoublyLinkedList();
 		foreach($value as $tag){
