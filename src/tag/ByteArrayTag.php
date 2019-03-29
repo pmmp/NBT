@@ -25,6 +25,7 @@ namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NBTStream;
+use pocketmine\nbt\ReaderTracker;
 use function strlen;
 
 #include <rules/NBT.h>
@@ -46,7 +47,7 @@ class ByteArrayTag extends NamedTag{
 		return NBT::TAG_ByteArray;
 	}
 
-	public function read(NBTStream $nbt) : void{
+	public function read(NBTStream $nbt, ReaderTracker $tracker) : void{
 		$this->value = $nbt->get($nbt->getInt());
 	}
 

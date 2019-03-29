@@ -25,6 +25,7 @@ namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NBTStream;
+use pocketmine\nbt\ReaderTracker;
 use function get_class;
 use function gettype;
 use function is_object;
@@ -318,7 +319,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 		}
 	}
 
-	public function read(NBTStream $nbt) : void{
+	public function read(NBTStream $nbt, ReaderTracker $tracker) : void{
 		$this->value = new \SplDoublyLinkedList();
 		$this->tagType = $nbt->getByte();
 		$size = $nbt->getInt();
@@ -328,12 +329,14 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 				throw new \UnexpectedValueException("Unexpected non-empty list of TAG_End");
 			}
 
-			$tagBase = NBT::createTag($this->tagType);
-			for($i = 0; $i < $size; ++$i){
-				$tag = clone $tagBase;
-				$tag->read($nbt);
-				$this->value->push($tag);
-			}
+			$tracker->protectDepth(function() use($nbt, $tracker, $size){
+				$tagBase = NBT::createTag($this->tagType);
+				for($i = 0; $i < $size; ++$i){
+					$tag = clone $tagBase;
+					$tag->read($nbt, $tracker);
+					$this->value->push($tag);
+				}
+			});
 		}else{
 			$this->tagType = NBT::TAG_End; //Some older NBT implementations used TAG_Byte for empty lists.
 		}

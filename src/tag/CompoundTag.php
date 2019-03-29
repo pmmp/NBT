@@ -25,6 +25,7 @@ namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NBTStream;
+use pocketmine\nbt\ReaderTracker;
 use function assert;
 use function count;
 use function current;
@@ -437,14 +438,16 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 		return NBT::TAG_Compound;
 	}
 
-	public function read(NBTStream $nbt) : void{
+	public function read(NBTStream $nbt, ReaderTracker $tracker) : void{
 		$this->value = [];
-		do{
-			$tag = $nbt->readTag();
-			if($tag !== null and $tag->__name !== ""){
-				$this->value[$tag->__name] = $tag;
-			}
-		}while($tag !== null);
+		$tracker->protectDepth(function() use($nbt, $tracker){
+			do{
+				$tag = $nbt->readTag($tracker);
+				if($tag !== null and $tag->__name !== ""){
+					$this->value[$tag->__name] = $tag;
+				}
+			}while($tag !== null);
+		});
 	}
 
 	public function write(NBTStream $nbt) : void{

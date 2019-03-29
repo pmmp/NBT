@@ -25,6 +25,7 @@ namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NBTStream;
+use pocketmine\nbt\ReaderTracker;
 
 #include <rules/NBT.h>
 
@@ -48,7 +49,7 @@ class ShortTag extends NamedTag{
 		return NBT::TAG_Short;
 	}
 
-	public function read(NBTStream $nbt) : void{
+	public function read(NBTStream $nbt, ReaderTracker $tracker) : void{
 		$this->value = $nbt->getSignedShort();
 	}
 

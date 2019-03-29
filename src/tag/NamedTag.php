@@ -25,6 +25,7 @@ namespace pocketmine\nbt\tag;
 
 
 use pocketmine\nbt\NBTStream;
+use pocketmine\nbt\ReaderTracker;
 use function get_class;
 use function str_repeat;
 use function strlen;
@@ -70,7 +71,7 @@ abstract class NamedTag{
 
 	abstract public function write(NBTStream $nbt) : void;
 
-	abstract public function read(NBTStream $nbt) : void;
+	abstract public function read(NBTStream $nbt, ReaderTracker $tracker) : void;
 
 	public function __toString(){
 		return $this->toString();

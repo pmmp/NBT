@@ -21,43 +21,32 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\nbt\tag;
+namespace pocketmine\nbt;
 
-use pocketmine\nbt\NBT;
-use pocketmine\nbt\NBTStream;
-use pocketmine\nbt\ReaderTracker;
+class ReaderTracker{
 
-#include <rules/NBT.h>
+	/** @var int */
+	private $maxDepth;
+	/** @var int */
+	private $currentDepth = 0;
 
-class DoubleTag extends NamedTag{
-	/** @var float */
-	private $value;
-
-	/**
-	 * @param string $name
-	 * @param float  $value
-	 */
-	public function __construct(string $name = "", float $value = 0.0){
-		parent::__construct($name);
-		$this->value = $value;
-	}
-
-	public function getType() : int{
-		return NBT::TAG_Double;
-	}
-
-	public function read(NBTStream $nbt, ReaderTracker $tracker) : void{
-		$this->value = $nbt->getDouble();
-	}
-
-	public function write(NBTStream $nbt) : void{
-		$nbt->putDouble($this->value);
+	public function __construct(int $maxDepth){
+		$this->maxDepth = $maxDepth;
 	}
 
 	/**
-	 * @return float
+	 * @param \Closure $execute
+	 *
+	 * @throws \UnexpectedValueException if the recursion depth is too deep
 	 */
-	public function getValue() : float{
-		return $this->value;
+	public function protectDepth(\Closure $execute) : void{
+		if($this->maxDepth > 0 and ++$this->currentDepth > $this->maxDepth){
+			throw new \UnexpectedValueException("Nesting level too deep: reached max depth of $this->maxDepth tags");
+		}
+		try{
+			$execute();
+		}finally{
+			--$this->currentDepth;
+		}
 	}
 }

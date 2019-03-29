@@ -81,13 +81,14 @@ abstract class NBTStream{
 	 * @param string $buffer
 	 * @param bool   $doMultiple Whether to keep reading after the first tag if there are more bytes in the buffer
 	 * @param int    &$offset
+	 * @param int    $maxDepth
 	 *
 	 * @return NamedTag|NamedTag[]
 	 */
-	public function read(string $buffer, bool $doMultiple = false, int &$offset = 0){
+	public function read(string $buffer, bool $doMultiple = false, int &$offset = 0, int $maxDepth = 0){
 		$this->offset = &$offset;
 		$this->buffer = $buffer;
-		$data = $this->readTag();
+		$data = $this->readTag(new ReaderTracker($maxDepth));
 
 		if($data === null){
 			throw new \InvalidArgumentException("Found TAG_End at the start of buffer");
@@ -96,7 +97,7 @@ abstract class NBTStream{
 		if($doMultiple and !$this->feof()){
 			$data = [$data];
 			do{
-				$tag = $this->readTag();
+				$tag = $this->readTag(new ReaderTracker($maxDepth));
 				if($tag !== null){
 					$data[] = $tag;
 				}
@@ -157,7 +158,7 @@ abstract class NBTStream{
 		return false;
 	}
 
-	public function readTag() : ?NamedTag{
+	public function readTag(ReaderTracker $tracker) : ?NamedTag{
 		$tagType = $this->getByte();
 		if($tagType === NBT::TAG_End){
 			return null;
@@ -165,7 +166,7 @@ abstract class NBTStream{
 
 		$tag = NBT::createTag($tagType);
 		$tag->setName($this->getString());
-		$tag->read($this);
+		$tag->read($this, $tracker);
 
 		return $tag;
 	}
