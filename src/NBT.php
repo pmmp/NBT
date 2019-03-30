@@ -57,11 +57,12 @@ abstract class NBT{
 	/**
 	 * @param int             $type
 	 * @param NbtStreamReader $reader
+	 * @param ReaderTracker   $tracker
 	 *
 	 * @return Tag
 	 * @throws NbtDataException
 	 */
-	public static function createTag(int $type, NbtStreamReader $reader) : Tag{
+	public static function createTag(int $type, NbtStreamReader $reader, ReaderTracker $tracker) : Tag{
 		switch($type){
 			case self::TAG_Byte:
 				return ByteTag::read($reader);
@@ -80,9 +81,9 @@ abstract class NBT{
 			case self::TAG_String:
 				return StringTag::read($reader);
 			case self::TAG_List:
-				return ListTag::read($reader);
+				return ListTag::read($reader, $tracker);
 			case self::TAG_Compound:
-				return CompoundTag::read($reader);
+				return CompoundTag::read($reader, $tracker);
 			case self::TAG_IntArray:
 				return IntArrayTag::read($reader);
 			default:

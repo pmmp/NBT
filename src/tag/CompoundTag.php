@@ -26,6 +26,7 @@ namespace pocketmine\nbt\tag;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
+use pocketmine\nbt\ReaderTracker;
 use function assert;
 use function count;
 use function current;
@@ -456,15 +457,17 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 		return NBT::TAG_Compound;
 	}
 
-	public static function read(NbtStreamReader $reader) : self{
+	public static function read(NbtStreamReader $reader, ReaderTracker $tracker) : self{
 		$result = new self;
-		for($type = $reader->readByte(); $type !== NBT::TAG_End; $type = $reader->readByte()){
-			$name = $reader->readString();
-			$tag = NBT::createTag($type, $reader);
-			if($name !== ""){ //TODO: reevaluate this condition
-				$result->setTag($name, $tag);
+		$tracker->protectDepth(static function() use($reader, $tracker, $result){
+			for($type = $reader->readByte(); $type !== NBT::TAG_End; $type = $reader->readByte()){
+				$name = $reader->readString();
+				$tag = NBT::createTag($type, $reader, $tracker);
+				if($name !== ""){ //TODO: reevaluate this condition
+					$result->setTag($name, $tag);
+				}
 			}
-		}
+		});
 		return $result;
 	}
 

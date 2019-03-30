@@ -43,19 +43,21 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	/**
+	 * @param int $maxDepth
+	 *
 	 * @return TreeRoot
 	 *
 	 * @throws BinaryDataException
 	 * @throws NbtDataException
 	 */
-	private function readRoot() : TreeRoot{
+	private function readRoot(int $maxDepth) : TreeRoot{
 		$type = $this->readByte();
 		if($type !== NBT::TAG_Compound){
 			throw new NbtDataException("Expected TAG_Compound at the start of buffer");
 		}
 
 		$rootName = $this->readString();
-		return new TreeRoot(CompoundTag::read($this), $rootName);
+		return new TreeRoot(CompoundTag::read($this, new ReaderTracker($maxDepth)), $rootName);
 	}
 
 	/**
@@ -63,15 +65,16 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 *
 	 * @param string $buffer
 	 * @param int    &$offset
+	 * @param int    $maxDepth
 	 *
 	 * @return TreeRoot
 	 * @throws NbtDataException
 	 */
-	public function read(string $buffer, int &$offset = 0) : TreeRoot{
+	public function read(string $buffer, int &$offset = 0, int $maxDepth = 0) : TreeRoot{
 		$this->buffer->setBuffer($buffer, $offset);
 
 		try{
-			$data = $this->readRoot();
+			$data = $this->readRoot($maxDepth);
 		}catch(BinaryDataException $e){
 			throw new NbtDataException($e->getMessage(), 0, $e);
 		}
@@ -87,18 +90,19 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * TODO: This is only necessary because we don't have a streams API worth mentioning. Get rid of this in the future.
 	 *
 	 * @param string $buffer
+	 * @param int    $maxDepth
 	 *
 	 * @return TreeRoot[]
 	 * @throws NbtDataException
 	 */
-	public function readMultiple(string $buffer) : array{
+	public function readMultiple(string $buffer, int $maxDepth = 0) : array{
 		$this->buffer->setBuffer($buffer);
 
 		$retval = [];
 
 		while(!$this->buffer->feof()){
 			try{
-				$retval[] = $this->readRoot();
+				$retval[] = $this->readRoot($maxDepth);
 			}catch(BinaryDataException $e){
 				throw new NbtDataException($e->getMessage(), 0, $e);
 			}
@@ -116,16 +120,18 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * TODO: This is only necessary because we don't have a streams API worth mentioning. Get rid of this in the future.
 	 *
 	 * @param string $buffer
+	 * @param int    $maxDepth
 	 *
 	 * @return TreeRoot
 	 * @throws NbtDataException
 	 */
-	public function readCompressed(string $buffer) : TreeRoot{
+	public function readCompressed(string $buffer, int $maxDepth = 0) : TreeRoot{
 		$raw = @zlib_decode($buffer); //silence useless warning
 		if($raw === false){
 			throw new NbtDataException("Failed to decompress NBT data");
 		}
-		return $this->read($raw);
+		$_ = 0;
+		return $this->read($raw, $_, $maxDepth);
 	}
 
 	private function writeRoot(TreeRoot $root) : void{
