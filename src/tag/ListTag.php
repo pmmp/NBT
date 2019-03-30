@@ -329,7 +329,7 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 				throw new \UnexpectedValueException("Unexpected non-empty list of TAG_End");
 			}
 
-			$tracker->protectDepth(static function() use($size, $tagType, $reader, $tracker){
+			$tracker->protectDepth(static function() use($size, $tagType, $reader, $tracker, &$value){
 				for($i = 0; $i < $size; ++$i){
 					$value[] = NBT::createTag($tagType, $reader, $tracker);
 				}
