@@ -198,8 +198,32 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 		$this->buffer->put($v);
 	}
 
+	/**
+	 * @param int $len
+	 * @return int
+	 * @throws NbtDataException
+	 */
+	protected static function checkReadStringLength(int $len) : int{
+		if($len > 32767){
+			throw new NbtDataException("NBT string length too large ($len > 32767)");
+		}
+		return $len;
+	}
+
+	/**
+	 * @param int $len
+	 * @return int
+	 * @throws \InvalidArgumentException
+	 */
+	protected static function checkWriteStringLength(int $len) : int{
+		if($len > 32767){
+			throw new \InvalidArgumentException("NBT string length too large ($len > 32767)");
+		}
+		return $len;
+	}
+
 	public function readString() : string{
-		return $this->buffer->get($this->readShort());
+		return $this->buffer->get(self::checkReadStringLength($this->readShort()));
 	}
 
 	/**
@@ -207,11 +231,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @throws \InvalidArgumentException if the string is too long
 	 */
 	public function writeString(string $v) : void{
-		$len = strlen($v);
-		if($len > 32767){
-			throw new \InvalidArgumentException("NBT strings cannot be longer than 32767 bytes, got $len bytes");
-		}
-		$this->writeShort($len);
+		$this->writeShort(self::checkWriteStringLength(strlen($v)));
 		$this->buffer->put($v);
 	}
 }
