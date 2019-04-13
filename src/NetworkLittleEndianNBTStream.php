@@ -50,15 +50,11 @@ class NetworkLittleEndianNBTStream extends LittleEndianNBTStream{
 	}
 
 	public function getString() : string{
-		return $this->get(Binary::readUnsignedVarInt($this->buffer, $this->offset));
+		return $this->get(self::checkReadStringLength(Binary::readUnsignedVarInt($this->buffer, $this->offset)));
 	}
 
 	public function putString(string $v) : void{
-		$len = strlen($v);
-		if($len > 32767){
-			throw new \InvalidArgumentException("NBT strings cannot be longer than 32767 bytes, got $len bytes");
-		}
-		$this->put(Binary::writeUnsignedVarInt($len) . $v);
+		$this->put(Binary::writeUnsignedVarInt(self::checkWriteStringLength(strlen($v))) . $v);
 	}
 
 	public function getIntArray() : array{

@@ -218,8 +218,12 @@ abstract class NBTStream{
 
 	abstract public function putDouble(float $v) : void;
 
+	/**
+	 * @return string
+	 * @throws \UnexpectedValueException if a too-large string is found (length may be invalid)
+	 */
 	public function getString() : string{
-		return $this->get($this->getShort());
+		return $this->get(self::checkReadStringLength($this->getShort()));
 	}
 
 	/**
@@ -227,12 +231,32 @@ abstract class NBTStream{
 	 * @throws \InvalidArgumentException if the string is too long
 	 */
 	public function putString(string $v) : void{
-		$len = strlen($v);
-		if($len > 32767){
-			throw new \InvalidArgumentException("NBT strings cannot be longer than 32767 bytes, got $len bytes");
-		}
-		$this->putShort($len);
+		$this->putShort(self::checkWriteStringLength(strlen($v)));
 		$this->put($v);
+	}
+
+	/**
+	 * @param int $len
+	 * @return int
+	 * @throws \UnexpectedValueException
+	 */
+	protected static function checkReadStringLength(int $len) : int{
+		if($len > 32767){
+			throw new \UnexpectedValueException("NBT string length too large ($len > 32767)");
+		}
+		return $len;
+	}
+
+	/**
+	 * @param int $len
+	 * @return int
+	 * @throws \InvalidArgumentException
+	 */
+	protected static function checkWriteStringLength(int $len) : int{
+		if($len > 32767){
+			throw new \InvalidArgumentException("NBT string length too large ($len > 32767)");
+		}
+		return $len;
 	}
 
 	/**
