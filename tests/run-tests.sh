@@ -18,5 +18,5 @@ fi
 
 curl https://phar.phpunit.de/phpunit-7.phar --silent --location -o phpunit.phar
 
-"$PHP_BINARY" phpunit.phar --bootstrap vendor/autoload.php tests/phpunit
+"$PHP_BINARY" -dxdebug.max_nesting_level=3000 phpunit.phar --bootstrap vendor/autoload.php tests/phpunit
 
