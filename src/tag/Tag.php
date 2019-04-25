@@ -25,7 +25,6 @@ namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NbtStreamWriter;
 use function get_class;
-use function str_repeat;
 
 abstract class Tag{
 
@@ -46,7 +45,7 @@ abstract class Tag{
 	}
 
 	public function toString(int $indentation = 0) : string{
-		return str_repeat("  ", $indentation) . get_class($this) . ": value='" . (string) $this->getValue() . "'";
+		return get_class($this) . ": value='" . (string) $this->getValue() . "'";
 	}
 
 	/**

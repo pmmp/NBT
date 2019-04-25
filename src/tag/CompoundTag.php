@@ -481,9 +481,9 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	}
 
 	public function toString(int $indentation = 0) : string{
-		$str = str_repeat("  ", $indentation) . get_class($this) . ": value={\n";
+		$str = get_class($this) . ": value={\n";
 		foreach($this->value as $name => $tag){
-			$str .= str_repeat("  ", $indentation + 1) . "\"$name\" =>\n" . $tag->toString($indentation + 1) . "\n";
+			$str .= str_repeat("  ", $indentation + 1) . "\"$name\" => " . $tag->toString($indentation + 1) . "\n";
 		}
 		return $str . str_repeat("  ", $indentation) . "}";
 	}

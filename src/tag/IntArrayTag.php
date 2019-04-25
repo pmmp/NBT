@@ -31,7 +31,6 @@ use function func_num_args;
 use function get_class;
 use function implode;
 use function is_int;
-use function str_repeat;
 
 final class IntArrayTag extends Tag{
 	/** @var int[] */
@@ -68,7 +67,7 @@ final class IntArrayTag extends Tag{
 	}
 
 	public function toString(int $indentation = 0) : string{
-		return str_repeat("  ", $indentation) . get_class($this) . ": value=[" . implode(",", $this->value) . "]";
+		return get_class($this) . ": value=[" . implode(",", $this->value) . "]";
 	}
 
 	/**
