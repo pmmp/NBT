@@ -480,8 +480,8 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 		$writer->writeByte(NBT::TAG_End);
 	}
 
-	public function toString(int $indentation = 0) : string{
-		$str = get_class($this) . ": value={\n";
+	protected function stringifyValue(int $indentation) : string{
+		$str = "{\n";
 		foreach($this->value as $name => $tag){
 			$str .= str_repeat("  ", $indentation + 1) . "\"$name\" => " . $tag->toString($indentation + 1) . "\n";
 		}

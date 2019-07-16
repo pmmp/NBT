@@ -66,8 +66,8 @@ final class IntArrayTag extends ImmutableTag{
 		$writer->writeIntArray($this->value);
 	}
 
-	public function toString(int $indentation = 0) : string{
-		return get_class($this) . ": value=[" . implode(",", $this->value) . "]";
+	protected function stringifyValue(int $indentation) : string{
+		return "[" . implode(",", $this->value) . "]";
 	}
 
 	/**

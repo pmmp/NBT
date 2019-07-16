@@ -349,8 +349,8 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 		}
 	}
 
-	public function toString(int $indentation = 0) : string{
-		$str = get_class($this) . ": value={\n";
+	protected function stringifyValue(int $indentation) : string{
+		$str = "{\n";
 		/** @var Tag $tag */
 		foreach($this->value as $tag){
 			$str .= str_repeat("  ", $indentation + 1) . $tag->toString($indentation + 1) . "\n";

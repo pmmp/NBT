@@ -58,4 +58,8 @@ final class FloatTag extends ImmutableTag{
 	public function getValue() : float{
 		return $this->value;
 	}
+
+	protected function stringifyValue(int $indentation) : string{
+		return (string) $this->value;
+	}
 }

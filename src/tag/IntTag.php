@@ -61,4 +61,8 @@ final class IntTag extends ImmutableTag{
 	public function getValue() : int{
 		return $this->value;
 	}
+
+	protected function stringifyValue(int $indentation) : string{
+		return (string) $this->value;
+	}
 }

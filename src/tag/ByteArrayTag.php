@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt\tag;
 
+use function base64_encode;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
@@ -57,5 +58,9 @@ final class ByteArrayTag extends ImmutableTag{
 	 */
 	public function getValue() : string{
 		return $this->value;
+	}
+
+	protected function stringifyValue(int $indentation) : string{
+		return "b64:" . base64_encode($this->value);
 	}
 }

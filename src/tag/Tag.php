@@ -44,9 +44,11 @@ abstract class Tag{
 		return $this->toString();
 	}
 
-	public function toString(int $indentation = 0) : string{
-		return get_class($this) . ": value='" . (string) $this->getValue() . "'";
+	final public function toString(int $indentation = 0) : string{
+		return get_class($this) . ": value=" . $this->stringifyValue($indentation);
 	}
+
+	abstract protected function stringifyValue(int $indentation) : string;
 
 	/**
 	 * Clones this tag safely, detecting recursive dependencies which would otherwise cause an infinite cloning loop.
