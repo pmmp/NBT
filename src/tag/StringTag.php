@@ -29,7 +29,7 @@ use pocketmine\nbt\NbtStreamWriter;
 use function func_num_args;
 use function strlen;
 
-final class StringTag extends Tag{
+final class StringTag extends ImmutableTag{
 	/** @var string */
 	private $value;
 

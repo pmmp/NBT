@@ -32,7 +32,7 @@ use function get_class;
 use function implode;
 use function is_int;
 
-final class IntArrayTag extends Tag{
+final class IntArrayTag extends ImmutableTag{
 	/** @var int[] */
 	private $value;
 

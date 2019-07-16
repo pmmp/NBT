@@ -74,7 +74,11 @@ class CompoundTagTest extends TestCase{
 		self::assertEquals($tag->getCount(), $tag2->getCount());
 
 		foreach($tag2 as $name => $child){
-			self::assertNotSame($child, $tag->getTag($name));
+			if($child instanceof ImmutableTag){
+				self::assertSame($child, $tag->getTag($name));
+			}else{
+				self::assertNotSame($child, $tag->getTag($name));
+			}
 		}
 	}
 

@@ -368,6 +368,10 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 		$this->value = $new;
 	}
 
+	protected function makeCopy(){
+		return clone $this;
+	}
+
 	public function next() : void{
 		$this->value->next();
 	}

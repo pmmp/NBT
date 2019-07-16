@@ -61,13 +61,18 @@ abstract class Tag{
 		}
 		$this->cloning = true;
 
-		$retval = clone $this;
+		$retval = $this->makeCopy();
 
 		$this->cloning = false;
 		$retval->cloning = false;
 
 		return $retval;
 	}
+
+	/**
+	 * @return static
+	 */
+	abstract protected function makeCopy();
 
 	/**
 	 * Compares this Tag to the given Tag and determines whether or not they are equal, based on type and value.

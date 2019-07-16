@@ -28,7 +28,7 @@ use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 use function func_num_args;
 
-final class ByteTag extends Tag{
+final class ByteTag extends ImmutableTag{
 	/** @var int */
 	private $value;
 

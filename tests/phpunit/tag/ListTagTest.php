@@ -108,7 +108,11 @@ class ListTagTest extends TestCase{
 		self::assertEquals($tag->getCount(), $tag2->getCount());
 
 		foreach($tag2 as $index => $child){
-			self::assertNotSame($child, $tag->get($index));
+			if($child instanceof ImmutableTag){
+				self::assertSame($child, $tag->get($index));
+			}else{
+				self::assertNotSame($child, $tag->get($index));
+			}
 		}
 	}
 

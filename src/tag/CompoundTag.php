@@ -494,6 +494,10 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 		}
 	}
 
+	protected function makeCopy(){
+		return clone $this;
+	}
+
 	public function next() : void{
 		next($this->value);
 	}
