@@ -23,10 +23,10 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt\tag;
 
-use function base64_encode;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
+use function base64_encode;
 use function func_num_args;
 
 final class ByteArrayTag extends ImmutableTag{

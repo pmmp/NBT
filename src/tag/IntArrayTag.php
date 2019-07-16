@@ -28,7 +28,6 @@ use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 use function assert;
 use function func_num_args;
-use function get_class;
 use function implode;
 use function is_int;
 
