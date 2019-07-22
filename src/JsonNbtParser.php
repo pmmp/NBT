@@ -196,6 +196,7 @@ class JsonNbtParser{
 			if($inQuotes){ //anything is allowed inside quotes, except unescaped quotes
 				if($c === '"'){
 					$inQuotes = false;
+					$retval = new StringTag($name, $value);
 					$foundEnd = true;
 				}elseif($c === "\\"){
 					$value .= $stream->get(1);
