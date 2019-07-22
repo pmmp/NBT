@@ -124,7 +124,7 @@ class JsonNbtParser{
 				continue;
 			}
 
-			--$stream->offset;
+			$stream->setOffset($stream->getOffset() - 1);
 			return true;
 		}
 
@@ -142,7 +142,7 @@ class JsonNbtParser{
 		if($stream->feof()){
 			throw new \UnexpectedValueException("Syntax error: unexpected end of stream, expected '$terminator'");
 		}
-		$offset = $stream->offset;
+		$offset = $stream->getOffset();
 		$c = $stream->get(1);
 		if($c === ","){
 			return false;
@@ -165,7 +165,7 @@ class JsonNbtParser{
 		$value = "";
 		$inQuotes = false;
 
-		$offset = $stream->offset;
+		$offset = $stream->getOffset();
 
 		$foundEnd = false;
 
@@ -173,7 +173,7 @@ class JsonNbtParser{
 		$retval = null;
 
 		while(!$stream->feof()){
-			$offset = $stream->offset;
+			$offset = $stream->getOffset();
 			$c = $stream->get(1);
 
 			if($inQuotes){ //anything is allowed inside quotes, except unescaped quotes
@@ -187,7 +187,7 @@ class JsonNbtParser{
 				}
 			}else{
 				if($c === "," or $c === "}" or $c === "]"){ //end of parent tag
-					$stream->offset--; //the caller needs to be able to read this character
+					$stream->setOffset($stream->getOffset() - 1); //the caller needs to be able to read this character
 					$foundEnd = true;
 					break;
 				}
@@ -285,7 +285,7 @@ class JsonNbtParser{
 	 */
 	private static function readKey(BinaryStream $stream) : string{
 		$key = "";
-		$offset = $stream->offset;
+		$offset = $stream->getOffset();
 
 		$inQuotes = false;
 		$foundEnd = false;
