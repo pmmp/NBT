@@ -35,12 +35,12 @@ class ByteTagTest extends TestCase{
 	}
 
 	public function testTooLargeValue() : void{
-		self::expectException(\InvalidArgumentException::class);
+		$this->expectException(\InvalidArgumentException::class);
 		new ByteTag("", 500);
 	}
 
 	public function testTooSmallValue() : void{
-		self::expectException(\InvalidArgumentException::class);
+		$this->expectException(\InvalidArgumentException::class);
 		new ByteTag("", -129);
 	}
 }

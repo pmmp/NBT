@@ -35,12 +35,12 @@ class ShortTagTest extends TestCase{
 	}
 
 	public function testTooLargeValue() : void{
-		self::expectException(\InvalidArgumentException::class);
+		$this->expectException(\InvalidArgumentException::class);
 		new ShortTag("", 99999);
 	}
 
 	public function testTooSmallValue() : void{
-		self::expectException(\InvalidArgumentException::class);
+		$this->expectException(\InvalidArgumentException::class);
 		new ShortTag("", -80000);
 	}
 }

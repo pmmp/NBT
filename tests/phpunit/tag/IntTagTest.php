@@ -34,12 +34,12 @@ class IntTagTest extends TestCase{
 	}
 
 	public function testTooLargeValue() : void{
-		self::expectException(\InvalidArgumentException::class);
+		$this->expectException(\InvalidArgumentException::class);
 		new IntTag("", 2 ** 35);
 	}
 
 	public function testTooSmallValue() : void{
-		self::expectException(\InvalidArgumentException::class);
+		$this->expectException(\InvalidArgumentException::class);
 		new IntTag("", -(2 ** 35));
 	}
 }
