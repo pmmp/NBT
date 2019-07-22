@@ -35,7 +35,7 @@ class StringTagTest extends TestCase{
 	}
 
 	public function testTooLongValue() : void{
-		self::expectException(\InvalidArgumentException::class);
+		$this->expectException(\InvalidArgumentException::class);
 		$value = str_repeat("a", 35000);
 
 		new StringTag($value);

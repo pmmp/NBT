@@ -140,7 +140,7 @@ class JsonNbtParser{
 				continue;
 			}
 
-			--$stream->offset;
+			$stream->setOffset($stream->getOffset() - 1);
 			return true;
 		}
 
@@ -204,7 +204,7 @@ class JsonNbtParser{
 				}
 			}else{
 				if($c === "," or $c === "}" or $c === "]"){ //end of parent tag
-					$stream->offset--; //the caller needs to be able to read this character
+					$stream->setOffset($stream->getOffset() - 1); //the caller needs to be able to read this character
 					$foundEnd = true;
 					break;
 				}
@@ -303,7 +303,7 @@ class JsonNbtParser{
 	 */
 	private static function readKey(BinaryStream $stream) : string{
 		$key = "";
-		$offset = $stream->offset;
+		$offset = $stream->getOffset();
 
 		$inQuotes = false;
 		$foundEnd = false;
