@@ -64,7 +64,7 @@ abstract class NBTStream{
 			return substr($this->buffer, $this->offset);
 		}
 
-		return $len === 1 ? $this->buffer{$this->offset++} : substr($this->buffer, ($this->offset += $len) - $len, $len);
+		return $len === 1 ? $this->buffer[$this->offset++] : substr($this->buffer, ($this->offset += $len) - $len, $len);
 	}
 
 	public function put(string $v) : void{
@@ -72,7 +72,7 @@ abstract class NBTStream{
 	}
 
 	public function feof() : bool{
-		return !isset($this->buffer{$this->offset});
+		return !isset($this->buffer[$this->offset]);
 	}
 
 	/**
@@ -320,12 +320,12 @@ abstract class NBTStream{
 						$isIntArray = false;
 					}
 				}
-				$tag{$key} = $isNumeric ? ($isIntArray ? new IntArrayTag($key, []) : new ListTag($key, [])) : new CompoundTag($key, []);
+				$tag[$key] = $isNumeric ? ($isIntArray ? new IntArrayTag($key, []) : new ListTag($key, [])) : new CompoundTag($key, []);
 				self::tagFromArray($tag->{$key}, $value, $guesser);
 			}else{
 				$v = call_user_func($guesser, $key, $value);
 				if($v instanceof NamedTag){
-					$tag{$key} = $v;
+					$tag[$key] = $v;
 				}
 			}
 		}
