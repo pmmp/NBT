@@ -64,6 +64,6 @@ final class StringTag extends ImmutableTag{
 	}
 
 	protected function stringifyValue(int $indentation) : string{
-		return $this->value;
+		return '"' . $this->value . '"';
 	}
 }
