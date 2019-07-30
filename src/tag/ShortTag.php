@@ -26,22 +26,13 @@ namespace pocketmine\nbt\tag;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
-use function func_num_args;
 
 final class ShortTag extends ImmutableTag{
-	/** @var int */
-	private $value;
+	use IntegerishTagTrait;
 
-	/**
-	 * @param int $value
-	 */
-	public function __construct(int $value){
-		self::restrictArgCount(__METHOD__, func_num_args(), 1);
-		if($value < -0x8000 or $value > 0x7fff){
-			throw new \InvalidArgumentException("Value $value is too large!");
-		}
-		$this->value = $value;
-	}
+	protected function min() : int{ return -0x8000; }
+
+	protected function max() : int{ return 0x7fff; }
 
 	public function getType() : int{
 		return NBT::TAG_Short;
@@ -53,16 +44,5 @@ final class ShortTag extends ImmutableTag{
 
 	public function write(NbtStreamWriter $writer) : void{
 		$writer->writeShort($this->value);
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getValue() : int{
-		return $this->value;
-	}
-
-	protected function stringifyValue(int $indentation) : string{
-		return (string) $this->value;
 	}
 }
