@@ -45,6 +45,7 @@ use function zlib_encode;
 #ifndef COMPILE
 use pocketmine\utils\Binary;
 #endif
+use pocketmine\utils\BinaryDataException;
 
 #include <rules/NBT.h>
 
@@ -56,12 +57,31 @@ abstract class NBTStream{
 	public $buffer = "";
 	public $offset = 0;
 
+	/**
+	 * @param int|bool $len
+	 *
+	 * @return string
+	 *
+	 * @throws BinaryDataException if there are not enough bytes left in the buffer
+	 */
 	public function get($len) : string{
-		if($len < 0){
-			$this->offset = strlen($this->buffer) - 1;
+		if($len === 0){
 			return "";
-		}elseif($len === true){
-			return substr($this->buffer, $this->offset);
+		}
+
+		$buflen = strlen($this->buffer);
+		if($len === true){
+			$str = substr($this->buffer, $this->offset);
+			$this->offset = $buflen;
+			return $str;
+		}
+		if($len < 0){
+			$this->offset = $buflen - 1;
+			return "";
+		}
+		$remaining = $buflen - $this->offset;
+		if($remaining < $len){
+			throw new BinaryDataException("Not enough bytes left in buffer: need $len, have $remaining");
 		}
 
 		return $len === 1 ? $this->buffer[$this->offset++] : substr($this->buffer, ($this->offset += $len) - $len, $len);
