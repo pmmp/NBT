@@ -87,8 +87,8 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	/**
 	 * Returns the tag with the specified name, or null if it does not exist.
 	 *
-	 * @param string      $name
-	 * @param string|null $expectedClass Class that extends Tag
+	 * @param string $name
+	 * @param string $expectedClass Class that extends Tag
 	 *
 	 * @return Tag|null
 	 * @throws \RuntimeException if the tag exists and is not of the expected type (if specified)
