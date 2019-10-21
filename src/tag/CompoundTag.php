@@ -87,8 +87,8 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	/**
 	 * Returns the tag with the specified name, or null if it does not exist.
 	 *
-	 * @param string      $name
-	 * @param string|null $expectedClass Class that extends NamedTag
+	 * @param string $name
+	 * @param string $expectedClass Class that extends NamedTag
 	 *
 	 * @return NamedTag|null
 	 * @throws \RuntimeException if the tag exists and is not of the expected type (if specified)
