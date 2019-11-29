@@ -53,6 +53,10 @@ final class IntArrayTag extends ImmutableTag{
 		$this->value = $value;
 	}
 
+	protected function getTypeName() : string{
+		return "IntArray";
+	}
+
 	public function getType() : int{
 		return NBT::TAG_IntArray;
 	}

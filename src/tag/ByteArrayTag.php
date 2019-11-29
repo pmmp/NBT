@@ -41,6 +41,10 @@ final class ByteArrayTag extends ImmutableTag{
 		$this->value = $value;
 	}
 
+	protected function getTypeName() : string{
+		return "ByteArray";
+	}
+
 	public function getType() : int{
 		return NBT::TAG_ByteArray;
 	}

@@ -36,6 +36,10 @@ final class LongTag extends ImmutableTag{
 
 	protected function max() : int{ return 0x7fffffffffffffff; }
 
+	protected function getTypeName() : string{
+		return "Long";
+	}
+
 	public function getType() : int{
 		return NBT::TAG_Long;
 	}

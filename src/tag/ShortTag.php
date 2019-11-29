@@ -34,6 +34,10 @@ final class ShortTag extends ImmutableTag{
 
 	protected function max() : int{ return 0x7fff; }
 
+	protected function getTypeName() : string{
+		return "Short";
+	}
+
 	public function getType() : int{
 		return NBT::TAG_Short;
 	}

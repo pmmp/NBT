@@ -44,6 +44,10 @@ final class StringTag extends ImmutableTag{
 		$this->value = $value;
 	}
 
+	protected function getTypeName() : string{
+		return "String";
+	}
+
 	public function getType() : int{
 		return NBT::TAG_String;
 	}

@@ -40,6 +40,10 @@ final class FloatTag extends ImmutableTag{
 		$this->value = $value;
 	}
 
+	protected function getTypeName() : string{
+		return "Float";
+	}
+
 	public function getType() : int{
 		return NBT::TAG_Float;
 	}

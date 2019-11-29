@@ -36,6 +36,10 @@ final class IntTag extends ImmutableTag{
 
 	protected function max() : int{ return 0x7fffffff; }
 
+	protected function getTypeName() : string{
+		return "Int";
+	}
+
 	public function getType() : int{
 		return NBT::TAG_Int;
 	}

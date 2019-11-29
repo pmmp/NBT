@@ -40,6 +40,10 @@ final class DoubleTag extends ImmutableTag{
 		$this->value = $value;
 	}
 
+	protected function getTypeName() : string{
+		return "Double";
+	}
+
 	public function getType() : int{
 		return NBT::TAG_Double;
 	}

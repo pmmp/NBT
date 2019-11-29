@@ -60,6 +60,6 @@ class TreeRoot{
 	}
 
 	public function __toString(){
-		return get_class($this) . " {\n  " . ($this->name !== "" ? "\"$this->name\" => " : "") . $this->root->toString(1) . "\n}";
+		return "ROOT {\n  " . ($this->name !== "" ? "\"$this->name\" => " : "") . $this->root->toString(1) . "\n}";
 	}
 }

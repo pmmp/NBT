@@ -273,6 +273,10 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 		return $this->value->isEmpty();
 	}
 
+	protected function getTypeName() : string{
+		return "List";
+	}
+
 	public function getType() : int{
 		return NBT::TAG_List;
 	}

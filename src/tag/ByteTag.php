@@ -34,6 +34,10 @@ final class ByteTag extends ImmutableTag{
 
 	protected function max() : int{ return 0x7f; }
 
+	protected function getTypeName() : string{
+		return "Byte";
+	}
+
 	public function getType() : int{
 		return NBT::TAG_Byte;
 	}

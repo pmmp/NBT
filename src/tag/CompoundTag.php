@@ -453,6 +453,10 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 		unset($this->value[$offset]);
 	}
 
+	protected function getTypeName() : string{
+		return "Compound";
+	}
+
 	public function getType() : int{
 		return NBT::TAG_Compound;
 	}
