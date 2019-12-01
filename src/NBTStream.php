@@ -149,7 +149,7 @@ abstract class NBTStream{
 		$this->offset = 0;
 		$this->buffer = "";
 
-		if($data instanceof CompoundTag){
+		if($data instanceof NamedTag){
 			$this->writeTag($data);
 
 			return $this->buffer;
