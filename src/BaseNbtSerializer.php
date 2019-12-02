@@ -51,6 +51,9 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 */
 	private function readRoot(int $maxDepth) : TreeRoot{
 		$type = $this->readByte();
+		if($type === NBT::TAG_End){
+			throw new NbtDataException("Found TAG_End at the start of buffer");
+		}
 
 		$rootName = $this->readString();
 		return new TreeRoot(NBT::createTag($type, $this, new ReaderTracker($maxDepth)), $rootName);
