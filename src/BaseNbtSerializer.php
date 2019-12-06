@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
-use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\utils\Binary;
 use pocketmine\utils\BinaryDataException;
 use pocketmine\utils\BinaryStream;
@@ -52,12 +51,12 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 */
 	private function readRoot(int $maxDepth) : TreeRoot{
 		$type = $this->readByte();
-		if($type !== NBT::TAG_Compound){
-			throw new NbtDataException("Expected TAG_Compound at the start of buffer");
+		if($type === NBT::TAG_End){
+			throw new NbtDataException("Found TAG_End at the start of buffer");
 		}
 
 		$rootName = $this->readString();
-		return new TreeRoot(CompoundTag::read($this, new ReaderTracker($maxDepth)), $rootName);
+		return new TreeRoot(NBT::createTag($type, $this, new ReaderTracker($maxDepth)), $rootName);
 	}
 
 	/**
@@ -85,7 +84,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	/**
-	 * Decodes a list of TAG_Compound into objects and returns them.
+	 * Decodes a list of NBT tags into objects and returns them.
 	 *
 	 * TODO: This is only necessary because we don't have a streams API worth mentioning. Get rid of this in the future.
 	 *
@@ -135,7 +134,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	private function writeRoot(TreeRoot $root) : void{
-		$this->writeByte(NBT::TAG_Compound);
+		$this->writeByte($root->getTag()->getType());
 		$this->writeString($root->getName());
 		$root->getTag()->write($this);
 	}

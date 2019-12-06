@@ -23,28 +23,28 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
-use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\Tag;
 use function get_class;
 
 /**
- * This class wraps around the root CompoundTag for NBT files to avoid losing the name information.
+ * This class wraps around the root Tag for NBT files to avoid losing the name information.
  */
 class TreeRoot{
 
-	/** @var CompoundTag */
+	/** @var Tag */
 	private $root;
 	/** @var string */
 	private $name;
 
-	public function __construct(CompoundTag $root, string $name = ""){
+	public function __construct(Tag $root, string $name = ""){
 		$this->root = $root;
 		$this->name = $name;
 	}
 
 	/**
-	 * @return CompoundTag
+	 * @return Tag
 	 */
-	public function getTag() : CompoundTag{
+	public function getTag() : Tag{
 		return $this->root;
 	}
 
