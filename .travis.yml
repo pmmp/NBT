@@ -3,7 +3,7 @@ language: php
 php:
  - 7.2
  - 7.3
- - 7.4snapshot
+ - 7.4
 
 before_script:
  - if [ -n "$GITHUB_ACCESS_TOKEN" ]; then composer config github-oauth.github.com ${GITHUB_ACCESS_TOKEN}; fi;
