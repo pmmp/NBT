@@ -444,6 +444,9 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 			do{
 				$tag = $nbt->readTag($tracker);
 				if($tag !== null){
+					if(isset($this->value[$tag->__name])){
+						throw new \UnexpectedValueException("Duplicate key \"$tag->__name\"");
+					}
 					$this->value[$tag->__name] = $tag;
 				}
 			}while($tag !== null);
