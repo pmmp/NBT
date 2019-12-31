@@ -443,7 +443,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 		$tracker->protectDepth(function() use($nbt, $tracker){
 			do{
 				$tag = $nbt->readTag($tracker);
-				if($tag !== null and $tag->__name !== ""){
+				if($tag !== null){
 					$this->value[$tag->__name] = $tag;
 				}
 			}while($tag !== null);
