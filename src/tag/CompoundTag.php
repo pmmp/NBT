@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
+use pocketmine\nbt\NbtDataException;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 use pocketmine\nbt\ReaderTracker;
@@ -467,6 +468,9 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 			for($type = $reader->readByte(); $type !== NBT::TAG_End; $type = $reader->readByte()){
 				$name = $reader->readString();
 				$tag = NBT::createTag($type, $reader, $tracker);
+				if($result->hasTag($name)){
+					throw new NbtDataException("Duplicate key \"$name\"");
+				}
 				$result->setTag($name, $tag);
 			}
 		});
