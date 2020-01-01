@@ -467,9 +467,7 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 			for($type = $reader->readByte(); $type !== NBT::TAG_End; $type = $reader->readByte()){
 				$name = $reader->readString();
 				$tag = NBT::createTag($type, $reader, $tracker);
-				if($name !== ""){ //TODO: reevaluate this condition
-					$result->setTag($name, $tag);
-				}
+				$result->setTag($name, $tag);
 			}
 		});
 		return $result;
