@@ -87,10 +87,14 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	/**
 	 * Returns the tag with the specified name, or null if it does not exist.
 	 *
+	 * @phpstan-template T of NamedTag
+	 *
 	 * @param string $name
 	 * @param string $expectedClass Class that extends NamedTag
+	 * @phpstan-param class-string<T> $expectedClass
 	 *
 	 * @return NamedTag|null
+	 * @phpstan-return T|null
 	 * @throws \RuntimeException if the tag exists and is not of the expected type (if specified)
 	 */
 	public function getTag(string $name, string $expectedClass = NamedTag::class) : ?NamedTag{
