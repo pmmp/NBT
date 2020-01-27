@@ -405,8 +405,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 		}
 
 		foreach($this as $k => $v){
-			$other = $that->get($k);
-			if($other === null or !$v->equalsValue($other)){ //ListTag members don't have names, don't bother checking it
+			if(!$v->equalsValue($that->get($k))){ //ListTag members don't have names, don't bother checking it
 				return false;
 			}
 		}
