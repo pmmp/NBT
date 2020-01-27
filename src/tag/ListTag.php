@@ -411,8 +411,7 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 		}
 
 		foreach($this as $k => $v){
-			$other = $that->get($k);
-			if($other === null or !$v->equals($other)){
+			if(!$v->equals($that->get($k))){
 				return false;
 			}
 		}

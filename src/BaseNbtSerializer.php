@@ -63,7 +63,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * Decodes NBT from the given binary string and returns it.
 	 *
 	 * @param string $buffer
-	 * @param int    &$offset
+	 * @param int    $offset reference parameter
 	 * @param int    $maxDepth
 	 *
 	 * @return TreeRoot
