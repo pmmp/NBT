@@ -100,7 +100,7 @@ abstract class NBTStream{
 	 *
 	 * @param string $buffer
 	 * @param bool   $doMultiple Whether to keep reading after the first tag if there are more bytes in the buffer
-	 * @param int    &$offset
+	 * @param int    $offset reference parameter
 	 * @param int    $maxDepth
 	 *
 	 * @return NamedTag|NamedTag[]
