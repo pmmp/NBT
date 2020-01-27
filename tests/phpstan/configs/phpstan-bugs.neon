@@ -17,3 +17,8 @@ parameters:
 			count: 1
 			path: ../../../src/tag/CompoundTag.php
 
+		-
+			#zlib_decode() false return
+			message: "#^Strict comparison using \\=\\=\\= between string and false will always evaluate to false\\.$#"
+			count: 1
+			path: ../../../src/BaseNbtSerializer.php
