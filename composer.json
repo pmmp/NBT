@@ -21,11 +21,5 @@
         "psr-4": {
             "pocketmine\\nbt\\": "tests/phpunit/"
         }
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/pmmp/BinaryUtils"
-        }
-    ]
+    }
 }
