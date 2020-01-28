@@ -11,7 +11,7 @@ before_script:
 
 script:
  - ./vendor/bin/phpstan analyze --no-progress
- - ./vendor/bin/phpunit --bootstrap vendor/autoload.php tests/phpunit
+ - ./vendor/bin/phpunit --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit
 
 cache:
  directories:
