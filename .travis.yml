@@ -7,10 +7,11 @@ php:
 
 before_script:
  - composer install --prefer-dist
+ - echo 'xdebug.max_nesting_level=3000' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
 
 script:
  - ./vendor/bin/phpstan analyze --no-progress
- - ./tests/run-tests.sh
+ - ./vendor/bin/phpunit --bootstrap vendor/autoload.php tests/phpunit
 
 cache:
  directories:
