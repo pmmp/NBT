@@ -64,4 +64,13 @@ class NbtSerializerTest extends TestCase{
 		$offset = 0;
 		$reader->read($data, $offset, 512);
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function testCompoundTagIntKeysEncode() : void{
+		$data = new CompoundTag();
+		$data->setInt("1", 1);
+		(new BigEndianNbtSerializer())->write(new TreeRoot($data));
+	}
 }

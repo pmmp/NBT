@@ -483,6 +483,11 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 
 	public function write(NbtStreamWriter $writer) : void{
 		foreach($this->value as $name => $tag){
+			if(is_int($name)){
+				//PHP sucks
+				//we only cast on seeing an int, because forcibly casting other types might conceal bugs.
+				$name = (string) $name;
+			}
 			$writer->writeByte($tag->getType());
 			$writer->writeString($name);
 			$tag->write($writer);
