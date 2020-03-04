@@ -190,7 +190,7 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 		}
 
 		if($default === null){
-			throw new NoSuchTagException("Tag \"$tag\" does not exist");
+			throw new NoSuchTagException("Tag \"$name\" does not exist");
 		}
 
 		return $default;
