@@ -27,7 +27,9 @@ use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtDataException;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
+use pocketmine\nbt\NoSuchTagException;
 use pocketmine\nbt\ReaderTracker;
+use pocketmine\nbt\UnexpectedTagTypeException;
 use function assert;
 use function count;
 use function current;
@@ -96,13 +98,13 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	 *
 	 * @return Tag|null
 	 * @phpstan-return T|null
-	 * @throws \RuntimeException if the tag exists and is not of the expected type (if specified)
+	 * @throws UnexpectedTagTypeException if the tag exists and is not of the expected type (if specified)
 	 */
 	public function getTag(string $name, string $expectedClass = Tag::class) : ?Tag{
 		assert(is_a($expectedClass, Tag::class, true));
 		$tag = $this->value[$name] ?? null;
 		if($tag !== null and !($tag instanceof $expectedClass)){
-			throw new \RuntimeException("Expected a tag of type $expectedClass, got " . get_class($tag));
+			throw new UnexpectedTagTypeException("Expected a tag of type $expectedClass, got " . get_class($tag));
 		}
 
 		return $tag;
@@ -179,6 +181,9 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	 * @param bool   $badTagDefault Return the specified default if the tag is not of the expected type.
 	 *
 	 * @return mixed
+	 *
+	 * @throws UnexpectedTagTypeException
+	 * @throws NoSuchTagException
 	 */
 	public function getTagValue(string $name, string $expectedClass, $default = null, bool $badTagDefault = false){
 		$tag = $this->getTag($name, $badTagDefault ? Tag::class : $expectedClass);
@@ -187,7 +192,11 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 		}
 
 		if($default === null){
-			throw new \RuntimeException("Tag with name \"$name\" " . ($tag !== null ? "not of expected type" : "not found") . " and no valid default value given");
+			if($tag !== null){
+				throw new UnexpectedTagTypeException("Tag \"$tag\" has unexpected type " . get_class($tag));
+			}else{
+				throw new NoSuchTagException("Tag \"$tag\" does not exist");
+			}
 		}
 
 		return $default;
