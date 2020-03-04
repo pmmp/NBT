@@ -37,11 +37,11 @@ class ReaderTracker{
 	/**
 	 * @param \Closure $execute
 	 *
-	 * @throws \UnexpectedValueException if the recursion depth is too deep
+	 * @throws NbtDataException if the recursion depth is too deep
 	 */
 	public function protectDepth(\Closure $execute) : void{
 		if($this->maxDepth > 0 and ++$this->currentDepth > $this->maxDepth){
-			throw new \UnexpectedValueException("Nesting level too deep: reached max depth of $this->maxDepth tags");
+			throw new NbtDataException("Nesting level too deep: reached max depth of $this->maxDepth tags");
 		}
 		try{
 			$execute();

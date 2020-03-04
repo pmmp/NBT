@@ -59,7 +59,7 @@ class NbtSerializerTest extends TestCase{
 		$reader = clone $serializer;
 		$data = $serializer->write(self::maxDepthProvider());
 
-		$this->expectException(\UnexpectedValueException::class);
+		$this->expectException(NbtDataException::class);
 
 		$offset = 0;
 		$reader->read($data, $offset, 512);
