@@ -131,22 +131,14 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	}
 
 	/**
-	 * Sets the specified Tag as a child tag of the CompoundTag at the offset specified by the tag's name. If a tag
-	 * already exists at the offset and the types do not match, an exception will be thrown unless $force is true.
+	 * Sets the specified Tag as a child tag of the CompoundTag at the offset specified by the tag's name.
 	 *
 	 * @param string $name
 	 * @param Tag    $tag
-	 * @param bool   $force
 	 *
 	 * @return $this
 	 */
-	public function setTag(string $name, Tag $tag, bool $force = false) : self{
-		if(!$force){
-			$existing = $this->value[$name] ?? null;
-			if($existing !== null and !($tag instanceof $existing)){
-				throw new \RuntimeException("Cannot set tag at \"$name\": tried to overwrite " . get_class($existing) . " with " . get_class($tag));
-			}
-		}
+	public function setTag(string $name, Tag $tag) : self{
 		$this->value[$name] = $tag;
 		return $this;
 	}
@@ -311,100 +303,91 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	/**
 	 * @param string $name
 	 * @param int    $value
-	 * @param bool   $force
 	 *
 	 * @return $this
 	 */
-	public function setByte(string $name, int $value, bool $force = false) : self{
-		return $this->setTag($name, new ByteTag($value), $force);
+	public function setByte(string $name, int $value) : self{
+		return $this->setTag($name, new ByteTag($value));
 	}
 
 	/**
 	 * @param string $name
 	 * @param int    $value
-	 * @param bool   $force
 	 *
 	 * @return $this
 	 */
-	public function setShort(string $name, int $value, bool $force = false) : self{
-		return $this->setTag($name, new ShortTag($value), $force);
+	public function setShort(string $name, int $value) : self{
+		return $this->setTag($name, new ShortTag($value));
 	}
 
 	/**
 	 * @param string $name
 	 * @param int    $value
-	 * @param bool   $force
 	 *
 	 * @return $this
 	 */
-	public function setInt(string $name, int $value, bool $force = false) : self{
-		return $this->setTag($name, new IntTag($value), $force);
+	public function setInt(string $name, int $value) : self{
+		return $this->setTag($name, new IntTag($value));
 	}
 
 	/**
 	 * @param string $name
 	 * @param int    $value
-	 * @param bool   $force
 	 *
 	 * @return $this
 	 */
-	public function setLong(string $name, int $value, bool $force = false) : self{
-		return $this->setTag($name, new LongTag($value), $force);
+	public function setLong(string $name, int $value) : self{
+		return $this->setTag($name, new LongTag($value));
 	}
 
 	/**
 	 * @param string $name
 	 * @param float  $value
-	 * @param bool   $force
 	 *
 	 * @return $this
 	 */
-	public function setFloat(string $name, float $value, bool $force = false) : self{
-		return $this->setTag($name, new FloatTag($value), $force);
+	public function setFloat(string $name, float $value) : self{
+		return $this->setTag($name, new FloatTag($value));
 	}
 
 	/**
 	 * @param string $name
 	 * @param float  $value
-	 * @param bool   $force
 	 *
 	 * @return $this
 	 */
-	public function setDouble(string $name, float $value, bool $force = false) : self{
-		return $this->setTag($name, new DoubleTag($value), $force);
+	public function setDouble(string $name, float $value) : self{
+		return $this->setTag($name, new DoubleTag($value));
 	}
 
 	/**
 	 * @param string $name
 	 * @param string $value
-	 * @param bool   $force
 	 *
 	 * @return $this
 	 */
-	public function setByteArray(string $name, string $value, bool $force = false) : self{
-		return $this->setTag($name, new ByteArrayTag($value), $force);
+	public function setByteArray(string $name, string $value) : self{
+		return $this->setTag($name, new ByteArrayTag($value));
 	}
 
 	/**
 	 * @param string $name
 	 * @param string $value
-	 * @param bool   $force
 	 *
 	 * @return $this
 	 */
-	public function setString(string $name, string $value, bool $force = false) : self{
-		return $this->setTag($name, new StringTag($value), $force);
+	public function setString(string $name, string $value) : self{
+		return $this->setTag($name, new StringTag($value));
 	}
 
 	/**
 	 * @param string $name
 	 * @param int[]  $value
-	 * @param bool   $force
 	 *
 	 * @return $this
 	 */
-	public function setIntArray(string $name, array $value, bool $force = false) : self{
-		return $this->setTag($name, new IntArrayTag($value), $force);
+	public function setIntArray(string $name, array $value) : self{
+		return $this->setTag($name, new IntArrayTag($value));
 	}
 
 

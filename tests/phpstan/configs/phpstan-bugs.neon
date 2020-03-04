@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			#$a instanceof $b bug
-			message: "#^If condition is always false\\.$#"
-			count: 1
-			path: ../../../src/tag/CompoundTag.php
-
-		-
 			message: "#^Call to function assert\\(\\) with false and string will always evaluate to false\\.$#"
 			count: 1
 			path: ../../../src/tag/CompoundTag.php
