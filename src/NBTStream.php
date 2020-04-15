@@ -58,7 +58,7 @@ abstract class NBTStream{
 	public $offset = 0;
 
 	/**
-	 * @param int|bool $len
+	 * @param int|true $len
 	 *
 	 * @return string
 	 *
@@ -143,7 +143,7 @@ abstract class NBTStream{
 	/**
 	 * @param NamedTag|NamedTag[] $data
 	 *
-	 * @return bool|string
+	 * @return false|string
 	 */
 	public function write($data){
 		$this->offset = 0;
@@ -168,7 +168,7 @@ abstract class NBTStream{
 	 * @param int                 $compression
 	 * @param int                 $level
 	 *
-	 * @return bool|string
+	 * @return false|string
 	 */
 	public function writeCompressed($data, int $compression = ZLIB_ENCODING_GZIP, int $level = 7){
 		if(($write = $this->write($data)) !== false){
