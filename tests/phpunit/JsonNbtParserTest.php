@@ -68,7 +68,7 @@ class JsonNbtParserTest extends TestCase{
 	}
 
 	public function testMixedList() : void{
-		$this->expectExceptionMessageRegExp("/Invalid tag of type .* assigned to ListTag, expected .*/");
+		$this->expectException(\TypeError::class); //TODO: throwing an engine level error on userdata is very bad ...
 		JsonNbtParser::parseJson("{TestList:[1f, string2, 3b]}");
 	}
 
