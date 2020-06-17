@@ -27,8 +27,6 @@ use pocketmine\utils\Binary;
 use pocketmine\utils\BinaryDataException;
 use pocketmine\utils\BinaryStream;
 use function strlen;
-use function zlib_decode;
-use function zlib_encode;
 
 /**
  * Base Named Binary Tag encoder/decoder
@@ -109,27 +107,6 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 		return $retval;
 	}
 
-	/**
-	 * Decodes NBT from the given compressed binary string and returns it. Anything decodable by zlib_decode() can be
-	 * processed.
-	 *
-	 * TODO: This is only necessary because we don't have a streams API worth mentioning. Get rid of this in the future.
-	 *
-	 * @param string $buffer
-	 * @param int    $maxDepth
-	 *
-	 * @return TreeRoot
-	 * @throws NbtDataException
-	 */
-	public function readCompressed(string $buffer, int $maxDepth = 0) : TreeRoot{
-		$raw = @zlib_decode($buffer); //silence useless warning
-		if($raw === false){
-			throw new NbtDataException("Failed to decompress NBT data");
-		}
-		$_ = 0;
-		return $this->read($raw, $_, $maxDepth);
-	}
-
 	private function writeRoot(TreeRoot $root) : void{
 		$this->writeByte($root->getTag()->getType());
 		$this->writeString($root->getName());
@@ -160,17 +137,6 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 			$this->writeRoot($root);
 		}
 		return $this->buffer->getBuffer();
-	}
-
-	/**
-	 * @param TreeRoot $data
-	 * @param int      $compression
-	 * @param int      $level
-	 *
-	 * @return string
-	 */
-	public function writeCompressed(TreeRoot $data, int $compression = ZLIB_ENCODING_GZIP, int $level = 7) : string{
-		return zlib_encode($this->write($data), $compression, $level);
 	}
 
 	public function readByte() : int{
