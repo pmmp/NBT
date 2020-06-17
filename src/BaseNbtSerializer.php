@@ -70,7 +70,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @throws NbtDataException
 	 */
 	public function read(string $buffer, int &$offset = 0, int $maxDepth = 0) : TreeRoot{
-		$this->buffer->setBuffer($buffer, $offset);
+		$this->buffer = new BinaryStream($buffer, $offset);
 
 		try{
 			$data = $this->readRoot($maxDepth);
@@ -78,7 +78,6 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 			throw new NbtDataException($e->getMessage(), 0, $e);
 		}
 		$offset = $this->buffer->getOffset();
-		$this->buffer->reset();
 
 		return $data;
 	}
@@ -95,7 +94,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @throws NbtDataException
 	 */
 	public function readMultiple(string $buffer, int $maxDepth = 0) : array{
-		$this->buffer->setBuffer($buffer);
+		$this->buffer = new BinaryStream($buffer);
 
 		$retval = [];
 
@@ -106,8 +105,6 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 				throw new NbtDataException($e->getMessage(), 0, $e);
 			}
 		}
-
-		$this->buffer->reset();
 
 		return $retval;
 	}
@@ -145,7 +142,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @return string
 	 */
 	public function write(TreeRoot $data) : string{
-		$this->buffer->reset();
+		$this->buffer = new BinaryStream();
 
 		$this->writeRoot($data);
 
@@ -158,7 +155,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @return string
 	 */
 	public function writeMultiple(array $data) : string{
-		$this->buffer->reset();
+		$this->buffer = new BinaryStream();
 		foreach($data as $root){
 			$this->writeRoot($root);
 		}
