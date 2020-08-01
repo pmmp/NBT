@@ -262,7 +262,6 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 		$this->setTag(new IntArrayTag($name, $value), $force);
 	}
 
-
 	/**
 	 * @param string $offset
 	 *

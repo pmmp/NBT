@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt\tag;
 
-
 use pocketmine\nbt\NBTStream;
 use pocketmine\nbt\ReaderTracker;
 use function get_class;

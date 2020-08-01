@@ -211,7 +211,6 @@ abstract class NBTStream{
 
 	abstract public function putShort(int $v) : void;
 
-
 	abstract public function getInt() : int;
 
 	abstract public function putInt(int $v) : void;
