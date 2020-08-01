@@ -34,10 +34,6 @@ class StringTag extends NamedTag{
 	/** @var string */
 	private $value;
 
-	/**
-	 * @param string $name
-	 * @param string $value
-	 */
 	public function __construct(string $name = "", string $value = ""){
 		parent::__construct($name);
 		if(strlen($value) > 32767){
@@ -58,9 +54,6 @@ class StringTag extends NamedTag{
 		$nbt->putString($this->value);
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getValue() : string{
 		return $this->value;
 	}

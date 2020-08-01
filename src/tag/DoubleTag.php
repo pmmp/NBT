@@ -33,10 +33,6 @@ class DoubleTag extends NamedTag{
 	/** @var float */
 	private $value;
 
-	/**
-	 * @param string $name
-	 * @param float  $value
-	 */
 	public function __construct(string $name = "", float $value = 0.0){
 		parent::__construct($name);
 		$this->value = $value;
@@ -54,9 +50,6 @@ class DoubleTag extends NamedTag{
 		$nbt->putDouble($this->value);
 	}
 
-	/**
-	 * @return float
-	 */
 	public function getValue() : float{
 		return $this->value;
 	}

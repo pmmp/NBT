@@ -34,10 +34,6 @@ class ByteArrayTag extends NamedTag{
 	/** @var string */
 	private $value;
 
-	/**
-	 * @param string $name
-	 * @param string $value
-	 */
 	public function __construct(string $name = "", string $value = ""){
 		parent::__construct($name);
 		$this->value = $value;
@@ -56,9 +52,6 @@ class ByteArrayTag extends NamedTag{
 		$nbt->put($this->value);
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getValue() : string{
 		return $this->value;
 	}

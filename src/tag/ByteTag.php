@@ -33,10 +33,6 @@ class ByteTag extends NamedTag{
 	/** @var int */
 	private $value;
 
-	/**
-	 * @param string $name
-	 * @param int    $value
-	 */
 	public function __construct(string $name = "", int $value = 0){
 		parent::__construct($name);
 		if($value < -128 or $value > 127){
@@ -57,9 +53,6 @@ class ByteTag extends NamedTag{
 		$nbt->putByte($this->value);
 	}
 
-	/**
-	 * @return int
-	 */
 	public function getValue() : int{
 		return $this->value;
 	}

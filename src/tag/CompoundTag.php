@@ -48,7 +48,6 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	private $value = [];
 
 	/**
-	 * @param string     $name
 	 * @param NamedTag[] $value
 	 */
 	public function __construct(string $name = "", array $value = []){
@@ -59,9 +58,6 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 		}
 	}
 
-	/**
-	 * @return int
-	 */
 	public function count() : int{
 		return count($this->value);
 	}
@@ -89,11 +85,9 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 *
 	 * @phpstan-template T of NamedTag
 	 *
-	 * @param string $name
 	 * @param string $expectedClass Class that extends NamedTag
 	 * @phpstan-param class-string<T> $expectedClass
 	 *
-	 * @return NamedTag|null
 	 * @phpstan-return T|null
 	 * @throws \RuntimeException if the tag exists and is not of the expected type (if specified)
 	 */
@@ -110,9 +104,6 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	/**
 	 * Returns the ListTag with the specified name, or null if it does not exist. Triggers an exception if a tag exists
 	 * with that name and the tag is not a ListTag.
-	 *
-	 * @param string $name
-	 * @return ListTag|null
 	 */
 	public function getListTag(string $name) : ?ListTag{
 		return $this->getTag($name, ListTag::class);
@@ -121,9 +112,6 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	/**
 	 * Returns the CompoundTag with the specified name, or null if it does not exist. Triggers an exception if a tag
 	 * exists with that name and the tag is not a CompoundTag.
-	 *
-	 * @param string $name
-	 * @return CompoundTag|null
 	 */
 	public function getCompoundTag(string $name) : ?CompoundTag{
 		return $this->getTag($name, CompoundTag::class);
@@ -132,9 +120,6 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	/**
 	 * Sets the specified NamedTag as a child tag of the CompoundTag at the offset specified by the tag's name. If a tag
 	 * already exists at the offset and the types do not match, an exception will be thrown unless $force is true.
-	 *
-	 * @param NamedTag $tag
-	 * @param bool     $force
 	 */
 	public function setTag(NamedTag $tag, bool $force = false) : void{
 		if(!$force){
@@ -160,11 +145,6 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 
 	/**
 	 * Returns whether the CompoundTag contains a child tag with the specified name.
-	 *
-	 * @param string $name
-	 * @param string $expectedClass
-	 *
-	 * @return bool
 	 */
 	public function hasTag(string $name, string $expectedClass = NamedTag::class) : bool{
 		assert(is_a($expectedClass, NamedTag::class, true));
@@ -176,8 +156,6 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * tag is not of type $expectedType, an exception will be thrown, unless a default is given and $badTagDefault is
 	 * true.
 	 *
-	 * @param string $name
-	 * @param string $expectedClass
 	 * @param mixed  $default
 	 * @param bool   $badTagDefault Return the specified default if the tag is not of the expected type.
 	 *
@@ -200,98 +178,40 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * The following methods are wrappers around getTagValue() with type safety.
 	 */
 
-	/**
-	 * @param string   $name
-	 * @param int|null $default
-	 * @param bool     $badTagDefault
-	 *
-	 * @return int
-	 */
 	public function getByte(string $name, ?int $default = null, bool $badTagDefault = false) : int{
 		return $this->getTagValue($name, ByteTag::class, $default, $badTagDefault);
 	}
 
-	/**
-	 * @param string   $name
-	 * @param int|null $default
-	 * @param bool     $badTagDefault
-	 *
-	 * @return int
-	 */
 	public function getShort(string $name, ?int $default = null, bool $badTagDefault = false) : int{
 		return $this->getTagValue($name, ShortTag::class, $default, $badTagDefault);
 	}
 
-	/**
-	 * @param string   $name
-	 * @param int|null $default
-	 * @param bool     $badTagDefault
-	 *
-	 * @return int
-	 */
 	public function getInt(string $name, ?int $default = null, bool $badTagDefault = false) : int{
 		return $this->getTagValue($name, IntTag::class, $default, $badTagDefault);
 	}
 
-	/**
-	 * @param string   $name
-	 * @param int|null $default
-	 * @param bool     $badTagDefault
-	 *
-	 * @return int
-	 */
 	public function getLong(string $name, ?int $default = null, bool $badTagDefault = false) : int{
 		return $this->getTagValue($name, LongTag::class, $default, $badTagDefault);
 	}
 
-	/**
-	 * @param string     $name
-	 * @param float|null $default
-	 * @param bool       $badTagDefault
-	 *
-	 * @return float
-	 */
 	public function getFloat(string $name, ?float $default = null, bool $badTagDefault = false) : float{
 		return $this->getTagValue($name, FloatTag::class, $default, $badTagDefault);
 	}
 
-	/**
-	 * @param string     $name
-	 * @param float|null $default
-	 * @param bool       $badTagDefault
-	 *
-	 * @return float
-	 */
 	public function getDouble(string $name, ?float $default = null, bool $badTagDefault = false) : float{
 		return $this->getTagValue($name, DoubleTag::class, $default, $badTagDefault);
 	}
 
-	/**
-	 * @param string      $name
-	 * @param string|null $default
-	 * @param bool        $badTagDefault
-	 *
-	 * @return string
-	 */
 	public function getByteArray(string $name, ?string $default = null, bool $badTagDefault = false) : string{
 		return $this->getTagValue($name, ByteArrayTag::class, $default, $badTagDefault);
 	}
 
-	/**
-	 * @param string      $name
-	 * @param string|null $default
-	 * @param bool        $badTagDefault
-	 *
-	 * @return string
-	 */
 	public function getString(string $name, ?string $default = null, bool $badTagDefault = false) : string{
 		return $this->getTagValue($name, StringTag::class, $default, $badTagDefault);
 	}
 
 	/**
-	 * @param string     $name
 	 * @param int[]|null $default
-	 * @param bool       $badTagDefault
 	 *
 	 * @return int[]
 	 */
@@ -303,82 +223,40 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * The following methods are wrappers around setTag() which create appropriate tag objects on the fly.
 	 */
 
-	/**
-	 * @param string $name
-	 * @param int    $value
-	 * @param bool   $force
-	 */
 	public function setByte(string $name, int $value, bool $force = false) : void{
 		$this->setTag(new ByteTag($name, $value), $force);
 	}
 
-	/**
-	 * @param string $name
-	 * @param int    $value
-	 * @param bool   $force
-	 */
 	public function setShort(string $name, int $value, bool $force = false) : void{
 		$this->setTag(new ShortTag($name, $value), $force);
 	}
 
-	/**
-	 * @param string $name
-	 * @param int    $value
-	 * @param bool   $force
-	 */
 	public function setInt(string $name, int $value, bool $force = false) : void{
 		$this->setTag(new IntTag($name, $value), $force);
 	}
 
-	/**
-	 * @param string $name
-	 * @param int    $value
-	 * @param bool   $force
-	 */
 	public function setLong(string $name, int $value, bool $force = false) : void{
 		$this->setTag(new LongTag($name, $value), $force);
 	}
 
-	/**
-	 * @param string $name
-	 * @param float  $value
-	 * @param bool   $force
-	 */
 	public function setFloat(string $name, float $value, bool $force = false) : void{
 		$this->setTag(new FloatTag($name, $value), $force);
 	}
 
-	/**
-	 * @param string $name
-	 * @param float  $value
-	 * @param bool   $force
-	 */
 	public function setDouble(string $name, float $value, bool $force = false) : void{
 		$this->setTag(new DoubleTag($name, $value), $force);
 	}
 
-	/**
-	 * @param string $name
-	 * @param string $value
-	 * @param bool   $force
-	 */
 	public function setByteArray(string $name, string $value, bool $force = false) : void{
 		$this->setTag(new ByteArrayTag($name, $value), $force);
 	}
 
-	/**
-	 * @param string $name
-	 * @param string $value
-	 * @param bool   $force
-	 */
 	public function setString(string $name, string $value, bool $force = false) : void{
 		$this->setTag(new StringTag($name, $value), $force);
 	}
 
 	/**
-	 * @param string $name
 	 * @param int[]  $value
-	 * @param bool   $force
 	 */
 	public function setIntArray(string $name, array $value, bool $force = false) : void{
 		$this->setTag(new IntArrayTag($name, $value), $force);
@@ -482,16 +360,10 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 		next($this->value);
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function valid() : bool{
 		return key($this->value) !== null;
 	}
 
-	/**
-	 * @return string|null
-	 */
 	public function key() : ?string{
 		$k = key($this->value);
 		if(is_int($k)){
@@ -504,9 +376,6 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 		return $k;
 	}
 
-	/**
-	 * @return NamedTag|null
-	 */
 	public function current() : ?NamedTag{
 		return current($this->value) ?: null;
 	}
@@ -535,10 +404,6 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 * this tag and the other will be overwritten by the tag in the other.
 	 *
 	 * This deep-clones all tags.
-	 *
-	 * @param CompoundTag $other
-	 *
-	 * @return CompoundTag
 	 */
 	public function merge(CompoundTag $other) : CompoundTag{
 		$new = clone $this;

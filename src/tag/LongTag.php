@@ -33,10 +33,6 @@ class LongTag extends NamedTag{
 	/** @var int */
 	private $value;
 
-	/**
-	 * @param string $name
-	 * @param int    $value
-	 */
 	public function __construct(string $name = "", int $value = 0){
 		parent::__construct($name);
 		$this->value = $value;
@@ -54,9 +50,6 @@ class LongTag extends NamedTag{
 		$nbt->putLong($this->value);
 	}
 
-	/**
-	 * @return int
-	 */
 	public function getValue() : int{
 		return $this->value;
 	}

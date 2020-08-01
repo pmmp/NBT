@@ -42,9 +42,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	private $value;
 
 	/**
-	 * @param string     $name
 	 * @param NamedTag[] $value
-	 * @param int        $tagType
 	 */
 	public function __construct(string $name = "", array $value = [], int $tagType = NBT::TAG_End){
 		parent::__construct($name);
@@ -71,8 +69,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	/**
 	 * Returns an array of tag values inserted into this list. ArrayAccess-implementing tags are returned as themselves
 	 * (such as ListTag and CompoundTag) and others are returned as primitive values or arrays.
-	 *
-	 * @return array
 	 */
 	public function getAllValues() : array{
 		$result = [];
@@ -89,8 +85,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * @param int $offset
-	 *
-	 * @return bool
 	 */
 	public function offsetExists($offset) : bool{
 		return isset($this->value[$offset]);
@@ -137,24 +131,16 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 		unset($this->value[$offset]);
 	}
 
-	/**
-	 * @return int
-	 */
 	public function count() : int{
 		return $this->value->count();
 	}
 
-	/**
-	 * @return int
-	 */
 	public function getCount() : int{
 		return $this->value->count();
 	}
 
 	/**
 	 * Appends the specified tag to the end of the list.
-	 *
-	 * @param NamedTag $tag
 	 */
 	public function push(NamedTag $tag) : void{
 		$this->checkTagType($tag);
@@ -163,8 +149,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Removes the last tag from the list and returns it.
-	 *
-	 * @return NamedTag
 	 */
 	public function pop() : NamedTag{
 		return $this->value->pop();
@@ -172,8 +156,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Adds the specified tag to the start of the list.
-	 *
-	 * @param NamedTag $tag
 	 */
 	public function unshift(NamedTag $tag) : void{
 		$this->checkTagType($tag);
@@ -182,8 +164,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Removes the first tag from the list and returns it.
-	 *
-	 * @return NamedTag
 	 */
 	public function shift() : NamedTag{
 		return $this->value->shift();
@@ -192,9 +172,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	/**
 	 * Inserts a tag into the list between existing tags, at the specified offset. Later values in the list are moved up
 	 * by 1 position.
-	 *
-	 * @param int      $offset
-	 * @param NamedTag $tag
 	 *
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
@@ -205,8 +182,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Removes a value from the list. All later tags in the list are moved down by 1 position.
-	 *
-	 * @param int $offset
 	 */
 	public function remove(int $offset) : void{
 		unset($this->value[$offset]);
@@ -215,9 +190,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	/**
 	 * Returns the tag at the specified offset.
 	 *
-	 * @param int $offset
-	 *
-	 * @return NamedTag
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
 	public function get(int $offset) : NamedTag{
@@ -226,8 +198,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Returns the element in the first position of the list, without removing it.
-	 *
-	 * @return NamedTag
 	 */
 	public function first() : NamedTag{
 		return $this->value->bottom();
@@ -235,8 +205,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Returns the element in the last position in the list (the end), without removing it.
-	 *
-	 * @return NamedTag
 	 */
 	public function last() : NamedTag{
 		return $this->value->top();
@@ -244,9 +212,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Overwrites the tag at the specified offset.
-	 *
-	 * @param int      $offset
-	 * @param NamedTag $tag
 	 *
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
@@ -257,10 +222,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Returns whether a tag exists at the specified offset.
-	 *
-	 * @param int $offset
-	 *
-	 * @return bool
 	 */
 	public function isset(int $offset) : bool{
 		return isset($this->value[$offset]);
@@ -268,8 +229,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Returns whether there are any tags in the list.
-	 *
-	 * @return bool
 	 */
 	public function empty() : bool{
 		return $this->value->isEmpty();
@@ -281,8 +240,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Returns the type of tag contained in this list.
-	 *
-	 * @return int
 	 */
 	public function getTagType() : int{
 		return $this->tagType;
@@ -292,7 +249,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	 * Sets the type of tag that can be added to this list. If TAG_End is used, the type will be auto-detected from the
 	 * first tag added to the list.
 	 *
-	 * @param int $type
 	 * @throws \LogicException if the list is not empty
 	 */
 	public function setTagType(int $type){
@@ -304,7 +260,6 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Type-checks the given NamedTag for addition to the list, updating the list tag type as appropriate.
-	 * @param NamedTag $tag
 	 *
 	 * @throws \TypeError if the tag type is not compatible.
 	 */
@@ -374,23 +329,14 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 		$this->value->next();
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function valid() : bool{
 		return $this->value->valid();
 	}
 
-	/**
-	 * @return NamedTag|null
-	 */
 	public function current() : ?NamedTag{
 		return $this->value->current();
 	}
 
-	/**
-	 * @return int
-	 */
 	public function key() : int{
 		return (int) $this->value->key();
 	}

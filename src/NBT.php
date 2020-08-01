@@ -54,11 +54,6 @@ abstract class NBT{
 	public const TAG_Compound = 10;
 	public const TAG_IntArray = 11;
 
-	/**
-	 * @param int $type
-	 *
-	 * @return NamedTag
-	 */
 	public static function createTag(int $type) : NamedTag{
 		switch($type){
 			case self::TAG_Byte:

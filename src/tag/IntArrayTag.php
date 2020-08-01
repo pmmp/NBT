@@ -39,7 +39,6 @@ class IntArrayTag extends NamedTag{
 	private $value;
 
 	/**
-	 * @param string $name
 	 * @param int[]  $value
 	 */
 	public function __construct(string $name = "", array $value = []){

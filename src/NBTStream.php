@@ -60,8 +60,6 @@ abstract class NBTStream{
 	/**
 	 * @param int|true $len
 	 *
-	 * @return string
-	 *
 	 * @throws BinaryDataException if there are not enough bytes left in the buffer
 	 */
 	public function get($len) : string{
@@ -98,10 +96,8 @@ abstract class NBTStream{
 	/**
 	 * Decodes NBT from the given binary string and returns it.
 	 *
-	 * @param string $buffer
 	 * @param bool   $doMultiple Whether to keep reading after the first tag if there are more bytes in the buffer
 	 * @param int    $offset reference parameter
-	 * @param int    $maxDepth
 	 *
 	 * @return NamedTag|NamedTag[]
 	 */
@@ -131,8 +127,6 @@ abstract class NBTStream{
 	/**
 	 * Decodes NBT from the given compressed binary string and returns it. Anything decodable by zlib_decode() can be
 	 * processed.
-	 *
-	 * @param string $buffer
 	 *
 	 * @return NamedTag|NamedTag[]
 	 */
@@ -165,8 +159,6 @@ abstract class NBTStream{
 
 	/**
 	 * @param NamedTag|NamedTag[] $data
-	 * @param int                 $compression
-	 * @param int                 $level
 	 *
 	 * @return false|string
 	 */
@@ -228,18 +220,15 @@ abstract class NBTStream{
 
 	abstract public function putLong(int $v) : void;
 
-
 	abstract public function getFloat() : float;
 
 	abstract public function putFloat(float $v) : void;
-
 
 	abstract public function getDouble() : float;
 
 	abstract public function putDouble(float $v) : void;
 
 	/**
-	 * @return string
 	 * @throws \UnexpectedValueException if a too-large string is found (length may be invalid)
 	 */
 	public function getString() : string{
@@ -247,7 +236,6 @@ abstract class NBTStream{
 	}
 
 	/**
-	 * @param string $v
 	 * @throws \InvalidArgumentException if the string is too long
 	 */
 	public function putString(string $v) : void{
@@ -256,8 +244,6 @@ abstract class NBTStream{
 	}
 
 	/**
-	 * @param int $len
-	 * @return int
 	 * @throws \UnexpectedValueException
 	 */
 	protected static function checkReadStringLength(int $len) : int{
@@ -268,8 +254,6 @@ abstract class NBTStream{
 	}
 
 	/**
-	 * @param int $len
-	 * @return int
 	 * @throws \InvalidArgumentException
 	 */
 	protected static function checkWriteStringLength(int $len) : int{
@@ -289,12 +273,6 @@ abstract class NBTStream{
 	 */
 	abstract public function putIntArray(array $array) : void;
 
-
-	/**
-	 * @param CompoundTag $data
-	 *
-	 * @return array
-	 */
 	public static function toArray(CompoundTag $data) : array{
 		$array = [];
 		self::tagToArray($array, $data);
@@ -354,12 +332,6 @@ abstract class NBTStream{
 		}
 	}
 
-	/**
-	 * @param array         $data
-	 * @param callable|null $guesser
-	 *
-	 * @return CompoundTag
-	 */
 	public static function fromArray(array $data, callable $guesser = null) : CompoundTag{
 		$tag = new CompoundTag("", []);
 		self::tagFromArray($tag, $data, $guesser ?? [self::class, "fromArrayGuesser"]);

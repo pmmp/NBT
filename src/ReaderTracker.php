@@ -35,8 +35,6 @@ class ReaderTracker{
 	}
 
 	/**
-	 * @param \Closure $execute
-	 *
 	 * @throws \UnexpectedValueException if the recursion depth is too deep
 	 */
 	public function protectDepth(\Closure $execute) : void{

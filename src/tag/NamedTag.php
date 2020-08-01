@@ -41,7 +41,6 @@ abstract class NamedTag{
 	protected $cloning = false;
 
 	/**
-	 * @param string $name
 	 * @throws \InvalidArgumentException if the name is too long
 	 */
 	public function __construct(string $name = ""){
@@ -51,16 +50,10 @@ abstract class NamedTag{
 		$this->__name = $name;
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getName() : string{
 		return $this->__name;
 	}
 
-	/**
-	 * @param string $name
-	 */
 	public function setName(string $name) : void{
 		$this->__name = $name;
 	}
@@ -85,7 +78,6 @@ abstract class NamedTag{
 	 * Clones this tag safely, detecting recursive dependencies which would otherwise cause an infinite cloning loop.
 	 * Used for cloning tags in tags that have children.
 	 *
-	 * @return NamedTag
 	 * @throws \RuntimeException if a recursive dependency was detected
 	 */
 	public function safeClone() : NamedTag{
@@ -105,10 +97,6 @@ abstract class NamedTag{
 	/**
 	 * Compares this NamedTag to the given NamedTag and determines whether or not they are equal, based on name, type
 	 * and value.
-	 *
-	 * @param NamedTag $that
-	 *
-	 * @return bool
 	 */
 	public function equals(NamedTag $that) : bool{
 		return $this->__name === $that->__name and $this->equalsValue($that);
@@ -117,10 +105,6 @@ abstract class NamedTag{
 	/**
 	 * Compares this NamedTag to the given NamedTag and determines whether they are equal, based on type and value only.
 	 * Complex tag types should override this to provide proper value comparison.
-	 *
-	 * @param NamedTag $that
-	 *
-	 * @return bool
 	 */
 	protected function equalsValue(NamedTag $that) : bool{
 		return $that instanceof $this and $this->getValue() === $that->getValue();
