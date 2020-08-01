@@ -33,9 +33,6 @@ final class ByteArrayTag extends ImmutableTag{
 	/** @var string */
 	private $value;
 
-	/**
-	 * @param string $value
-	 */
 	public function __construct(string $value){
 		self::restrictArgCount(__METHOD__, func_num_args(), 1);
 		$this->value = $value;
@@ -57,9 +54,6 @@ final class ByteArrayTag extends ImmutableTag{
 		$writer->writeByteArray($this->value);
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getValue() : string{
 		return $this->value;
 	}

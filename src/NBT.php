@@ -55,11 +55,6 @@ abstract class NBT{
 	public const TAG_IntArray = 11;
 
 	/**
-	 * @param int             $type
-	 * @param NbtStreamReader $reader
-	 * @param ReaderTracker   $tracker
-	 *
-	 * @return Tag
 	 * @throws NbtDataException
 	 */
 	public static function createTag(int $type, NbtStreamReader $reader, ReaderTracker $tracker) : Tag{

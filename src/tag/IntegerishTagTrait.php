@@ -37,9 +37,6 @@ trait IntegerishTagTrait{
 	/** @var int */
 	private $value;
 
-	/**
-	 * @param int $value
-	 */
 	public function __construct(int $value){
 		if(func_num_args() > 1){
 			throw new \ArgumentCountError(__METHOD__ . "() expects at most 1 parameters, " . func_num_args() . " given");
@@ -50,9 +47,6 @@ trait IntegerishTagTrait{
 		$this->value = $value;
 	}
 
-	/**
-	 * @return int
-	 */
 	public function getValue() : int{
 		return $this->value;
 	}

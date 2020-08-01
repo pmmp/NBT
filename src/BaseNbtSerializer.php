@@ -40,10 +40,6 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	/**
-	 * @param int $maxDepth
-	 *
-	 * @return TreeRoot
-	 *
 	 * @throws BinaryDataException
 	 * @throws NbtDataException
 	 */
@@ -60,11 +56,8 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	/**
 	 * Decodes NBT from the given binary string and returns it.
 	 *
-	 * @param string $buffer
 	 * @param int    $offset reference parameter
-	 * @param int    $maxDepth
 	 *
-	 * @return TreeRoot
 	 * @throws NbtDataException
 	 */
 	public function read(string $buffer, int &$offset = 0, int $maxDepth = 0) : TreeRoot{
@@ -84,9 +77,6 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * Decodes a list of NBT tags into objects and returns them.
 	 *
 	 * TODO: This is only necessary because we don't have a streams API worth mentioning. Get rid of this in the future.
-	 *
-	 * @param string $buffer
-	 * @param int    $maxDepth
 	 *
 	 * @return TreeRoot[]
 	 * @throws NbtDataException
@@ -113,11 +103,6 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 		$root->getTag()->write($this);
 	}
 
-	/**
-	 * @param TreeRoot $data
-	 *
-	 * @return string
-	 */
 	public function write(TreeRoot $data) : string{
 		$this->buffer = new BinaryStream();
 
@@ -128,8 +113,6 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 
 	/**
 	 * @param TreeRoot[] $data
-	 *
-	 * @return string
 	 */
 	public function writeMultiple(array $data) : string{
 		$this->buffer = new BinaryStream();
@@ -161,8 +144,6 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	/**
-	 * @param int $len
-	 * @return int
 	 * @throws NbtDataException
 	 */
 	protected static function checkReadStringLength(int $len) : int{
@@ -173,8 +154,6 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	/**
-	 * @param int $len
-	 * @return int
 	 * @throws \InvalidArgumentException
 	 */
 	protected static function checkWriteStringLength(int $len) : int{
@@ -189,7 +168,6 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	/**
-	 * @param string $v
 	 * @throws \InvalidArgumentException if the string is too long
 	 */
 	public function writeString(string $v) : void{

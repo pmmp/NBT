@@ -46,9 +46,6 @@ class JsonNbtParser{
 	/**
 	 * Parses JSON-formatted NBT into a CompoundTag and returns it. Used for parsing tags supplied with the /give command.
 	 *
-	 * @param string $data
-	 *
-	 * @return CompoundTag
 	 * @throws NbtDataException
 	 */
 	public static function parseJson(string $data) : CompoundTag{
@@ -70,9 +67,6 @@ class JsonNbtParser{
 	}
 
 	/**
-	 * @param BinaryStream $stream
-	 *
-	 * @return ListTag
 	 * @throws BinaryDataException
 	 * @throws NbtDataException
 	 */
@@ -94,9 +88,6 @@ class JsonNbtParser{
 	}
 
 	/**
-	 * @param BinaryStream $stream
-	 *
-	 * @return CompoundTag
 	 * @throws BinaryDataException
 	 * @throws NbtDataException
 	 */
@@ -123,10 +114,6 @@ class JsonNbtParser{
 	}
 
 	/**
-	 * @param BinaryStream $stream
-	 * @param string       $terminator
-	 *
-	 * @return bool
 	 * @throws BinaryDataException
 	 * @throws NbtDataException
 	 */
@@ -148,9 +135,6 @@ class JsonNbtParser{
 	}
 
 	/**
-	 * @param BinaryStream $stream
-	 * @param string       $terminator
-	 *
 	 * @return bool true if terminator has been found, false if comma was found
 	 * @throws BinaryDataException
 	 * @throws NbtDataException
@@ -172,9 +156,6 @@ class JsonNbtParser{
 	}
 
 	/**
-	 * @param BinaryStream $stream
-	 *
-	 * @return Tag
 	 * @throws BinaryDataException
 	 * @throws NbtDataException
 	 */
@@ -296,9 +277,6 @@ class JsonNbtParser{
 	}
 
 	/**
-	 * @param BinaryStream $stream
-	 *
-	 * @return string
 	 * @throws BinaryDataException
 	 * @throws NbtDataException
 	 */

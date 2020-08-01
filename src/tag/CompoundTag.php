@@ -62,9 +62,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 		return new self;
 	}
 
-	/**
-	 * @return int
-	 */
 	public function count() : int{
 		return count($this->value);
 	}
@@ -92,11 +89,9 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	 *
 	 * @phpstan-template T of Tag
 	 *
-	 * @param string $name
 	 * @param string $expectedClass Class that extends Tag
 	 * @phpstan-param class-string<T> $expectedClass
 	 *
-	 * @return Tag|null
 	 * @phpstan-return T|null
 	 * @throws UnexpectedTagTypeException if the tag exists and is not of the expected type (if specified)
 	 */
@@ -113,9 +108,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	/**
 	 * Returns the ListTag with the specified name, or null if it does not exist. Triggers an exception if a tag exists
 	 * with that name and the tag is not a ListTag.
-	 *
-	 * @param string $name
-	 * @return ListTag|null
 	 */
 	public function getListTag(string $name) : ?ListTag{
 		return $this->getTag($name, ListTag::class);
@@ -124,9 +116,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	/**
 	 * Returns the CompoundTag with the specified name, or null if it does not exist. Triggers an exception if a tag
 	 * exists with that name and the tag is not a CompoundTag.
-	 *
-	 * @param string $name
-	 * @return CompoundTag|null
 	 */
 	public function getCompoundTag(string $name) : ?CompoundTag{
 		return $this->getTag($name, CompoundTag::class);
@@ -134,9 +123,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 
 	/**
 	 * Sets the specified Tag as a child tag of the CompoundTag at the offset specified by the tag's name.
-	 *
-	 * @param string $name
-	 * @param Tag    $tag
 	 *
 	 * @return $this
 	 */
@@ -159,11 +145,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 
 	/**
 	 * Returns whether the CompoundTag contains a child tag with the specified name.
-	 *
-	 * @param string $name
-	 * @param string $expectedClass
-	 *
-	 * @return bool
 	 */
 	public function hasTag(string $name, string $expectedClass = Tag::class) : bool{
 		assert(is_a($expectedClass, Tag::class, true));
@@ -174,8 +155,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	 * Returns the value of the child tag with the specified name, or $default if the tag doesn't exist. If the child
 	 * tag is not of type $expectedType, an exception will be thrown.
 	 *
-	 * @param string $name
-	 * @param string $expectedClass
 	 * @param mixed  $default
 	 *
 	 * @return mixed
@@ -200,88 +179,39 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	 * The following methods are wrappers around getTagValue() with type safety.
 	 */
 
-	/**
-	 * @param string   $name
-	 * @param int|null $default
-	 *
-	 * @return int
-	 */
 	public function getByte(string $name, ?int $default = null) : int{
 		return $this->getTagValue($name, ByteTag::class, $default);
 	}
 
-	/**
-	 * @param string   $name
-	 * @param int|null $default
-	 *
-	 * @return int
-	 */
 	public function getShort(string $name, ?int $default = null) : int{
 		return $this->getTagValue($name, ShortTag::class, $default);
 	}
 
-	/**
-	 * @param string   $name
-	 * @param int|null $default
-	 *
-	 * @return int
-	 */
 	public function getInt(string $name, ?int $default = null) : int{
 		return $this->getTagValue($name, IntTag::class, $default);
 	}
 
-	/**
-	 * @param string   $name
-	 * @param int|null $default
-	 *
-	 * @return int
-	 */
 	public function getLong(string $name, ?int $default = null) : int{
 		return $this->getTagValue($name, LongTag::class, $default);
 	}
 
-	/**
-	 * @param string     $name
-	 * @param float|null $default
-	 *
-	 * @return float
-	 */
 	public function getFloat(string $name, ?float $default = null) : float{
 		return $this->getTagValue($name, FloatTag::class, $default);
 	}
 
-	/**
-	 * @param string     $name
-	 * @param float|null $default
-	 *
-	 * @return float
-	 */
 	public function getDouble(string $name, ?float $default = null) : float{
 		return $this->getTagValue($name, DoubleTag::class, $default);
 	}
 
-	/**
-	 * @param string      $name
-	 * @param string|null $default
-	 *
-	 * @return string
-	 */
 	public function getByteArray(string $name, ?string $default = null) : string{
 		return $this->getTagValue($name, ByteArrayTag::class, $default);
 	}
 
-	/**
-	 * @param string      $name
-	 * @param string|null $default
-	 *
-	 * @return string
-	 */
 	public function getString(string $name, ?string $default = null) : string{
 		return $this->getTagValue($name, StringTag::class, $default);
 	}
 
 	/**
-	 * @param string     $name
 	 * @param int[]|null $default
 	 *
 	 * @return int[]
@@ -295,9 +225,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	 */
 
 	/**
-	 * @param string $name
-	 * @param int    $value
-	 *
 	 * @return $this
 	 */
 	public function setByte(string $name, int $value) : self{
@@ -305,9 +232,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	}
 
 	/**
-	 * @param string $name
-	 * @param int    $value
-	 *
 	 * @return $this
 	 */
 	public function setShort(string $name, int $value) : self{
@@ -315,9 +239,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	}
 
 	/**
-	 * @param string $name
-	 * @param int    $value
-	 *
 	 * @return $this
 	 */
 	public function setInt(string $name, int $value) : self{
@@ -325,9 +246,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	}
 
 	/**
-	 * @param string $name
-	 * @param int    $value
-	 *
 	 * @return $this
 	 */
 	public function setLong(string $name, int $value) : self{
@@ -335,9 +253,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	}
 
 	/**
-	 * @param string $name
-	 * @param float  $value
-	 *
 	 * @return $this
 	 */
 	public function setFloat(string $name, float $value) : self{
@@ -345,9 +260,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	}
 
 	/**
-	 * @param string $name
-	 * @param float  $value
-	 *
 	 * @return $this
 	 */
 	public function setDouble(string $name, float $value) : self{
@@ -355,9 +267,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	}
 
 	/**
-	 * @param string $name
-	 * @param string $value
-	 *
 	 * @return $this
 	 */
 	public function setByteArray(string $name, string $value) : self{
@@ -365,9 +274,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	}
 
 	/**
-	 * @param string $name
-	 * @param string $value
-	 *
 	 * @return $this
 	 */
 	public function setString(string $name, string $value) : self{
@@ -375,7 +281,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	}
 
 	/**
-	 * @param string $name
 	 * @param int[]  $value
 	 *
 	 * @return $this
@@ -494,16 +399,10 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 		next($this->value);
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function valid() : bool{
 		return key($this->value) !== null;
 	}
 
-	/**
-	 * @return string|null
-	 */
 	public function key() : ?string{
 		$k = key($this->value);
 		if(is_int($k)){
@@ -516,9 +415,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 		return $k;
 	}
 
-	/**
-	 * @return Tag|null
-	 */
 	public function current() : ?Tag{
 		return current($this->value) ?: null;
 	}
@@ -547,10 +443,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	 * this tag and the other will be overwritten by the tag in the other.
 	 *
 	 * This deep-clones all tags.
-	 *
-	 * @param CompoundTag $other
-	 *
-	 * @return CompoundTag
 	 */
 	public function merge(CompoundTag $other) : CompoundTag{
 		$new = clone $this;

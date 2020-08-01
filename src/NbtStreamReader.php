@@ -31,61 +31,51 @@ use pocketmine\utils\BinaryDataException;
 interface NbtStreamReader{
 
 	/**
-	 * @return int
 	 * @throws BinaryDataException
 	 */
 	public function readByte() : int;
 
 	/**
-	 * @return int
 	 * @throws BinaryDataException
 	 */
 	public function readSignedByte() : int;
 
 	/**
-	 * @return int
 	 * @throws BinaryDataException
 	 */
 	public function readShort() : int;
 
 	/**
-	 * @return int
 	 * @throws BinaryDataException
 	 */
 	public function readSignedShort() : int;
 
 	/**
-	 * @return int
 	 * @throws BinaryDataException
 	 */
 	public function readInt() : int;
 
 	/**
-	 * @return int
 	 * @throws BinaryDataException
 	 */
 	public function readLong() : int;
 
 	/**
-	 * @return float
 	 * @throws BinaryDataException
 	 */
 	public function readFloat() : float;
 
 	/**
-	 * @return float
 	 * @throws BinaryDataException
 	 */
 	public function readDouble() : float;
 
 	/**
-	 * @return string
 	 * @throws BinaryDataException
 	 */
 	public function readByteArray() : string;
 
 	/**
-	 * @return string
 	 * @throws BinaryDataException
 	 */
 	public function readString() : string;

@@ -33,9 +33,6 @@ final class StringTag extends ImmutableTag{
 	/** @var string */
 	private $value;
 
-	/**
-	 * @param string $value
-	 */
 	public function __construct(string $value){
 		self::restrictArgCount(__METHOD__, func_num_args(), 1);
 		if(strlen($value) > 32767){
@@ -60,9 +57,6 @@ final class StringTag extends ImmutableTag{
 		$writer->writeString($this->value);
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getValue() : string{
 		return $this->value;
 	}

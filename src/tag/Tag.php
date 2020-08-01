@@ -56,7 +56,6 @@ abstract class Tag{
 	 * Clones this tag safely, detecting recursive dependencies which would otherwise cause an infinite cloning loop.
 	 * Used for cloning tags in tags that have children.
 	 *
-	 * @return Tag
 	 * @throws \RuntimeException if a recursive dependency was detected
 	 */
 	public function safeClone() : Tag{
@@ -81,10 +80,6 @@ abstract class Tag{
 	/**
 	 * Compares this Tag to the given Tag and determines whether or not they are equal, based on type and value.
 	 * Complex tag types should override this to provide proper value comparison.
-	 *
-	 * @param Tag $that
-	 *
-	 * @return bool
 	 */
 	public function equals(Tag $that) : bool{
 		return $that instanceof $this and $this->getValue() === $that->getValue();

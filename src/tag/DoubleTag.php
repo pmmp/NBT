@@ -32,9 +32,6 @@ final class DoubleTag extends ImmutableTag{
 	/** @var float */
 	private $value;
 
-	/**
-	 * @param float $value
-	 */
 	public function __construct(float $value){
 		self::restrictArgCount(__METHOD__, func_num_args(), 1);
 		$this->value = $value;
@@ -56,9 +53,6 @@ final class DoubleTag extends ImmutableTag{
 		$writer->writeDouble($this->value);
 	}
 
-	/**
-	 * @return float
-	 */
 	public function getValue() : float{
 		return $this->value;
 	}

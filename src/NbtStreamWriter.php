@@ -43,8 +43,6 @@ interface NbtStreamWriter{
 	public function writeByteArray(string $v) : void;
 
 	/**
-	 * @param string $v
-	 *
 	 * @throws \InvalidArgumentException if the string is too long
 	 */
 	public function writeString(string $v) : void;

@@ -43,7 +43,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * @param Tag[] $value
-	 * @param int   $tagType
 	 */
 	public function __construct(array $value = [], int $tagType = NBT::TAG_End){
 		self::restrictArgCount(__METHOD__, func_num_args(), 2);
@@ -69,8 +68,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 	/**
 	 * Returns an array of tag values inserted into this list. ArrayAccess-implementing tags are returned as themselves
 	 * (such as ListTag and CompoundTag) and others are returned as primitive values or arrays.
-	 *
-	 * @return array
 	 */
 	public function getAllValues() : array{
 		$result = [];
@@ -87,8 +84,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * @param int $offset
-	 *
-	 * @return bool
 	 */
 	public function offsetExists($offset) : bool{
 		return isset($this->value[$offset]);
@@ -135,24 +130,16 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 		unset($this->value[$offset]);
 	}
 
-	/**
-	 * @return int
-	 */
 	public function count() : int{
 		return $this->value->count();
 	}
 
-	/**
-	 * @return int
-	 */
 	public function getCount() : int{
 		return $this->value->count();
 	}
 
 	/**
 	 * Appends the specified tag to the end of the list.
-	 *
-	 * @param Tag $tag
 	 */
 	public function push(Tag $tag) : void{
 		$this->checkTagType($tag);
@@ -161,8 +148,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Removes the last tag from the list and returns it.
-	 *
-	 * @return Tag
 	 */
 	public function pop() : Tag{
 		return $this->value->pop();
@@ -170,8 +155,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Adds the specified tag to the start of the list.
-	 *
-	 * @param Tag $tag
 	 */
 	public function unshift(Tag $tag) : void{
 		$this->checkTagType($tag);
@@ -180,8 +163,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Removes the first tag from the list and returns it.
-	 *
-	 * @return Tag
 	 */
 	public function shift() : Tag{
 		return $this->value->shift();
@@ -190,9 +171,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 	/**
 	 * Inserts a tag into the list between existing tags, at the specified offset. Later values in the list are moved up
 	 * by 1 position.
-	 *
-	 * @param int $offset
-	 * @param Tag $tag
 	 *
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
@@ -203,8 +181,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Removes a value from the list. All later tags in the list are moved down by 1 position.
-	 *
-	 * @param int $offset
 	 */
 	public function remove(int $offset) : void{
 		unset($this->value[$offset]);
@@ -213,9 +189,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 	/**
 	 * Returns the tag at the specified offset.
 	 *
-	 * @param int $offset
-	 *
-	 * @return Tag
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
 	public function get(int $offset) : Tag{
@@ -224,8 +197,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Returns the element in the first position of the list, without removing it.
-	 *
-	 * @return Tag
 	 */
 	public function first() : Tag{
 		return $this->value->bottom();
@@ -233,8 +204,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Returns the element in the last position in the list (the end), without removing it.
-	 *
-	 * @return Tag
 	 */
 	public function last() : Tag{
 		return $this->value->top();
@@ -242,9 +211,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Overwrites the tag at the specified offset.
-	 *
-	 * @param int $offset
-	 * @param Tag $tag
 	 *
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
@@ -255,10 +221,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Returns whether a tag exists at the specified offset.
-	 *
-	 * @param int $offset
-	 *
-	 * @return bool
 	 */
 	public function isset(int $offset) : bool{
 		return isset($this->value[$offset]);
@@ -266,8 +228,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Returns whether there are any tags in the list.
-	 *
-	 * @return bool
 	 */
 	public function empty() : bool{
 		return $this->value->isEmpty();
@@ -283,8 +243,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Returns the type of tag contained in this list.
-	 *
-	 * @return int
 	 */
 	public function getTagType() : int{
 		return $this->tagType;
@@ -294,7 +252,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 	 * Sets the type of tag that can be added to this list. If TAG_End is used, the type will be auto-detected from the
 	 * first tag added to the list.
 	 *
-	 * @param int $type
 	 * @throws \LogicException if the list is not empty
 	 */
 	public function setTagType(int $type){
@@ -306,8 +263,6 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 
 	/**
 	 * Type-checks the given Tag for addition to the list, updating the list tag type as appropriate.
-	 *
-	 * @param Tag $tag
 	 *
 	 * @throws \TypeError if the tag type is not compatible.
 	 */
@@ -380,23 +335,14 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 		$this->value->next();
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function valid() : bool{
 		return $this->value->valid();
 	}
 
-	/**
-	 * @return Tag|null
-	 */
 	public function current() : ?Tag{
 		return $this->value->current();
 	}
 
-	/**
-	 * @return int
-	 */
 	public function key() : int{
 		return (int) $this->value->key();
 	}
