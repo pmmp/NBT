@@ -25,7 +25,6 @@ namespace pocketmine\nbt;
 
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\Tag;
-use function get_class;
 
 /**
  * This class wraps around the root Tag for NBT files to avoid losing the name information.

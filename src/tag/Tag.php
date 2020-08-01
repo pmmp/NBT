@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NbtStreamWriter;
-use function get_class;
 
 abstract class Tag{
 
