@@ -44,7 +44,7 @@ abstract class Tag{
 	}
 
 	final public function toString(int $indentation = 0) : string{
-		return "TAG_" . $this->getTypeName() . ": value=" . $this->stringifyValue($indentation);
+		return "TAG_" . $this->getTypeName() . "=" . $this->stringifyValue($indentation);
 	}
 
 	abstract protected function getTypeName() : string;
