@@ -107,7 +107,7 @@ abstract class NBTStream{
 		$data = $this->readTag(new ReaderTracker($maxDepth));
 
 		if($data === null){
-			throw new \InvalidArgumentException("Found TAG_End at the start of buffer");
+			throw new \UnexpectedValueException("Found TAG_End at the start of buffer");
 		}
 
 		if($doMultiple and !$this->feof()){
