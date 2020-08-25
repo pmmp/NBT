@@ -320,37 +320,46 @@ abstract class NBTStream{
 	}
 
 	/**
-	 * @param CompoundTag|ListTag $tag
-	 * @param mixed[] $data
+	 * @param mixed $value
 	 * @phpstan-param callable(string $key, mixed $value) : ?NamedTag $guesser
 	 */
-	private static function tagFromArray(NamedTag $tag, array $data, callable $guesser) : void{
-		foreach($data as $key => $value){
-			$name = is_int($key) ? "" : $key;
-			if(is_array($value)){
-				$isNumeric = true;
-				$isIntArray = true;
-				foreach($value as $k => $v){
-					if(!is_numeric($k)){
-						$isNumeric = false;
-						break;
-					}elseif(!is_int($v)){
-						$isIntArray = false;
-					}
-				}
-				if($isNumeric && $isIntArray){
-					$tag[$key] = new IntArrayTag($name, $value);
-				}else{
-					$node = $isNumeric ? new ListTag($name, []) : new CompoundTag($name, []);
-					self::tagFromArray($node, $value, $guesser);
-					$tag[$key] = $node;
-				}
-			}else{
-				$v = call_user_func($guesser, $name, $value);
-				if($v instanceof NamedTag){
-					$tag[$key] = $v;
+	private static function parseArrayValue(string $name, $value, callable $guesser) : ?NamedTag{
+		if(is_array($value)){
+			$isNumeric = true;
+			$isIntArray = true;
+			foreach($value as $k => $v){
+				if(!is_numeric($k)){
+					$isNumeric = false;
+					break;
+				}elseif(!is_int($v)){
+					$isIntArray = false;
 				}
 			}
+
+			if($isNumeric && $isIntArray){
+				return new IntArrayTag($name, $value);
+			}elseif($isNumeric){
+				$node = new ListTag($name, []);
+				foreach($value as $v){
+					$vtag = self::parseArrayValue("", $v, $guesser);
+					//TODO: this will throw a TypeError if wrong tags are encountered after the first one
+					if($vtag !== null){
+						$node->push($vtag);
+					}
+				}
+				return $node;
+			}else{
+				$node = new CompoundTag($name, []);
+				foreach($value as $k => $v){
+					$vtag = self::parseArrayValue((string) $k, $value, $guesser);
+					if($vtag !== null){
+						$node->setTag($vtag);
+					}
+				}
+				return $node;
+			}
+		}else{
+			return call_user_func($guesser, $name, $value);
 		}
 	}
 
@@ -360,7 +369,12 @@ abstract class NBTStream{
 	 */
 	public static function fromArray(array $data, callable $guesser = null) : CompoundTag{
 		$tag = new CompoundTag("", []);
-		self::tagFromArray($tag, $data, $guesser ?? [self::class, "fromArrayGuesser"]);
+		foreach($data as $k => $v){
+			$vtag = self::parseArrayValue($k, $v, $guesser ?? [self::class, "fromArrayGuesser"]);
+			if($vtag !== null){
+				$tag->setTag($vtag);
+			}
+		}
 		return $tag;
 	}
 }
