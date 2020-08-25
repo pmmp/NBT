@@ -33,12 +33,19 @@ use function str_repeat;
 
 #include <rules/NBT.h>
 
+/**
+ * @phpstan-implements \ArrayAccess<int, mixed>
+ * @phpstan-implements \Iterator<int, NamedTag>
+ */
 class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	use NoDynamicFieldsTrait;
 
 	/** @var int */
 	private $tagType;
-	/** @var \SplDoublyLinkedList|NamedTag[] */
+	/**
+	 * @var \SplDoublyLinkedList|NamedTag[]
+	 * @phpstan-var \SplDoublyLinkedList<NamedTag>
+	 */
 	private $value;
 
 	/**
@@ -69,6 +76,8 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	/**
 	 * Returns an array of tag values inserted into this list. ArrayAccess-implementing tags are returned as themselves
 	 * (such as ListTag and CompoundTag) and others are returned as primitive values or arrays.
+	 * @return mixed[]
+	 * @phpstan-return list<mixed>
 	 */
 	public function getAllValues() : array{
 		$result = [];
@@ -173,6 +182,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	 * Inserts a tag into the list between existing tags, at the specified offset. Later values in the list are moved up
 	 * by 1 position.
 	 *
+	 * @return void
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
 	public function insert(int $offset, NamedTag $tag){
@@ -249,6 +259,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	 * Sets the type of tag that can be added to this list. If TAG_End is used, the type will be auto-detected from the
 	 * first tag added to the list.
 	 *
+	 * @return void
 	 * @throws \LogicException if the list is not empty
 	 */
 	public function setTagType(int $type){

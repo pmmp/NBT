@@ -57,6 +57,7 @@ abstract class NamedTag{
 		$this->__name = $name;
 	}
 
+	/** @return mixed */
 	abstract public function getValue();
 
 	abstract public function getType() : int;

@@ -53,8 +53,9 @@ use pocketmine\utils\BinaryDataException;
  * Base Named Binary Tag encoder/decoder
  */
 abstract class NBTStream{
-
+	/** @var string */
 	public $buffer = "";
+	/** @var int */
 	public $offset = 0;
 
 	/**
@@ -272,6 +273,10 @@ abstract class NBTStream{
 	 */
 	abstract public function putIntArray(array $array) : void;
 
+	/**
+	 * @return mixed[]
+	 * @phpstan-return array<string, mixed>
+	 */
 	public static function toArray(CompoundTag $data) : array{
 		$array = [];
 		self::tagToArray($array, $data);
@@ -293,6 +298,9 @@ abstract class NBTStream{
 		}
 	}
 
+	/**
+	 * @param mixed $value
+	 */
 	public static function fromArrayGuesser(string $key, $value) : ?NamedTag{
 		if(is_int($value)){
 			return new IntTag($key, $value);
@@ -307,6 +315,10 @@ abstract class NBTStream{
 		return null;
 	}
 
+	/**
+	 * @param mixed[] $data
+	 * @phpstan-param callable(string $key, mixed $value) : ?NamedTag $guesser
+	 */
 	private static function tagFromArray(NamedTag $tag, array $data, callable $guesser) : void{
 		foreach($data as $key => $value){
 			if(is_array($value)){
@@ -331,6 +343,10 @@ abstract class NBTStream{
 		}
 	}
 
+	/**
+	 * @param mixed[] $data
+	 * @phpstan-param (callable(string $key, mixed $value) : ?NamedTag)|null $guesser
+	 */
 	public static function fromArray(array $data, callable $guesser = null) : CompoundTag{
 		$tag = new CompoundTag("", []);
 		self::tagFromArray($tag, $data, $guesser ?? [self::class, "fromArrayGuesser"]);

@@ -41,6 +41,10 @@ use function str_repeat;
 
 #include <rules/NBT.h>
 
+/**
+ * @phpstan-implements \ArrayAccess<string, mixed>
+ * @phpstan-implements \Iterator<string, NamedTag>
+ */
 class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countable{
 	use NoDynamicFieldsTrait;
 
@@ -145,6 +149,8 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 
 	/**
 	 * Returns whether the CompoundTag contains a child tag with the specified name.
+	 *
+	 * @phpstan-param class-string<NamedTag> $expectedClass
 	 */
 	public function hasTag(string $name, string $expectedClass = NamedTag::class) : bool{
 		assert(is_a($expectedClass, NamedTag::class, true));
@@ -158,6 +164,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	 *
 	 * @param mixed  $default
 	 * @param bool   $badTagDefault Return the specified default if the tag is not of the expected type.
+	 * @phpstan-param class-string<NamedTag> $expectedClass
 	 *
 	 * @return mixed
 	 */
