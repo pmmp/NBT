@@ -320,6 +320,7 @@ abstract class NBTStream{
 	}
 
 	/**
+	 * @param CompoundTag|ListTag $tag
 	 * @param mixed[] $data
 	 * @phpstan-param callable(string $key, mixed $value) : ?NamedTag $guesser
 	 */
@@ -336,9 +337,13 @@ abstract class NBTStream{
 						$isIntArray = false;
 					}
 				}
-				$node = $isNumeric ? ($isIntArray ? new IntArrayTag($key, []) : new ListTag($key, [])) : new CompoundTag($key, []);
-				self::tagFromArray($node, $value, $guesser);
-				$tag[$key] = $node;
+				if($isNumeric && $isIntArray){
+					$tag[$key] = new IntArrayTag($key, $value);
+				}else{
+					$node = $isNumeric ? new ListTag($key, []) : new CompoundTag($key, []);
+					self::tagFromArray($node, $value, $guesser);
+					$tag[$key] = $node;
+				}
 			}else{
 				$v = call_user_func($guesser, $key, $value);
 				if($v instanceof NamedTag){
