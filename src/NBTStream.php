@@ -289,11 +289,11 @@ abstract class NBTStream{
 
 	/**
 	 * @param mixed[]                         $data
-	 * @param CompoundTag|ListTag|IntArrayTag $tag
+	 * @param CompoundTag|ListTag $tag
 	 */
 	private static function tagToArray(array &$data, NamedTag $tag) : void{
 		foreach($tag as $key => $value){
-			if($value instanceof CompoundTag or $value instanceof ListTag or $value instanceof IntArrayTag){
+			if($value instanceof CompoundTag or $value instanceof ListTag){
 				$data[$key] = [];
 				self::tagToArray($data[$key], $value);
 			}else{
