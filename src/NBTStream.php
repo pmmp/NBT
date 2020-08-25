@@ -336,8 +336,9 @@ abstract class NBTStream{
 						$isIntArray = false;
 					}
 				}
-				$tag[$key] = $isNumeric ? ($isIntArray ? new IntArrayTag($key, []) : new ListTag($key, [])) : new CompoundTag($key, []);
-				self::tagFromArray($tag->{$key}, $value, $guesser);
+				$node = $isNumeric ? ($isIntArray ? new IntArrayTag($key, []) : new ListTag($key, [])) : new CompoundTag($key, []);
+				self::tagFromArray($node, $value, $guesser);
+				$tag[$key] = $node;
 			}else{
 				$v = call_user_func($guesser, $key, $value);
 				if($v instanceof NamedTag){
