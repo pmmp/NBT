@@ -132,7 +132,11 @@ abstract class NBTStream{
 	 * @return NamedTag|NamedTag[]
 	 */
 	public function readCompressed(string $buffer){
-		return $this->read(zlib_decode($buffer));
+		$decompressed = zlib_decode($buffer);
+		if($decompressed === false){
+			throw new \UnexpectedValueException("Failed to decompress data");
+		}
+		return $this->read($decompressed);
 	}
 
 	/**
