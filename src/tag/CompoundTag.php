@@ -44,6 +44,10 @@ use function next;
 use function reset;
 use function str_repeat;
 
+/**
+ * @phpstan-implements \ArrayAccess<string, mixed>
+ * @phpstan-implements \Iterator<string, Tag>
+ */
 final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countable{
 	use NoDynamicFieldsTrait;
 
@@ -145,6 +149,8 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 
 	/**
 	 * Returns whether the CompoundTag contains a child tag with the specified name.
+	 *
+	 * @phpstan-param class-string<Tag> $expectedClass
 	 */
 	public function hasTag(string $name, string $expectedClass = Tag::class) : bool{
 		assert(is_a($expectedClass, Tag::class, true));
@@ -156,6 +162,7 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	 * tag is not of type $expectedType, an exception will be thrown.
 	 *
 	 * @param mixed  $default
+	 * @phpstan-param class-string<Tag> $expectedClass
 	 *
 	 * @return mixed
 	 *
@@ -318,8 +325,8 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	}
 
 	/**
-	 * @param string $offset
-	 * @param Tag    $value
+	 * @param string|null $offset
+	 * @param Tag         $value
 	 *
 	 * @throws \InvalidArgumentException if offset is null
 	 * @throws \TypeError if $value is not a Tag object
@@ -349,7 +356,7 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 
 	public static function read(NbtStreamReader $reader, ReaderTracker $tracker) : self{
 		$result = new self;
-		$tracker->protectDepth(static function() use($reader, $tracker, $result){
+		$tracker->protectDepth(static function() use($reader, $tracker, $result) : void{
 			for($type = $reader->readByte(); $type !== NBT::TAG_End; $type = $reader->readByte()){
 				$name = $reader->readString();
 				$tag = NBT::createTag($type, $reader, $tracker);
@@ -402,8 +409,11 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 		return key($this->value) !== null;
 	}
 
-	public function key() : ?string{
+	public function key() : string{
 		$k = key($this->value);
+		if($k === null){
+			throw new \OutOfBoundsException("Iterator already reached the end");
+		}
 		if(is_int($k)){
 			/* PHP arrays are idiotic and cast keys like "1" to int(1)
 			 * TODO: perhaps we should consider using a \Ds\Map for this?
@@ -414,8 +424,12 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 		return $k;
 	}
 
-	public function current() : ?Tag{
-		return current($this->value) ?: null;
+	public function current() : Tag{
+		$current = current($this->value);
+		if($current === false){
+			throw new \OutOfBoundsException("Iterator already reached the end");
+		}
+		return $current;
 	}
 
 	public function rewind() : void{

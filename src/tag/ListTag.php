@@ -33,12 +33,19 @@ use function gettype;
 use function is_object;
 use function str_repeat;
 
+/**
+ * @phpstan-implements \ArrayAccess<int, mixed>
+ * @phpstan-implements \Iterator<int, Tag>
+ */
 final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 	use NoDynamicFieldsTrait;
 
 	/** @var int */
 	private $tagType;
-	/** @var \SplDoublyLinkedList|Tag[] */
+	/**
+	 * @var \SplDoublyLinkedList|Tag[]
+	 * @phpstan-var \SplDoublyLinkedList<Tag>
+	 */
 	private $value;
 
 	/**
@@ -68,6 +75,8 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 	/**
 	 * Returns an array of tag values inserted into this list. ArrayAccess-implementing tags are returned as themselves
 	 * (such as ListTag and CompoundTag) and others are returned as primitive values or arrays.
+	 * @return mixed[]
+	 * @phpstan-return list<mixed>
 	 */
 	public function getAllValues() : array{
 		$result = [];
@@ -172,6 +181,7 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 	 * Inserts a tag into the list between existing tags, at the specified offset. Later values in the list are moved up
 	 * by 1 position.
 	 *
+	 * @return void
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
 	public function insert(int $offset, Tag $tag){
@@ -192,6 +202,9 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
 	public function get(int $offset) : Tag{
+		if(!isset($this->value[$offset])){
+			throw new \OutOfRangeException("No such tag at offset $offset");
+		}
 		return $this->value[$offset];
 	}
 
@@ -252,6 +265,7 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 	 * Sets the type of tag that can be added to this list. If TAG_End is used, the type will be auto-detected from the
 	 * first tag added to the list.
 	 *
+	 * @return void
 	 * @throws \LogicException if the list is not empty
 	 */
 	public function setTagType(int $type){
@@ -288,7 +302,7 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 				throw new \UnexpectedValueException("Unexpected non-empty list of TAG_End");
 			}
 
-			$tracker->protectDepth(static function() use($size, $tagType, $reader, $tracker, &$value){
+			$tracker->protectDepth(static function() use($size, $tagType, $reader, $tracker, &$value) : void{
 				for($i = 0; $i < $size; ++$i){
 					$value[] = NBT::createTag($tagType, $reader, $tracker);
 				}
@@ -339,12 +353,18 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 		return $this->value->valid();
 	}
 
-	public function current() : ?Tag{
+	public function current() : Tag{
+		if(!$this->value->valid()){
+			throw new \OutOfBoundsException("Iteration already reached end of list");
+		}
 		return $this->value->current();
 	}
 
 	public function key() : int{
-		return (int) $this->value->key();
+		if(!$this->value->valid()){
+			throw new \OutOfBoundsException("Iteration already reached end of list");
+		}
+		return $this->value->key();
 	}
 
 	public function rewind() : void{

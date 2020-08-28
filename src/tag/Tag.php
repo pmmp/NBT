@@ -33,6 +33,7 @@ abstract class Tag{
 	 */
 	protected $cloning = false;
 
+	/** @return mixed */
 	abstract public function getValue();
 
 	abstract public function getType() : int;

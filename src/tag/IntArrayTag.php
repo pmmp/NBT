@@ -40,7 +40,7 @@ final class IntArrayTag extends ImmutableTag{
 	 */
 	public function __construct(array $value){
 		self::restrictArgCount(__METHOD__, func_num_args(), 1);
-		assert((function() use(&$value){
+		assert((function() use(&$value) : bool{
 			foreach($value as $v){
 				if(!is_int($v)){
 					return false;
