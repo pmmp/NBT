@@ -298,8 +298,8 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 	}
 
 	/**
-	 * @param string   $offset
-	 * @param NamedTag $value
+	 * @param string|null $offset
+	 * @param NamedTag    $value
 	 *
 	 * @throws \InvalidArgumentException if offset is null
 	 * @throws \TypeError if $value is not a NamedTag object
