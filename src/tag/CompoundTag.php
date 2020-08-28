@@ -328,7 +328,7 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 
 	public function read(NBTStream $nbt, ReaderTracker $tracker) : void{
 		$this->value = [];
-		$tracker->protectDepth(function() use($nbt, $tracker){
+		$tracker->protectDepth(function() use($nbt, $tracker) : void{
 			do{
 				$tag = $nbt->readTag($tracker);
 				if($tag !== null){

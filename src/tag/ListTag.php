@@ -298,7 +298,7 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 				throw new \UnexpectedValueException("Unexpected non-empty list of TAG_End");
 			}
 
-			$tracker->protectDepth(function() use($nbt, $tracker, $size){
+			$tracker->protectDepth(function() use($nbt, $tracker, $size) : void{
 				$tagBase = NBT::createTag($this->tagType);
 				for($i = 0; $i < $size; ++$i){
 					$tag = clone $tagBase;
