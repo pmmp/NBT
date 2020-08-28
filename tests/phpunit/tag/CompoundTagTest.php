@@ -52,16 +52,6 @@ class CompoundTagTest extends TestCase{
 	}
 
 	/**
-	 * $tag[] = $value is not allowed on CompoundTags
-	 */
-	public function testAppendSyntax() : void{
-		$this->expectException(\InvalidArgumentException::class);
-
-		$tag = new CompoundTag();
-		$tag[] = new StringTag("tag");
-	}
-
-	/**
 	 * Cloning a CompoundTag should clone all of its children
 	 *
 	 * @throws \Exception
