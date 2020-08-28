@@ -2,7 +2,7 @@ includes:
 	- tests/phpstan/configs/phpstan-bugs.neon
 
 parameters:
-	level: 7
+	level: 8
 	treatPhpDocTypesAsCertain: false
 	paths:
 		- src

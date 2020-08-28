@@ -370,8 +370,11 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 		return key($this->value) !== null;
 	}
 
-	public function key() : ?string{
+	public function key() : string{
 		$k = key($this->value);
+		if($k === null){
+			throw new \OutOfBoundsException("Iterator already reached the end");
+		}
 		if(is_int($k)){
 			/* PHP arrays are idiotic and cast keys like "1" to int(1)
 			 * TODO: perhaps we should consider using a \Ds\Map for this?
@@ -382,8 +385,12 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 		return $k;
 	}
 
-	public function current() : ?NamedTag{
-		return current($this->value) ?: null;
+	public function current() : NamedTag{
+		$current = current($this->value);
+		if($current === false){
+			throw new \OutOfBoundsException("Iterator already reached the end");
+		}
+		return $current;
 	}
 
 	public function rewind() : void{

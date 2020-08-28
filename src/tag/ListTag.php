@@ -203,6 +203,9 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
 	public function get(int $offset) : NamedTag{
+		if(!isset($this->value[$offset])){
+			throw new \OutOfRangeException("No such tag at offset $offset");
+		}
 		return $this->value[$offset];
 	}
 
@@ -344,12 +347,18 @@ class ListTag extends NamedTag implements \ArrayAccess, \Countable, \Iterator{
 		return $this->value->valid();
 	}
 
-	public function current() : ?NamedTag{
+	public function current() : NamedTag{
+		if(!$this->value->valid()){
+			throw new \OutOfBoundsException("Iteration already reached end of list");
+		}
 		return $this->value->current();
 	}
 
 	public function key() : int{
-		return (int) $this->value->key();
+		if(!$this->value->valid()){
+			throw new \OutOfBoundsException("Iteration already reached end of list");
+		}
+		return $this->value->key();
 	}
 
 	public function rewind() : void{
