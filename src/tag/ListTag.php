@@ -34,10 +34,9 @@ use function is_object;
 use function str_repeat;
 
 /**
- * @phpstan-implements \ArrayAccess<int, mixed>
  * @phpstan-implements \Iterator<int, Tag>
  */
-final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
+final class ListTag extends Tag implements \Countable, \Iterator{
 	use NoDynamicFieldsTrait;
 
 	/** @var int */
@@ -73,70 +72,17 @@ final class ListTag extends Tag implements \ArrayAccess, \Countable, \Iterator{
 	}
 
 	/**
-	 * Returns an array of tag values inserted into this list. ArrayAccess-implementing tags are returned as themselves
-	 * (such as ListTag and CompoundTag) and others are returned as primitive values or arrays.
+	 * Returns an array of tag values inserted into this list.
 	 * @return mixed[]
 	 * @phpstan-return list<mixed>
 	 */
 	public function getAllValues() : array{
 		$result = [];
 		foreach($this->value as $tag){
-			if($tag instanceof \ArrayAccess){
-				$result[] = $tag;
-			}else{
-				$result[] = $tag->getValue();
-			}
+			$result[] = $tag->getValue();
 		}
 
 		return $result;
-	}
-
-	/**
-	 * @param int $offset
-	 */
-	public function offsetExists($offset) : bool{
-		return isset($this->value[$offset]);
-	}
-
-	/**
-	 * @param int $offset
-	 *
-	 * @return CompoundTag|ListTag|mixed
-	 */
-	public function offsetGet($offset){
-		/** @var Tag|null $value */
-		$value = $this->value[$offset] ?? null;
-
-		if($value instanceof \ArrayAccess){
-			return $value;
-		}elseif($value !== null){
-			return $value->getValue();
-		}
-
-		return null;
-	}
-
-	/**
-	 * @param int|null $offset
-	 * @param Tag      $value
-	 *
-	 * @throws \TypeError if an incompatible tag type is given
-	 * @throws \TypeError if $value is not a Tag object
-	 */
-	public function offsetSet($offset, $value) : void{
-		if($value instanceof Tag){
-			$this->checkTagType($value);
-			$this->value[$offset] = $value;
-		}else{
-			throw new \TypeError("Value set by ArrayAccess must be an instance of " . Tag::class . ", got " . (is_object($value) ? " instance of " . get_class($value) : gettype($value)));
-		}
-	}
-
-	/**
-	 * @param int $offset
-	 */
-	public function offsetUnset($offset) : void{
-		unset($this->value[$offset]);
 	}
 
 	public function count() : int{

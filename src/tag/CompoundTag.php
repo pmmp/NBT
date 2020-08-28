@@ -45,10 +45,9 @@ use function reset;
 use function str_repeat;
 
 /**
- * @phpstan-implements \ArrayAccess<string, mixed>
  * @phpstan-implements \Iterator<string, Tag>
  */
-final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countable{
+final class CompoundTag extends Tag implements \Iterator, \Countable{
 	use NoDynamicFieldsTrait;
 
 	/** @var Tag[] */
@@ -294,56 +293,6 @@ final class CompoundTag extends Tag implements \ArrayAccess, \Iterator, \Countab
 	 */
 	public function setIntArray(string $name, array $value) : self{
 		return $this->setTag($name, new IntArrayTag($value));
-	}
-
-	/**
-	 * @param string $offset
-	 *
-	 * @return bool
-	 */
-	public function offsetExists($offset){
-		return isset($this->value[$offset]);
-	}
-
-	/**
-	 * @param string $offset
-	 *
-	 * @return mixed|null|\ArrayAccess
-	 */
-	public function offsetGet($offset){
-		if(isset($this->value[$offset])){
-			if($this->value[$offset] instanceof \ArrayAccess){
-				return $this->value[$offset];
-			}else{
-				return $this->value[$offset]->getValue();
-			}
-		}
-
-		assert(false, "Offset $offset not found");
-
-		return null;
-	}
-
-	/**
-	 * @param string|null $offset
-	 * @param Tag         $value
-	 *
-	 * @throws \InvalidArgumentException if offset is null
-	 * @throws \TypeError if $value is not a Tag object
-	 */
-	public function offsetSet($offset, $value){
-		if($offset === null){
-			throw new \InvalidArgumentException("Array access push syntax is not supported");
-		}
-		if($value instanceof Tag){
-			$this->value[$offset] = $value;
-		}else{
-			throw new \TypeError("Value set by ArrayAccess must be an instance of " . Tag::class . ", got " . (is_object($value) ? " instance of " . get_class($value) : gettype($value)));
-		}
-	}
-
-	public function offsetUnset($offset){
-		unset($this->value[$offset]);
 	}
 
 	protected function getTypeName() : string{

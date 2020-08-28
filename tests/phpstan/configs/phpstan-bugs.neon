@@ -6,11 +6,6 @@ parameters:
 			path: ../../../src/tag/CompoundTag.php
 
 		-
-			message: "#^Call to function assert\\(\\) with false and string will always evaluate to false\\.$#"
-			count: 1
-			path: ../../../src/tag/CompoundTag.php
-
-		-
 			message: "#^Call to function is_int\\(\\) with int will always evaluate to true\\.$#"
 			count: 1
 			path: ../../../src/tag/IntArrayTag.php
