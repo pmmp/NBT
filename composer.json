@@ -9,7 +9,7 @@
         "pocketmine/binaryutils": "^0.1.9"
     },
     "require-dev": {
-        "phpstan/phpstan": "0.12.42",
+        "phpstan/phpstan": "0.12.43",
         "irstea/phpunit-shim": "^7.5 || ^8.0",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan-strict-rules": "^0.12.4"
