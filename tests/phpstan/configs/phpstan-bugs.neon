@@ -1,11 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Call to function is_array\\(\\) with array\\<pocketmine\\\\nbt\\\\tag\\\\NamedTag\\> will always evaluate to true\\.$#"
-			count: 1
-			path: ../../../src/NBTStream.php
-
-		-
 			message: "#^Strict comparison using \\!\\=\\= between null and null will always evaluate to false\\.$#"
 			count: 1
 			path: ../../../src/tag/CompoundTag.php
