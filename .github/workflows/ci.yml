@@ -16,6 +16,8 @@ jobs:
       uses: shivammathur/setup-php@2.9.0
       with:
         php-version: ${{ matrix.php }}
+        tools: phpunit
+    - run: echo 'xdebug.max_nesting_level=3000' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
     - name: Cache Composer packages
       id: composer-cache
       uses: actions/cache@v2
@@ -27,3 +29,5 @@ jobs:
       run: composer install --prefer-dist --no-interaction
     - name: Run PHPStan
       run: ./vendor/bin/phpstan analyze --no-progress
+    - name: Run PHPUnit
+      run: ./vendor/bin/phpunit --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit
