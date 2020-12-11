@@ -1,11 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Call to function assert\\(\\) with bool will always evaluate to true\\.$#"
-			count: 2
-			path: ../../../src/tag/CompoundTag.php
-
-		-
 			message: "#^Call to function is_int\\(\\) with int will always evaluate to true\\.$#"
 			count: 1
 			path: ../../../src/tag/IntArrayTag.php
