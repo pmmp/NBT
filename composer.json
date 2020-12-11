@@ -3,7 +3,7 @@
     "description": "PHP library for working with Named Binary Tags",
     "type": "library",
     "require": {
-        "php": ">=7.2.0",
+        "php": "^7.2 || ^8.0",
         "php-64bit": "*",
         "ext-zlib": "*",
         "pocketmine/binaryutils": "^0.1.9"
