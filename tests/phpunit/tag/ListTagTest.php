@@ -25,6 +25,9 @@ namespace pocketmine\nbt\tag;
 
 use PHPUnit\Framework\TestCase;
 use pocketmine\nbt\NBT;
+use function array_fill;
+use function array_key_first;
+use function array_map;
 
 class ListTagTest extends TestCase{
 
@@ -134,5 +137,21 @@ class ListTagTest extends TestCase{
 		$this->expectException(\ArgumentCountError::class);
 
 		new ListTag([new IntTag(1)], NBT::TAG_End, "world");
+	}
+
+	/**
+	 * Modification during iteration should not have any effect on iteration (similarly to how array iteration operates
+	 * on a copy of the array instead of the array itself).
+	 */
+	public function testModificationDuringIteration() : void{
+		$tag = new ListTag(array_map(function(int $v) : IntTag{
+			return new IntTag($v);
+		}, array_fill(0, 10, 0)));
+
+		foreach($tag as $k => $v){
+			$tag->remove(0); //remove the first tag, all following tags shift down by one
+		}
+		//if we iterated by-ref, entries are likely to have been skipped
+		self::assertCount(0, $tag);
 	}
 }

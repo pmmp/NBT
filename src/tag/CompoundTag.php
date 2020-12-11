@@ -32,22 +32,17 @@ use pocketmine\nbt\ReaderTracker;
 use pocketmine\nbt\UnexpectedTagTypeException;
 use function assert;
 use function count;
-use function current;
 use function func_num_args;
 use function get_class;
-use function gettype;
 use function is_a;
 use function is_int;
-use function is_object;
-use function key;
-use function next;
-use function reset;
 use function str_repeat;
+use function strval;
 
 /**
- * @phpstan-implements \Iterator<string, Tag>
+ * @phpstan-implements \IteratorAggregate<string, Tag>
  */
-final class CompoundTag extends Tag implements \Iterator, \Countable{
+final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	use NoDynamicFieldsTrait;
 
 	/** @var Tag[] */
@@ -350,39 +345,16 @@ final class CompoundTag extends Tag implements \Iterator, \Countable{
 		return clone $this;
 	}
 
-	public function next() : void{
-		next($this->value);
-	}
-
-	public function valid() : bool{
-		return key($this->value) !== null;
-	}
-
-	public function key() : string{
-		$k = key($this->value);
-		if($k === null){
-			throw new \OutOfBoundsException("Iterator already reached the end");
+	/**
+	 * @return \Generator|Tag[]
+	 * @phpstan-return \Generator<string, Tag, void, void>
+	 */
+	public function getIterator() : \Generator{
+		foreach($this->value as $name => $tag){
+			// PHP arrays are idiotic and cast keys like "1" to int(1)
+			// this also stops us using "yield from". REEEEEEEEEE
+			yield strval($name) => $tag;
 		}
-		if(is_int($k)){
-			/* PHP arrays are idiotic and cast keys like "1" to int(1)
-			 * TODO: perhaps we should consider using a \Ds\Map for this?
-			 */
-			$k = (string) $k;
-		}
-
-		return $k;
-	}
-
-	public function current() : Tag{
-		$current = current($this->value);
-		if($current === false){
-			throw new \OutOfBoundsException("Iterator already reached the end");
-		}
-		return $current;
-	}
-
-	public function rewind() : void{
-		reset($this->value);
 	}
 
 	public function equals(Tag $that) : bool{

@@ -25,6 +25,7 @@ namespace pocketmine\nbt\tag;
 
 use PHPUnit\Framework\TestCase;
 use function array_fill;
+use function str_repeat;
 
 
 class CompoundTagTest extends TestCase{
@@ -166,6 +167,21 @@ class CompoundTagTest extends TestCase{
 		$this->expectException(\ArgumentCountError::class);
 
 		new CompoundTag("hello");
+	}
+
+	/**
+	 * Modification during iteration should not have any effect on iteration (similarly to how array iteration operates
+	 * on a copy of the array instead of the array itself).
+	 */
+	public function testModificationDuringIteration() : void{
+		$tag = CompoundTag::create();
+		for($i = 0; $i < 10; ++$i){
+			$tag->setString(str_repeat("a", $i), str_repeat("b", $i));
+		}
+		foreach($tag as $name => $value){
+			$tag->removeTag($name);
+		}
+		self::assertCount(0, $tag);
 	}
 
 	//TODO: add more tests

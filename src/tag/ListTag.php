@@ -29,14 +29,13 @@ use pocketmine\nbt\NbtStreamWriter;
 use pocketmine\nbt\ReaderTracker;
 use function func_num_args;
 use function get_class;
-use function gettype;
-use function is_object;
+use function iterator_to_array;
 use function str_repeat;
 
 /**
- * @phpstan-implements \Iterator<int, Tag>
+ * @phpstan-implements \IteratorAggregate<int, Tag>
  */
-final class ListTag extends Tag implements \Countable, \Iterator{
+final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	use NoDynamicFieldsTrait;
 
 	/** @var int */
@@ -291,30 +290,14 @@ final class ListTag extends Tag implements \Countable, \Iterator{
 		return clone $this;
 	}
 
-	public function next() : void{
-		$this->value->next();
-	}
-
-	public function valid() : bool{
-		return $this->value->valid();
-	}
-
-	public function current() : Tag{
-		if(!$this->value->valid()){
-			throw new \OutOfBoundsException("Iteration already reached end of list");
-		}
-		return $this->value->current();
-	}
-
-	public function key() : int{
-		if(!$this->value->valid()){
-			throw new \OutOfBoundsException("Iteration already reached end of list");
-		}
-		return $this->value->key();
-	}
-
-	public function rewind() : void{
-		$this->value->rewind();
+	/**
+	 * @return \Generator|Tag[]
+	 * @phpstan-return \Generator<int, Tag, void, void>
+	 */
+	public function getIterator() : \Generator{
+		//we technically don't need iterator_to_array() here, but I don't feel comfortable relying on "yield from" to
+		//copy the underlying dataset referenced by SplDoublyLinkedList
+		yield from iterator_to_array($this->value, true);
 	}
 
 	public function equals(Tag $that) : bool{
