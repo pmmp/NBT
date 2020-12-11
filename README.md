@@ -1,4 +1,4 @@
 # PocketMine-NBT
-[![Build Status](https://travis-ci.org/pmmp/NBT.svg?branch=master)](https://travis-ci.org/pmmp/NBT)
+![CI](https://github.com/pmmp/NBT/workflows/CI/badge.svg)
 
 PHP library for working with Named Binary Tags
