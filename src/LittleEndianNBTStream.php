@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\nbt;
 
 use function array_values;
+use function assert;
 use function count;
 use function pack;
 use function unpack;
@@ -81,7 +82,9 @@ class LittleEndianNBTStream extends NBTStream{
 
 	public function getIntArray() : array{
 		$len = $this->getInt();
-		return array_values(unpack("V*", $this->get($len * 4)));
+		$unpacked = unpack("V*", $this->get($len * 4));
+		assert($unpacked !== false, "The formatting string is valid, and we gave a multiple of 4 bytes");
+		return array_values($unpacked);
 	}
 
 	public function putIntArray(array $array) : void{
