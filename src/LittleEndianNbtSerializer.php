@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\nbt;
 
 use function array_values;
+use function assert;
 use function count;
 use function pack;
 use function unpack;
@@ -76,7 +77,9 @@ class LittleEndianNbtSerializer extends BaseNbtSerializer{
 
 	public function readIntArray() : array{
 		$len = $this->readInt();
-		return array_values(unpack("V*", $this->buffer->get($len * 4)));
+		$unpacked = unpack("V*", $this->buffer->get($len * 4));
+		assert($unpacked !== false, "The formatting string is valid, and we gave a multiple of 4 bytes");
+		return array_values($unpacked);
 	}
 
 	public function writeIntArray(array $array) : void{
