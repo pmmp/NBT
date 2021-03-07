@@ -24,6 +24,11 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use PHPUnit\Framework\TestCase;
+use pocketmine\nbt\LittleEndianNbtSerializer;
+use pocketmine\nbt\TreeRoot;
+use const PHP_FLOAT_EPSILON;
+use const PHP_FLOAT_MAX;
+use const PHP_FLOAT_MIN;
 
 class FloatTagTest extends TestCase{
 
@@ -38,5 +43,25 @@ class FloatTagTest extends TestCase{
 		$this->expectException(\ArgumentCountError::class);
 
 		new FloatTag(1, "world");
+	}
+
+	/**
+	 * @phpstan-return \Generator<int, array{float}, void, void>
+	 */
+	public function equalityAfterDecodeProvider() : \Generator{
+		yield [0.3];
+		yield [PHP_FLOAT_EPSILON];
+		yield [PHP_FLOAT_MAX];
+		yield [PHP_FLOAT_MIN];
+	}
+
+	/**
+	 * @dataProvider equalityAfterDecodeProvider
+	 */
+	public function testEqualityAfterDecode(float $value) : void{
+		$tag = new FloatTag($value);
+		$serializer = new LittleEndianNbtSerializer();
+		$tag2 = $serializer->read($serializer->write(new TreeRoot($tag)));
+		self::assertTrue($tag->equals($tag2->getTag()));
 	}
 }
