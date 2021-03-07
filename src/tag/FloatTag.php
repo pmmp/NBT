@@ -26,6 +26,7 @@ namespace pocketmine\nbt\tag;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NBTStream;
 use pocketmine\nbt\ReaderTracker;
+use pocketmine\utils\Binary;
 
 #include <rules/NBT.h>
 
@@ -52,5 +53,12 @@ class FloatTag extends NamedTag{
 
 	public function getValue() : float{
 		return $this->value;
+	}
+
+	protected function equalsValue(NamedTag $that) : bool{
+		//the values of TAG_Float are represented in 32 bits (single precision), so we don't want extra precision given
+		//by 64-bit in-memory representation to break comparison (e.g. 0.3 != decode(encode(0.3)))
+		//this intentionally truncates our value so that it compares as valid
+		return $that instanceof $this && Binary::writeFloat($this->value) === Binary::writeFloat($that->value);
 	}
 }

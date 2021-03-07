@@ -24,6 +24,10 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use PHPUnit\Framework\TestCase;
+use pocketmine\nbt\LittleEndianNBTStream;
+use const PHP_FLOAT_EPSILON;
+use const PHP_FLOAT_MAX;
+use const PHP_FLOAT_MIN;
 
 class FloatTagTest extends TestCase{
 
@@ -32,5 +36,25 @@ class FloatTagTest extends TestCase{
 
 		$tag = new FloatTag("", $value);
 		self::assertSame($value, $tag->getValue());
+	}
+
+	/**
+	 * @phpstan-return \Generator<int, array{float}, void, void>
+	 */
+	public function equalityAfterDecodeProvider() : \Generator{
+		yield [0.3];
+		yield [PHP_FLOAT_EPSILON];
+		yield [PHP_FLOAT_MAX];
+		yield [PHP_FLOAT_MIN];
+	}
+
+	/**
+	 * @dataProvider equalityAfterDecodeProvider
+	 */
+	public function testEqualityAfterDecode(float $value) : void{
+		$tag = new FloatTag("", $value);
+		$serializer = new LittleEndianNBTStream();
+		$tag2 = $serializer->read($serializer->write($tag));
+		self::assertTrue($tag->equals($tag2));
 	}
 }
