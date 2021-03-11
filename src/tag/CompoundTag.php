@@ -39,8 +39,6 @@ use function next;
 use function reset;
 use function str_repeat;
 
-#include <rules/NBT.h>
-
 /**
  * @phpstan-implements \ArrayAccess<string, mixed>
  * @phpstan-implements \Iterator<string, NamedTag>

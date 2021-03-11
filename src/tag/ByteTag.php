@@ -27,8 +27,6 @@ use pocketmine\nbt\NBT;
 use pocketmine\nbt\NBTStream;
 use pocketmine\nbt\ReaderTracker;
 
-#include <rules/NBT.h>
-
 class ByteTag extends NamedTag{
 	/** @var int */
 	private $value;

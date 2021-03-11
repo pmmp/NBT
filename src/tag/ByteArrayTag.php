@@ -28,8 +28,6 @@ use pocketmine\nbt\NBTStream;
 use pocketmine\nbt\ReaderTracker;
 use function strlen;
 
-#include <rules/NBT.h>
-
 class ByteArrayTag extends NamedTag{
 	/** @var string */
 	private $value;

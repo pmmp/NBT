@@ -31,8 +31,6 @@ use function gettype;
 use function is_object;
 use function str_repeat;
 
-#include <rules/NBT.h>
-
 /**
  * @phpstan-implements \ArrayAccess<int, mixed>
  * @phpstan-implements \Iterator<int, NamedTag>

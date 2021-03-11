@@ -23,16 +23,12 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
+use pocketmine\utils\Binary;
 use function array_values;
 use function assert;
 use function count;
 use function pack;
 use function unpack;
-#ifndef COMPILE
-use pocketmine\utils\Binary;
-#endif
-
-#include <rules/NBT.h>
 
 class BigEndianNBTStream extends NBTStream{
 
