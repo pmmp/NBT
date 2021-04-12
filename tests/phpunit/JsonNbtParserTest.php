@@ -63,8 +63,9 @@ class JsonNbtParserTest extends TestCase{
 	public function testEmptyList() : void{
 		$tag = JsonNbtParser::parseJson("{TestList:[]}");
 		self::assertNotNull($tag);
-		self::assertTrue($tag->hasTag("TestList", ListTag::class));
-		self::assertCount(0, $tag->getListTag("TestList"));
+		$list = $tag->getTag("TestList");
+		self::assertTrue($list instanceof ListTag);
+		self::assertCount(0, $list);
 	}
 
 	public function testMixedList() : void{
@@ -74,7 +75,7 @@ class JsonNbtParserTest extends TestCase{
 
 	public function testQuotedKeys() : void{
 		$tag = JsonNbtParser::parseJson("{\"String With Spaces\": 1}");
-		self::assertTrue($tag->hasTag("String With Spaces", IntTag::class));
+		self::assertTrue($tag->getTag("String With Spaces") instanceof IntTag);
 	}
 
 	public function testQuotedValues() : void{

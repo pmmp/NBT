@@ -152,7 +152,7 @@ class CompoundTagTest extends TestCase{
 		}
 
 		for($i = 0; $i < 10; ++$i){
-			self::assertTrue($t->hasTag("$i"));
+			self::assertTrue($t->getTag("$i") !== null);
 		}
 
 		$check = 0;

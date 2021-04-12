@@ -142,16 +142,6 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	}
 
 	/**
-	 * Returns whether the CompoundTag contains a child tag with the specified name.
-	 *
-	 * @phpstan-param class-string<Tag> $expectedClass
-	 */
-	public function hasTag(string $name, string $expectedClass = Tag::class) : bool{
-		assert(is_a($expectedClass, Tag::class, true));
-		return ($this->value[$name] ?? null) instanceof $expectedClass;
-	}
-
-	/**
 	 * Returns the value of the child tag with the specified name, or $default if the tag doesn't exist. If the child
 	 * tag is not of type $expectedType, an exception will be thrown.
 	 *
@@ -304,7 +294,7 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 			for($type = $reader->readByte(); $type !== NBT::TAG_End; $type = $reader->readByte()){
 				$name = $reader->readString();
 				$tag = NBT::createTag($type, $reader, $tracker);
-				if($result->hasTag($name)){
+				if($result->getTag($name) !== null){
 					throw new NbtDataException("Duplicate key \"$name\"");
 				}
 				$result->setTag($name, $tag);

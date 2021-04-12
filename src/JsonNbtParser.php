@@ -97,7 +97,7 @@ class JsonNbtParser{
 		if(self::skipWhitespace($stream, "}")){
 			while(!$stream->feof()){
 				$k = self::readKey($stream);
-				if($retval->hasTag($k)){
+				if($retval->getTag($k) !== null){
 					throw new NbtDataException("Syntax error: duplicate compound leaf node '$k'");
 				}
 				$retval->setTag($k, self::readValue($stream));
