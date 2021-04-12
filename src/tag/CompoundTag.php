@@ -153,7 +153,7 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @throws UnexpectedTagTypeException
 	 * @throws NoSuchTagException
 	 */
-	public function getTagValue(string $name, string $expectedClass, $default = null){
+	private function getTagValue(string $name, string $expectedClass, $default = null){
 		$tag = $this->getTag($name, $expectedClass);
 		if($tag instanceof $expectedClass){
 			return $tag->getValue();
