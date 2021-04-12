@@ -30,11 +30,9 @@ use pocketmine\nbt\NbtStreamWriter;
 use pocketmine\nbt\NoSuchTagException;
 use pocketmine\nbt\ReaderTracker;
 use pocketmine\nbt\UnexpectedTagTypeException;
-use function assert;
 use function count;
 use function func_num_args;
 use function get_class;
-use function is_a;
 use function is_int;
 use function str_repeat;
 use function strval;
@@ -84,23 +82,9 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * Returns the tag with the specified name, or null if it does not exist.
-	 *
-	 * @phpstan-template T of Tag
-	 *
-	 * @param string $expectedClass Class that extends Tag
-	 * @phpstan-param class-string<T> $expectedClass
-	 *
-	 * @phpstan-return T|null
-	 * @throws UnexpectedTagTypeException if the tag exists and is not of the expected type (if specified)
 	 */
-	public function getTag(string $name, string $expectedClass = Tag::class) : ?Tag{
-		assert(is_a($expectedClass, Tag::class, true));
-		$tag = $this->value[$name] ?? null;
-		if($tag !== null and !($tag instanceof $expectedClass)){
-			throw new UnexpectedTagTypeException("Expected a tag of type $expectedClass, got " . get_class($tag));
-		}
-
-		return $tag;
+	public function getTag(string $name) : ?Tag{
+		return $this->value[$name] ?? null;
 	}
 
 	/**
@@ -108,7 +92,11 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * with that name and the tag is not a ListTag.
 	 */
 	public function getListTag(string $name) : ?ListTag{
-		return $this->getTag($name, ListTag::class);
+		$tag = $this->getTag($name);
+		if($tag !== null && !($tag instanceof ListTag)){
+			throw new UnexpectedTagTypeException("Expected a tag of type " . ListTag::class . ", got " . get_class($tag));
+		}
+		return $tag;
 	}
 
 	/**
@@ -116,7 +104,11 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * exists with that name and the tag is not a CompoundTag.
 	 */
 	public function getCompoundTag(string $name) : ?CompoundTag{
-		return $this->getTag($name, CompoundTag::class);
+		$tag = $this->getTag($name);
+		if($tag !== null && !($tag instanceof CompoundTag)){
+			throw new UnexpectedTagTypeException("Expected a tag of type " . CompoundTag::class . ", got " . get_class($tag));
+		}
+		return $tag;
 	}
 
 	/**
@@ -146,7 +138,9 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * tag is not of type $expectedType, an exception will be thrown.
 	 *
 	 * @param mixed  $default
-	 * @phpstan-param class-string<Tag> $expectedClass
+	 *
+	 * @phpstan-template T of Tag
+	 * @phpstan-param class-string<T> $expectedClass
 	 *
 	 * @return mixed
 	 *
@@ -154,9 +148,12 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @throws NoSuchTagException
 	 */
 	private function getTagValue(string $name, string $expectedClass, $default = null){
-		$tag = $this->getTag($name, $expectedClass);
+		$tag = $this->getTag($name);
 		if($tag instanceof $expectedClass){
 			return $tag->getValue();
+		}
+		if($tag !== null){
+			throw new UnexpectedTagTypeException("Expected a tag of type $expectedClass, got " . get_class($tag));
 		}
 
 		if($default === null){
