@@ -142,7 +142,7 @@ class CompoundTagTest extends TestCase{
 		$merged = $t1->merge($t2);
 		self::assertSame("replacement", $merged->getString("test1"));
 		self::assertCount(2, $merged);
-		self::assertSame(2, $merged->getInt("test2"));
+		self::assertEquals(2, $merged->getInt("test2"));
 	}
 
 	public function testNumericStringKeys() : void{

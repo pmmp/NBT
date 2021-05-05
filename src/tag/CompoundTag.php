@@ -27,6 +27,7 @@ use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtDataException;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
+use pocketmine\nbt\NoSuchTagException;
 use pocketmine\nbt\ReaderTracker;
 use pocketmine\nbt\UnexpectedTagTypeException;
 use function count;
@@ -133,17 +134,20 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	}
 
 	/**
-	 * Returns the value of the child tag with the specified name, or null if the tag doesn't exist. If the child tag is
-	 * not of type $expectedType, an exception will be thrown.
+	 * Returns the value of the child tag with the specified name, or $default if the tag doesn't exist. If the child
+	 * tag is not of type $expectedType, an exception will be thrown.
+	 *
+	 * @param mixed  $default
 	 *
 	 * @phpstan-template T of Tag
 	 * @phpstan-param class-string<T> $expectedClass
 	 *
-	 * @return mixed|null the value of the tag if found, or null otherwise.
+	 * @return mixed
 	 *
 	 * @throws UnexpectedTagTypeException
+	 * @throws NoSuchTagException
 	 */
-	private function getTagValue(string $name, string $expectedClass){
+	private function getTagValue(string $name, string $expectedClass, $default = null){
 		$tag = $this->getTag($name);
 		if($tag instanceof $expectedClass){
 			return $tag->getValue();
@@ -152,50 +156,56 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 			throw new UnexpectedTagTypeException("Expected a tag of type $expectedClass, got " . get_class($tag));
 		}
 
-		return null;
+		if($default === null){
+			throw new NoSuchTagException("Tag \"$name\" does not exist");
+		}
+
+		return $default;
 	}
 
 	/*
 	 * The following methods are wrappers around getTagValue() with type safety.
 	 */
 
-	public function getByte(string $name) : ?int{
-		return $this->getTagValue($name, ByteTag::class);
+	public function getByte(string $name, ?int $default = null) : int{
+		return $this->getTagValue($name, ByteTag::class, $default);
 	}
 
-	public function getShort(string $name) : ?int{
-		return $this->getTagValue($name, ShortTag::class);
+	public function getShort(string $name, ?int $default = null) : int{
+		return $this->getTagValue($name, ShortTag::class, $default);
 	}
 
-	public function getInt(string $name) : ?int{
-		return $this->getTagValue($name, IntTag::class);
+	public function getInt(string $name, ?int $default = null) : int{
+		return $this->getTagValue($name, IntTag::class, $default);
 	}
 
-	public function getLong(string $name) : ?int{
-		return $this->getTagValue($name, LongTag::class);
+	public function getLong(string $name, ?int $default = null) : int{
+		return $this->getTagValue($name, LongTag::class, $default);
 	}
 
-	public function getFloat(string $name) : ?float{
-		return $this->getTagValue($name, FloatTag::class);
+	public function getFloat(string $name, ?float $default = null) : float{
+		return $this->getTagValue($name, FloatTag::class, $default);
 	}
 
-	public function getDouble(string $name) : ?float{
-		return $this->getTagValue($name, DoubleTag::class);
+	public function getDouble(string $name, ?float $default = null) : float{
+		return $this->getTagValue($name, DoubleTag::class, $default);
 	}
 
-	public function getByteArray(string $name) : ?string{
-		return $this->getTagValue($name, ByteArrayTag::class);
+	public function getByteArray(string $name, ?string $default = null) : string{
+		return $this->getTagValue($name, ByteArrayTag::class, $default);
 	}
 
-	public function getString(string $name) : ?string{
-		return $this->getTagValue($name, StringTag::class);
+	public function getString(string $name, ?string $default = null) : string{
+		return $this->getTagValue($name, StringTag::class, $default);
 	}
 
 	/**
-	 * @return int[]|null
+	 * @param int[]|null $default
+	 *
+	 * @return int[]
 	 */
-	public function getIntArray(string $name) : ?array{
-		return $this->getTagValue($name, IntArrayTag::class);
+	public function getIntArray(string $name, ?array $default = null) : array{
+		return $this->getTagValue($name, IntArrayTag::class, $default);
 	}
 
 	/*
