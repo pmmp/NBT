@@ -44,7 +44,7 @@ class CompoundTagTest extends TestCase{
 		 */
 		foreach($tag as $name => $value){
 			// we used to get other stuff when iterating, like the tag's __name property (before Iterator was implemented by CompoundTag)
-			self::assertRegExp('/hello[0-9]/', $name);
+			self::assertMatchesRegularExpression('/hello[0-9]/', $name);
 			self::assertInstanceOf(StringTag::class, $value);
 			++$count;
 		}

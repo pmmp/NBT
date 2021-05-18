@@ -9,7 +9,7 @@
     },
     "require-dev": {
         "phpstan/phpstan": "0.12.85",
-        "irstea/phpunit-shim": "^7.5 || ^8.0",
+        "irstea/phpunit-shim": "^9.5",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan-strict-rules": "^0.12.4"
     },
