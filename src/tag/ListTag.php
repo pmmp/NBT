@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
+use pocketmine\nbt\NbtDataException;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 use pocketmine\nbt\ReaderTracker;
@@ -244,7 +245,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 		if($size > 0){
 			if($tagType === NBT::TAG_End){
-				throw new \UnexpectedValueException("Unexpected non-empty list of TAG_End");
+				throw new NbtDataException("Unexpected non-empty list of TAG_End");
 			}
 
 			$tracker->protectDepth(static function() use($size, $tagType, $reader, $tracker, &$value) : void{
