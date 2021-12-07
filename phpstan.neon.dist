@@ -1,8 +1,9 @@
 includes:
+	- tests/phpstan/configs/impossible-mixed.neon
 	- tests/phpstan/configs/phpstan-bugs.neon
 
 parameters:
-	level: 8
+	level: 9
 	treatPhpDocTypesAsCertain: false
 	paths:
 		- src
