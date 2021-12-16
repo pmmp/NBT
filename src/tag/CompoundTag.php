@@ -331,7 +331,12 @@ class CompoundTag extends NamedTag implements \ArrayAccess, \Iterator, \Countabl
 				$tag = $nbt->readTag($tracker);
 				if($tag !== null){
 					if(isset($this->value[$tag->__name])){
-						throw new \UnexpectedValueException("Duplicate key \"$tag->__name\"");
+						//this is technically a corruption case, but it's very common on older PM worlds (pretty much every
+						//furnace in PM worlds prior to 2017 is affected), and since we can't extricate this borked data
+						//from the rest in Anvil/McRegion worlds, we can't barf on this - it would result in complete loss
+						//of the chunk.
+						//TODO: add a flag to enable throwing on this (strict mode)
+						continue;
 					}
 					$this->value[$tag->__name] = $tag;
 				}
