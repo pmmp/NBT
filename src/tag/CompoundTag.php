@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\NbtDataException;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 use pocketmine\nbt\NoSuchTagException;
@@ -292,7 +291,12 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 				$name = $reader->readString();
 				$tag = NBT::createTag($type, $reader, $tracker);
 				if($result->getTag($name) !== null){
-					throw new NbtDataException("Duplicate key \"$name\"");
+					//this is technically a corruption case, but it's very common on older PM worlds (pretty much every
+					//furnace in PM worlds prior to 2017 is affected), and since we can't extricate this borked data
+					//from the rest in Anvil/McRegion worlds, we can't barf on this - it would result in complete loss
+					//of the chunk.
+					//TODO: add a flag to enable throwing on this (strict mode)
+					continue;
 				}
 				$result->setTag($name, $tag);
 			}
