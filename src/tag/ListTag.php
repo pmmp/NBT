@@ -278,6 +278,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	}
 
 	public function __clone(){
+		/** @phpstan-var \SplDoublyLinkedList<Tag> $new */
 		$new = new \SplDoublyLinkedList();
 
 		foreach($this->value as $tag){
