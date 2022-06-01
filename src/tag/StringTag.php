@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt\tag;
 
+use pocketmine\nbt\InvalidTagValueException;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
@@ -36,7 +37,7 @@ final class StringTag extends ImmutableTag{
 	public function __construct(string $value){
 		self::restrictArgCount(__METHOD__, func_num_args(), 1);
 		if(strlen($value) > 32767){
-			throw new \InvalidArgumentException("StringTag cannot hold more than 32767 bytes, got string of length " . strlen($value));
+			throw new InvalidTagValueException("StringTag cannot hold more than 32767 bytes, got string of length " . strlen($value));
 		}
 		$this->value = $value;
 	}

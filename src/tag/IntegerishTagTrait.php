@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt\tag;
 
+use pocketmine\nbt\InvalidTagValueException;
 use function func_num_args;
 
 /**
@@ -42,7 +43,7 @@ trait IntegerishTagTrait{
 			throw new \ArgumentCountError(__METHOD__ . "() expects at most 1 parameters, " . func_num_args() . " given");
 		}
 		if($value < $this->min() or $value > $this->max()){
-			throw new \InvalidArgumentException("Value $value is outside the allowed range " . $this->min() . " - " . $this->max());
+			throw new InvalidTagValueException("Value $value is outside the allowed range " . $this->min() . " - " . $this->max());
 		}
 		$this->value = $value;
 	}
