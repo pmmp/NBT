@@ -69,7 +69,7 @@ class JsonNbtParserTest extends TestCase{
 	}
 
 	public function testMixedList() : void{
-		$this->expectException(\TypeError::class); //TODO: throwing an engine level error on userdata is very bad ...
+		$this->expectExceptionMessage("lists can only contain one type of value");
 		JsonNbtParser::parseJson("{TestList:[1f, string2, 3b]}");
 	}
 

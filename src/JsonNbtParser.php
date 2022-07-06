@@ -78,10 +78,15 @@ class JsonNbtParser{
 		if(self::skipWhitespace($stream, "]")){
 			while(!$stream->feof()){
 				try{
-					$retval->push(self::readValue($stream));
+					$value = self::readValue($stream);
 				}catch(InvalidTagValueException $e){
 					throw new NbtDataException("Data error: " . $e->getMessage());
 				}
+				$expectedType = $retval->getTagType();
+				if($expectedType !== NBT::TAG_End && $expectedType !== $value->getType()){
+					throw new NbtDataException("Data error: lists can only contain one type of value");
+				}
+				$retval->push($value);
 				if(self::readBreak($stream, "]")){
 					return $retval;
 				}
