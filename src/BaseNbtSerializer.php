@@ -135,7 +135,11 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	public function readByteArray() : string{
-		return $this->buffer->get($this->readInt());
+		$length = $this->readInt();
+		if($length < 0){
+			throw new NbtDataException("Array length cannot be less than zero ($length < 0)");
+		}
+		return $this->buffer->get($length);
 	}
 
 	public function writeByteArray(string $v) : void{
