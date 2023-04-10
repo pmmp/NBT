@@ -51,7 +51,6 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * Helper method for easier fluent usage.
-	 * @return CompoundTag
 	 */
 	public static function create() : self{
 		return new self;
@@ -123,8 +122,6 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	/**
 	 * Removes the child tags with the specified names from the CompoundTag. This function accepts a variadic list of
 	 * strings.
-	 *
-	 * @param string ...$names
 	 */
 	public function removeTag(string ...$names) : void{
 		foreach($names as $name){
