@@ -76,10 +76,11 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 
 	/**
 	 * Reads a tag without a header from the buffer and returns it. The tag does not have a name, and the type is not
-	 * specified by the binary data. Only the tag's raw binary value is present.
+	 * specified by the binary data. Only the tag's raw binary value is present. This could be used if the expected root
+	 * type is always the same.
 	 *
-	 * This could be used if the expected root type is always the same, but it's not usually seen in the wild.
-	 * However, this is used in some places in the Minecraft: Bedrock network protocol.
+	 * This format is not usually seen in the wild, but it is used in some places in the Minecraft: Bedrock network
+	 * protocol.
 	 *
 	 * @throws NbtDataException
 	 */
