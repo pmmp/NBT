@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
+use pocketmine\nbt\tag\Tag;
 use pocketmine\utils\Binary;
 use pocketmine\utils\BinaryDataException;
 use pocketmine\utils\BinaryStream;
@@ -74,6 +75,24 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	/**
+	 * Reads a tag without a header from the buffer and returns it. The tag does not have a name, and the type is not
+	 * specified by the binary data. Only the tag's raw binary value is present.
+	 *
+	 * This could be used if the expected root type is always the same, but it's not usually seen in the wild.
+	 * However, this is used in some places in the Minecraft: Bedrock network protocol.
+	 *
+	 * @throws NbtDataException
+	 */
+	public function readHeadless(string $buffer, int $rootType, int &$offset = 0, int $maxDepth = 0) : Tag{
+		$this->buffer = new BinaryStream($buffer, $offset);
+
+		$data = NBT::createTag($rootType, $this, new ReaderTracker($maxDepth));
+		$offset = $this->buffer->getOffset();
+
+		return $data;
+	}
+
+	/**
 	 * Decodes a list of NBT tags into objects and returns them.
 	 *
 	 * TODO: This is only necessary because we don't have a streams API worth mentioning. Get rid of this in the future.
@@ -108,6 +127,18 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 
 		$this->writeRoot($data);
 
+		return $this->buffer->getBuffer();
+	}
+
+	/**
+	 * Writes a nameless tag without any header information. The reader of the data must know what type to expect, as
+	 * it is not specified in the data.
+	 *
+	 * @see BaseNbtSerializer::readHeadless()
+	 */
+	public function writeHeadless(Tag $data) : string{
+		$this->buffer = new BinaryStream();
+		$data->write($this);
 		return $this->buffer->getBuffer();
 	}
 

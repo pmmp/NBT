@@ -25,7 +25,9 @@ namespace pocketmine\nbt;
 
 use PHPUnit\Framework\TestCase;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
+use pocketmine\utils\Binary;
 
 class NbtSerializerTest extends TestCase{
 
@@ -72,5 +74,15 @@ class NbtSerializerTest extends TestCase{
 		$data = new CompoundTag();
 		$data->setInt("1", 1);
 		(new BigEndianNbtSerializer())->write(new TreeRoot($data));
+	}
+
+	public function testHeadlessDecodeEncode() : void{
+		$tag = new IntTag(123);
+		$serializer = new BigEndianNbtSerializer();
+		$raw = $serializer->writeHeadless($tag);
+		self::assertSame($raw, Binary::writeInt(123));
+
+		$tag2 = $serializer->readHeadless($raw, NBT::TAG_Int);
+		self::assertEquals($tag, $tag2);
 	}
 }
