@@ -26,7 +26,6 @@ namespace pocketmine\nbt\tag;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
-use pocketmine\utils\Binary;
 use function func_num_args;
 
 final class FloatTag extends ImmutableTag{
@@ -66,6 +65,6 @@ final class FloatTag extends ImmutableTag{
 		//the values of TAG_Float are represented in 32 bits (single precision), so we don't want extra precision given
 		//by 64-bit in-memory representation to break comparison (e.g. 0.3 != decode(encode(0.3)))
 		//this intentionally truncates our value so that it compares as valid
-		return $that instanceof $this && Binary::writeFloat($this->value) === Binary::writeFloat($that->value);
+		return $that instanceof $this && pack("G", $this->value) === pack("G", $that->value);
 	}
 }

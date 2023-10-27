@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
-use pocketmine\utils\BinaryDataException;
+use pmmp\encoding\DataDecodeException;
 
 /**
  * @internal
@@ -31,58 +31,58 @@ use pocketmine\utils\BinaryDataException;
 interface NbtStreamReader{
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 */
 	public function readByte() : int;
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 */
 	public function readSignedByte() : int;
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 */
 	public function readShort() : int;
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 */
 	public function readSignedShort() : int;
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 */
 	public function readInt() : int;
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 */
 	public function readLong() : int;
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 */
 	public function readFloat() : float;
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 */
 	public function readDouble() : float;
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 */
 	public function readByteArray() : string;
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 */
 	public function readString() : string;
 
 	/**
 	 * @return int[]
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 */
 	public function readIntArray() : array;
 }
