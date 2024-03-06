@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
+use pmmp\encoding\ByteBuffer;
+use pmmp\encoding\DataDecodeException;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\DoubleTag;
@@ -33,8 +35,6 @@ use pocketmine\nbt\tag\LongTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\nbt\tag\Tag;
-use pocketmine\utils\BinaryDataException;
-use pocketmine\utils\BinaryStream;
 use function is_numeric;
 use function strpos;
 use function strtolower;
@@ -49,34 +49,35 @@ class JsonNbtParser{
 	 * @throws NbtDataException
 	 */
 	public static function parseJson(string $data) : CompoundTag{
-		$stream = new BinaryStream(trim($data, " \r\n\t"));
+		$stream = new ByteBuffer(trim($data, " \r\n\t"));
 
 		try{
-			if(($b = $stream->get(1)) !== "{"){
+			if(($b = $stream->readByteArray(1)) !== "{"){
 				throw new NbtDataException("Syntax error: expected compound start but got '$b'");
 			}
 			$ret = self::parseCompound($stream); //don't return directly, syntax needs to be validated
 		}catch(NbtDataException $e){
-			throw new NbtDataException($e->getMessage() . " at offset " . $stream->getOffset());
-		}catch(BinaryDataException $e){
-			throw new NbtDataException("Syntax error: " . $e->getMessage() . " at offset " . $stream->getOffset());
+			throw new NbtDataException($e->getMessage() . " at offset " . $stream->getReadOffset());
+		}catch(DataDecodeException $e){
+			throw new NbtDataException("Syntax error: " . $e->getMessage() . " at offset " . $stream->getReadOffset());
 		}
-		if(!$stream->feof()){
-			throw new NbtDataException("Syntax error: unexpected trailing characters after end of tag: " . $stream->getRemaining());
+		$leftover = $stream->getUsedLength() - $stream->getReadOffset();
+		if($leftover > 0){
+			throw new NbtDataException("Syntax error: unexpected trailing characters after end of tag: " . $stream->readByteArray($leftover));
 		}
 
 		return $ret;
 	}
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 * @throws NbtDataException
 	 */
-	private static function parseList(BinaryStream $stream) : ListTag{
+	private static function parseList(ByteBuffer $stream) : ListTag{
 		$retval = new ListTag();
 
 		if(self::skipWhitespace($stream, "]")){
-			while(!$stream->feof()){
+			while($stream->getReadOffset() < $stream->getUsedLength()){
 				try{
 					$value = self::readValue($stream);
 				}catch(InvalidTagValueException $e){
@@ -99,14 +100,14 @@ class JsonNbtParser{
 	}
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 * @throws NbtDataException
 	 */
-	private static function parseCompound(BinaryStream $stream) : CompoundTag{
+	private static function parseCompound(ByteBuffer $stream) : CompoundTag{
 		$retval = new CompoundTag();
 
 		if(self::skipWhitespace($stream, "}")){
-			while(!$stream->feof()){
+			while($stream->getReadOffset() < $stream->getUsedLength()){
 				$k = self::readKey($stream);
 				if($retval->getTag($k) !== null){
 					throw new NbtDataException("Syntax error: duplicate compound leaf node '$k'");
@@ -129,12 +130,12 @@ class JsonNbtParser{
 	}
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 * @throws NbtDataException
 	 */
-	private static function skipWhitespace(BinaryStream $stream, string $terminator) : bool{
-		while(!$stream->feof()){
-			$b = $stream->get(1);
+	private static function skipWhitespace(ByteBuffer $stream, string $terminator) : bool{
+		while($stream->getReadOffset() < $stream->getUsedLength()){
+			$b = $stream->readByteArray(1);
 			if($b === $terminator){
 				return false;
 			}
@@ -142,7 +143,7 @@ class JsonNbtParser{
 				continue;
 			}
 
-			$stream->setOffset($stream->getOffset() - 1);
+			$stream->setReadOffset($stream->getReadOffset() - 1);
 			return true;
 		}
 
@@ -151,15 +152,14 @@ class JsonNbtParser{
 
 	/**
 	 * @return bool true if terminator has been found, false if comma was found
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 * @throws NbtDataException
 	 */
-	private static function readBreak(BinaryStream $stream, string $terminator) : bool{
-		if($stream->feof()){
+	private static function readBreak(ByteBuffer $stream, string $terminator) : bool{
+		if($stream->getReadOffset() >= $stream->getUsedLength()){
 			throw new NbtDataException("Syntax error: unexpected end of stream, expected '$terminator'");
 		}
-		$offset = $stream->getOffset();
-		$c = $stream->get(1);
+		$c = $stream->readByteArray(1);
 		if($c === ","){
 			return false;
 		}
@@ -167,28 +167,25 @@ class JsonNbtParser{
 			return true;
 		}
 
-		throw new NbtDataException("Syntax error: unexpected '$c' end at offset $offset");
+		throw new NbtDataException("Syntax error: unexpected '$c' end");
 	}
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 * @throws NbtDataException
 	 * @throws InvalidTagValueException
 	 */
-	private static function readValue(BinaryStream $stream) : Tag{
+	private static function readValue(ByteBuffer $stream) : Tag{
 		$value = "";
 		$inQuotes = false;
-
-		$offset = $stream->getOffset();
 
 		$foundEnd = false;
 
 		/** @var Tag|null $retval */
 		$retval = null;
 
-		while(!$stream->feof()){
-			$offset = $stream->getOffset();
-			$c = $stream->get(1);
+		while($stream->getReadOffset() < $stream->getUsedLength()){
+			$c = $stream->readByteArray(1);
 
 			if($inQuotes){ //anything is allowed inside quotes, except unescaped quotes
 				if($c === '"'){
@@ -196,13 +193,13 @@ class JsonNbtParser{
 					$retval = new StringTag($value);
 					$foundEnd = true;
 				}elseif($c === "\\"){
-					$value .= $stream->get(1);
+					$value .= $stream->readByteArray(1);
 				}else{
 					$value .= $c;
 				}
 			}else{
 				if($c === "," or $c === "}" or $c === "]"){ //end of parent tag
-					$stream->setOffset($stream->getOffset() - 1); //the caller needs to be able to read this character
+					$stream->setReadOffset($stream->getReadOffset() - 1); //the caller needs to be able to read this character
 					$foundEnd = true;
 					break;
 				}
@@ -213,19 +210,19 @@ class JsonNbtParser{
 					}
 
 					if($foundEnd){ //unexpected non-whitespace character after end of value
-						throw new NbtDataException("Syntax error: unexpected '$c' after end of value at offset $offset");
+						throw new NbtDataException("Syntax error: unexpected '$c' after end of value");
 					}
 				}
 
 				if($c === '"'){ //start of quoted string
 					if($value !== ""){
-						throw new NbtDataException("Syntax error: unexpected quote at offset $offset");
+						throw new NbtDataException("Syntax error: unexpected quote");
 					}
 					$inQuotes = true;
 
 				}elseif($c === "{"){ //start of compound tag
 					if($value !== ""){
-						throw new NbtDataException("Syntax error: unexpected compound start at offset $offset (enclose in double quotes for literal)");
+						throw new NbtDataException("Syntax error: unexpected compound start (enclose in double quotes for literal)");
 					}
 
 					$retval = self::parseCompound($stream);
@@ -233,7 +230,7 @@ class JsonNbtParser{
 
 				}elseif($c === "["){ //start of list tag - TODO: arrays
 					if($value !== ""){
-						throw new NbtDataException("Syntax error: unexpected list start at offset $offset (enclose in double quotes for literal)");
+						throw new NbtDataException("Syntax error: unexpected list start (enclose in double quotes for literal)");
 					}
 
 					$retval = self::parseList($stream);
@@ -250,10 +247,10 @@ class JsonNbtParser{
 		}
 
 		if($value === ""){
-			throw new NbtDataException("Syntax error: empty value at offset $offset");
+			throw new NbtDataException("Syntax error: empty value");
 		}
 		if(!$foundEnd){
-			throw new NbtDataException("Syntax error: unexpected end of stream at offset $offset");
+			throw new NbtDataException("Syntax error: unexpected end of stream");
 		}
 
 		$last = strtolower(substr($value, -1));
@@ -293,25 +290,24 @@ class JsonNbtParser{
 	}
 
 	/**
-	 * @throws BinaryDataException
+	 * @throws DataDecodeException
 	 * @throws NbtDataException
 	 */
-	private static function readKey(BinaryStream $stream) : string{
+	private static function readKey(ByteBuffer $stream) : string{
 		$key = "";
-		$offset = $stream->getOffset();
 
 		$inQuotes = false;
 		$foundEnd = false;
 
-		while(!$stream->feof()){
-			$c = $stream->get(1);
+		while($stream->getReadOffset() < $stream->getUsedLength()){
+			$c = $stream->readByteArray(1);
 
 			if($inQuotes){
 				if($c === '"'){
 					$inQuotes = false;
 					$foundEnd = true;
 				}elseif($c === "\\"){
-					$key .= $stream->get(1);
+					$key .= $stream->readByteArray(1);
 				}else{
 					$key .= $c;
 				}
@@ -327,18 +323,18 @@ class JsonNbtParser{
 					}
 
 					if($foundEnd){ //unexpected non-whitespace character after end of value
-						throw new NbtDataException("Syntax error: unexpected '$c' after end of value at offset $offset");
+						throw new NbtDataException("Syntax error: unexpected '$c' after end of value");
 					}
 				}
 
 				if($c === '"'){ //start of quoted string
 					if($key !== ""){
-						throw new NbtDataException("Syntax error: unexpected quote at offset $offset");
+						throw new NbtDataException("Syntax error: unexpected quote");
 					}
 					$inQuotes = true;
 
 				}elseif($c === "{" or $c === "}" or $c === "[" or $c === "]" or $c === ","){
-					throw new NbtDataException("Syntax error: unexpected '$c' at offset $offset (enclose in double quotes for literal)");
+					throw new NbtDataException("Syntax error: unexpected '$c' (enclose in double quotes for literal)");
 				}else{ //any other character
 					$key .= $c;
 				}
@@ -346,10 +342,10 @@ class JsonNbtParser{
 		}
 
 		if($key === ""){
-			throw new NbtDataException("Syntax error: invalid empty key at offset $offset");
+			throw new NbtDataException("Syntax error: invalid empty key");
 		}
 		if(!$foundEnd){
-			throw new NbtDataException("Syntax error: unexpected end of stream at offset $offset");
+			throw new NbtDataException("Syntax error: unexpected end of stream");
 		}
 
 		return $key;

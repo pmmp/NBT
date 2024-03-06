@@ -32,47 +32,47 @@ use function unpack;
 class BigEndianNbtSerializer extends BaseNbtSerializer{
 
 	public function readShort() : int{
-		return $this->buffer->getShort();
+		return $this->buffer->readUnsignedShortBE();
 	}
 
 	public function readSignedShort() : int{
-		return $this->buffer->getSignedShort();
+		return $this->buffer->readSignedShortBE();
 	}
 
 	public function writeShort(int $v) : void{
-		$this->buffer->putShort($v);
+		$this->buffer->writeUnsignedShortBE($v);
 	}
 
 	public function readInt() : int{
-		return $this->buffer->getInt();
+		return $this->buffer->readSignedIntBE();
 	}
 
 	public function writeInt(int $v) : void{
-		$this->buffer->putInt($v);
+		$this->buffer->writeSignedIntBE($v);
 	}
 
 	public function readLong() : int{
-		return $this->buffer->getLong();
+		return $this->buffer->readSignedLongBE();
 	}
 
 	public function writeLong(int $v) : void{
-		$this->buffer->putLong($v);
+		$this->buffer->writeSignedLongBE($v);
 	}
 
 	public function readFloat() : float{
-		return $this->buffer->getFloat();
+		return $this->buffer->readFloatBE();
 	}
 
 	public function writeFloat(float $v) : void{
-		$this->buffer->putFloat($v);
+		$this->buffer->writeFloatBE($v);
 	}
 
 	public function readDouble() : float{
-		return $this->buffer->getDouble();
+		return $this->buffer->readDoubleBE();
 	}
 
 	public function writeDouble(float $v) : void{
-		$this->buffer->putDouble($v);
+		$this->buffer->writeDoubleBE($v);
 	}
 
 	public function readIntArray() : array{
@@ -80,13 +80,13 @@ class BigEndianNbtSerializer extends BaseNbtSerializer{
 		if($len < 0){
 			throw new NbtDataException("Array length cannot be less than zero ($len < 0)");
 		}
-		$unpacked = unpack("N*", $this->buffer->get($len * 4));
+		$unpacked = unpack("N*", $this->buffer->readByteArray($len * 4));
 		assert($unpacked !== false, "The formatting string is valid, and we gave a multiple of 4 bytes");
 		return array_values($unpacked);
 	}
 
 	public function writeIntArray(array $array) : void{
 		$this->writeInt(count($array));
-		$this->buffer->put(pack("N*", ...$array));
+		$this->buffer->writeByteArray(pack("N*", ...$array));
 	}
 }
