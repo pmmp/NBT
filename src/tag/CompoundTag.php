@@ -265,7 +265,8 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	}
 
 	/**
-	 * @param int[]  $value
+	 * @param int[] $value
+	 * @phpstan-param list<int> $value
 	 *
 	 * @return $this
 	 */

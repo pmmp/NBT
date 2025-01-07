@@ -1,7 +1,13 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Call to function is_int\\(\\) with int will always evaluate to true\\.$#"
+			message: '#^Call to function is_int\(\) with int will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 1
 			path: ../../../src/tag/IntArrayTag.php
 
+		-
+			message: '#^Parameter \#1 \$array \(list\<int\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: ../../../src/tag/IntArrayTag.php
