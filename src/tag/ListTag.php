@@ -61,11 +61,12 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * @return Tag[]
+	 * @phpstan-return list<Tag>
 	 */
 	public function getValue() : array{
 		$value = [];
-		foreach($this->value as $k => $v){
-			$value[$k] = $v;
+		foreach($this->value as $v){
+			$value[] = $v;
 		}
 
 		return $value;

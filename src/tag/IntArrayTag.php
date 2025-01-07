@@ -26,17 +26,22 @@ namespace pocketmine\nbt\tag;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
+use function array_values;
 use function assert;
 use function func_num_args;
 use function implode;
 use function is_int;
 
 final class IntArrayTag extends ImmutableTag{
-	/** @var int[] */
+	/**
+	 * @var int[]
+	 * @phpstan-var list<int>
+	 */
 	private $value;
 
 	/**
 	 * @param int[] $value
+	 * @phpstan-param list<int> $value
 	 */
 	public function __construct(array $value){
 		self::restrictArgCount(__METHOD__, func_num_args(), 1);
@@ -50,7 +55,7 @@ final class IntArrayTag extends ImmutableTag{
 			return true;
 		})());
 
-		$this->value = $value;
+		$this->value = array_values($value);
 	}
 
 	protected function getTypeName() : string{
@@ -75,6 +80,7 @@ final class IntArrayTag extends ImmutableTag{
 
 	/**
 	 * @return int[]
+	 * @phpstan-return list<int>
 	 */
 	public function getValue() : array{
 		return $this->value;

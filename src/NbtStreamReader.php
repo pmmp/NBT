@@ -82,6 +82,7 @@ interface NbtStreamReader{
 
 	/**
 	 * @return int[]
+	 * @phpstan-return list<int>
 	 * @throws BinaryDataException
 	 */
 	public function readIntArray() : array;

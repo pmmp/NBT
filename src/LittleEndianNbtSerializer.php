@@ -80,6 +80,7 @@ class LittleEndianNbtSerializer extends BaseNbtSerializer{
 		if($len < 0){
 			throw new NbtDataException("Array length cannot be less than zero ($len < 0)");
 		}
+		/** @var array<int>|false $unpacked */
 		$unpacked = unpack("V*", $this->buffer->get($len * 4));
 		assert($unpacked !== false, "The formatting string is valid, and we gave a multiple of 4 bytes");
 		return array_values($unpacked);
