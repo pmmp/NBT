@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
+use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBuffer;
 use pmmp\encoding\DataDecodeException;
 use pocketmine\nbt\tag\Tag;
@@ -43,7 +44,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @throws NbtDataException
 	 */
 	private function readRoot(int $maxDepth) : TreeRoot{
-		$type = $this->buffer->readUnsignedByte();
+		$type = Byte::readUnsigned($this->buffer);
 		if($type === NBT::TAG_End){
 			throw new NbtDataException("Found TAG_End at the start of buffer");
 		}
@@ -119,7 +120,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	private function writeRoot(TreeRoot $root) : void{
-		$this->buffer->writeUnsignedByte($root->getTag()->getType());
+		Byte::writeUnsigned($this->buffer, $root->getTag()->getType());
 		$this->writeString($root->getName());
 		$root->getTag()->write($this);
 	}
@@ -156,15 +157,15 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	public function readByte() : int{
-		return $this->buffer->readUnsignedByte();
+		return Byte::readUnsigned($this->buffer);
 	}
 
 	public function readSignedByte() : int{
-		return $this->buffer->readSignedByte();
+		return Byte::readSigned($this->buffer);
 	}
 
 	public function writeByte(int $v) : void{
-		$this->buffer->writeUnsignedByte($v);
+		Byte::writeUnsigned($this->buffer, $v);
 	}
 
 	public function readByteArray() : string{

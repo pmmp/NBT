@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt;
 
+use pmmp\encoding\BE;
 use function array_values;
 use function assert;
 use function count;
@@ -32,47 +33,47 @@ use function unpack;
 class BigEndianNbtSerializer extends BaseNbtSerializer{
 
 	public function readShort() : int{
-		return $this->buffer->readUnsignedShortBE();
+		return BE::readUnsignedShort($this->buffer);
 	}
 
 	public function readSignedShort() : int{
-		return $this->buffer->readSignedShortBE();
+		return BE::readSignedShort($this->buffer);
 	}
 
 	public function writeShort(int $v) : void{
-		$this->buffer->writeUnsignedShortBE($v);
+		BE::writeUnsignedShort($this->buffer, $v);
 	}
 
 	public function readInt() : int{
-		return $this->buffer->readSignedIntBE();
+		return BE::readSignedInt($this->buffer);
 	}
 
 	public function writeInt(int $v) : void{
-		$this->buffer->writeSignedIntBE($v);
+		BE::writeSignedInt($this->buffer, $v);
 	}
 
 	public function readLong() : int{
-		return $this->buffer->readSignedLongBE();
+		return BE::readSignedLong($this->buffer);
 	}
 
 	public function writeLong(int $v) : void{
-		$this->buffer->writeSignedLongBE($v);
+		BE::writeSignedLong($this->buffer, $v);
 	}
 
 	public function readFloat() : float{
-		return $this->buffer->readFloatBE();
+		return BE::readFloat($this->buffer);
 	}
 
 	public function writeFloat(float $v) : void{
-		$this->buffer->writeFloatBE($v);
+		BE::writeFloat($this->buffer, $v);
 	}
 
 	public function readDouble() : float{
-		return $this->buffer->readDoubleBE();
+		return BE::readDouble($this->buffer);
 	}
 
 	public function writeDouble(float $v) : void{
-		$this->buffer->writeDoubleBE($v);
+		BE::writeDouble($this->buffer, $v);
 	}
 
 	public function readIntArray() : array{
