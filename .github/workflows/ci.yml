@@ -8,18 +8,18 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
     strategy:
       matrix:
-        php: ['7.4', '8.0', '8.1']
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
     name: PHP ${{ matrix.php }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Setup PHP
-      uses: shivammathur/setup-php@2.9.0
+      uses: shivammathur/setup-php@2.31.1
       with:
         php-version: ${{ matrix.php }}
         ini-values: xdebug.max_nesting_level=3000
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: "~/.composer/cache"
         key: "php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}"

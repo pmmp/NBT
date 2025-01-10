@@ -1,47 +1,55 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Method pocketmine\\\\nbt\\\\tag\\\\CompoundTag\\:\\:getByte\\(\\) should return int but returns mixed\\.$#"
+			message: '#^Method pocketmine\\nbt\\tag\\CompoundTag\:\:getByte\(\) should return int but returns mixed\.$#'
+			identifier: return.type
 			count: 1
 			path: ../../../src/tag/CompoundTag.php
 
 		-
-			message: "#^Method pocketmine\\\\nbt\\\\tag\\\\CompoundTag\\:\\:getByteArray\\(\\) should return string but returns mixed\\.$#"
+			message: '#^Method pocketmine\\nbt\\tag\\CompoundTag\:\:getByteArray\(\) should return string but returns mixed\.$#'
+			identifier: return.type
 			count: 1
 			path: ../../../src/tag/CompoundTag.php
 
 		-
-			message: "#^Method pocketmine\\\\nbt\\\\tag\\\\CompoundTag\\:\\:getDouble\\(\\) should return float but returns mixed\\.$#"
+			message: '#^Method pocketmine\\nbt\\tag\\CompoundTag\:\:getDouble\(\) should return float but returns mixed\.$#'
+			identifier: return.type
 			count: 1
 			path: ../../../src/tag/CompoundTag.php
 
 		-
-			message: "#^Method pocketmine\\\\nbt\\\\tag\\\\CompoundTag\\:\\:getFloat\\(\\) should return float but returns mixed\\.$#"
+			message: '#^Method pocketmine\\nbt\\tag\\CompoundTag\:\:getFloat\(\) should return float but returns mixed\.$#'
+			identifier: return.type
 			count: 1
 			path: ../../../src/tag/CompoundTag.php
 
 		-
-			message: "#^Method pocketmine\\\\nbt\\\\tag\\\\CompoundTag\\:\\:getInt\\(\\) should return int but returns mixed\\.$#"
+			message: '#^Method pocketmine\\nbt\\tag\\CompoundTag\:\:getInt\(\) should return int but returns mixed\.$#'
+			identifier: return.type
 			count: 1
 			path: ../../../src/tag/CompoundTag.php
 
 		-
-			message: "#^Method pocketmine\\\\nbt\\\\tag\\\\CompoundTag\\:\\:getIntArray\\(\\) should return array\\<int\\> but returns mixed\\.$#"
+			message: '#^Method pocketmine\\nbt\\tag\\CompoundTag\:\:getIntArray\(\) should return array\<int\> but returns mixed\.$#'
+			identifier: return.type
 			count: 1
 			path: ../../../src/tag/CompoundTag.php
 
 		-
-			message: "#^Method pocketmine\\\\nbt\\\\tag\\\\CompoundTag\\:\\:getLong\\(\\) should return int but returns mixed\\.$#"
+			message: '#^Method pocketmine\\nbt\\tag\\CompoundTag\:\:getLong\(\) should return int but returns mixed\.$#'
+			identifier: return.type
 			count: 1
 			path: ../../../src/tag/CompoundTag.php
 
 		-
-			message: "#^Method pocketmine\\\\nbt\\\\tag\\\\CompoundTag\\:\\:getShort\\(\\) should return int but returns mixed\\.$#"
+			message: '#^Method pocketmine\\nbt\\tag\\CompoundTag\:\:getShort\(\) should return int but returns mixed\.$#'
+			identifier: return.type
 			count: 1
 			path: ../../../src/tag/CompoundTag.php
 
 		-
-			message: "#^Method pocketmine\\\\nbt\\\\tag\\\\CompoundTag\\:\\:getString\\(\\) should return string but returns mixed\\.$#"
+			message: '#^Method pocketmine\\nbt\\tag\\CompoundTag\:\:getString\(\) should return string but returns mixed\.$#'
+			identifier: return.type
 			count: 1
 			path: ../../../src/tag/CompoundTag.php
-

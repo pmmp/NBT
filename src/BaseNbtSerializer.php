@@ -99,6 +99,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * TODO: This is only necessary because we don't have a streams API worth mentioning. Get rid of this in the future.
 	 *
 	 * @return TreeRoot[]
+	 * @phpstan-return list<TreeRoot>
 	 * @throws NbtDataException
 	 */
 	public function readMultiple(string $buffer, int $maxDepth = 0) : array{

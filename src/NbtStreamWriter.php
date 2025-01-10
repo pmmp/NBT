@@ -49,6 +49,7 @@ interface NbtStreamWriter{
 
 	/**
 	 * @param int[] $array
+	 * @phpstan-param list<int> $array
 	 */
 	public function writeIntArray(array $array) : void;
 }
