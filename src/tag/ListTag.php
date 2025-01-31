@@ -28,6 +28,8 @@ use pocketmine\nbt\NbtDataException;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 use pocketmine\nbt\ReaderTracker;
+use function assert;
+use function count;
 use function func_num_args;
 use function get_class;
 use function iterator_to_array;
@@ -304,12 +306,14 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	}
 
 	public function equals(Tag $that) : bool{
-		if(!($that instanceof $this) or $this->count() !== $that->count()){
+		if(!($that instanceof $this) or count($this->value) !== count($that->value)){
 			return false;
 		}
 
-		foreach($this as $k => $v){
-			if(!$v->equals($that->get($k))){
+		$thatValues = $that->getValue(); //SplDoublyLinkedList has O(n) random access, so this is faster than repeated get() calls
+		foreach($this->value as $k => $v){
+			assert(isset($thatValues[$k]), "We checked the count above, so this should not be missing");
+			if(!$v->equals($thatValues[$k])){
 				return false;
 			}
 		}

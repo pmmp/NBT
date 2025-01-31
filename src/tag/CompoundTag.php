@@ -347,12 +347,12 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	}
 
 	public function equals(Tag $that) : bool{
-		if(!($that instanceof $this) or $this->count() !== $that->count()){
+		if(!($that instanceof $this) or count($this->value) !== count($that->value)){
 			return false;
 		}
 
-		foreach($this as $k => $v){
-			$other = $that->getTag($k);
+		foreach($this->value as $k => $v){
+			$other = $that->value[$k] ?? null;
 			if($other === null or !$v->equals($other)){
 				return false;
 			}
