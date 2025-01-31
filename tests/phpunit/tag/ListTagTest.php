@@ -162,4 +162,20 @@ class ListTagTest extends TestCase{
 		self::assertSame($list->getTagType(), $list2->getTagType());
 		self::assertSame($list->getCount(), $list2->getCount());
 	}
+
+	public function testEquals() : void{
+		$list1 = new ListTag([new IntTag(1)]);
+		$list2 = new ListTag([new IntTag(1)]);
+
+		self::assertTrue($list1->equals($list2));
+		self::assertTrue($list2->equals($list1));
+
+		$extraValue = new ListTag([new IntTag(1), new IntTag(2)]);
+		self::assertFalse($list1->equals($extraValue));
+		self::assertFalse($extraValue->equals($list1));
+
+		$differentValue = new ListTag([new IntTag(2)]);
+		self::assertFalse($list1->equals($differentValue));
+		self::assertFalse($differentValue->equals($list1));
+	}
 }
