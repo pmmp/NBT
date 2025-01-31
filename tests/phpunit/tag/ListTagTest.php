@@ -24,7 +24,9 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use PHPUnit\Framework\TestCase;
+use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\NBT;
+use pocketmine\nbt\TreeRoot;
 use function array_fill;
 use function array_key_first;
 use function array_keys;
@@ -144,5 +146,20 @@ class ListTagTest extends TestCase{
 		$list->remove(1);
 		self::assertSame([0, 2], $list->getAllValues());
 		self::assertSame([0, 1], array_keys($list->getValue()));
+	}
+
+	/**
+	 * Tests that empty lists remember their original type from deserialization
+	 * Previously we were discarding these, creating problems for read/write integrity testing
+	 */
+	public function testEmptyBinarySymmetry() : void{
+		$list = new ListTag([], NBT::TAG_Byte);
+
+		$serializer = new BigEndianNbtSerializer();
+		$list2 = $serializer->read($serializer->write(new TreeRoot($list)))->getTag();
+
+		self::assertInstanceOf(ListTag::class, $list2);
+		self::assertSame($list->getTagType(), $list2->getTagType());
+		self::assertSame($list->getCount(), $list2->getCount());
 	}
 }
