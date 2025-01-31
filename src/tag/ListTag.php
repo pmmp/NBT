@@ -57,6 +57,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * @param Tag[] $value
+	 * @param int $tagType @deprecated
 	 */
 	public function __construct(array $value = [], int $tagType = NBT::TAG_End){
 		self::restrictArgCount(__METHOD__, func_num_args(), 2);
@@ -235,6 +236,9 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 *
 	 * @return void
 	 * @throws \LogicException if the list is not empty
+	 *
+	 * @deprecated As of 1.1, an empty list's type will always be inferred from the first Tag to be inserted.
+	 * Therefore, this function is now useless.
 	 */
 	public function setTagType(int $type){
 		if(count($this->value) > 0){
@@ -251,11 +255,10 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	private function checkTagType(Tag $tag) : void{
 		$type = $tag->getType();
 		if($type !== $this->tagType){
-			if($this->tagType === NBT::TAG_End){
+			if(count($this->value) === 0){
 				$this->tagType = $type;
 			}else{
-				//TODO: reintroduce type info
-				throw new \TypeError("Invalid tag of type " . get_class($tag) . " assigned to ListTag");
+				throw new \TypeError("Invalid tag of type " . get_class($tag) . " assigned to ListTag, expected " . get_class($this->value[0]));
 			}
 		}
 	}
@@ -275,8 +278,6 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 					$value[] = NBT::createTag($tagType, $reader, $tracker);
 				}
 			});
-		}else{
-			$tagType = NBT::TAG_End; //Some older NBT implementations used TAG_Byte for empty lists.
 		}
 		return new self($value, $tagType);
 	}

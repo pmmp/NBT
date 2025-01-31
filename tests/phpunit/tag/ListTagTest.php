@@ -46,56 +46,25 @@ class ListTagTest extends TestCase{
 	}
 
 	/**
-	 * Lists of TAG_End will have their type auto-detected when something is inserted
+	 * Empty lists will have their type auto-detected when something is inserted
 	 * @throws \Exception
 	 */
 	public function testTypeDetection() : void{
 		$list = new ListTag([], NBT::TAG_End);
 		$list->push(new StringTag("works"));
 
-		self::assertEquals(NBT::TAG_String, $list->getTagType(), "Adding a tag to an empty list of TAG_End type should change its type");
+		self::assertEquals(NBT::TAG_String, $list->getTagType(), "Adding a tag to an empty list should change its type to match the inserted tag");
 	}
 
 	/**
 	 * Lists with a pre-set type can't have other tag types added to them
 	 */
 	public function testAddWrongTypeEmptyList() : void{
-		$this->expectException(\TypeError::class);
-
 		$list = new ListTag([], NBT::TAG_Compound);
-		$list->push(new StringTag("shouldn't work"));
+		$list->push(new StringTag("works"));
+
+		self::assertEquals(NBT::TAG_String, $list->getTagType(), "Empty list type should change to match inserted values");
 	}
-
-	/**
-	 * Empty lists can have their tag changed manually, no matter what type they are
-	 */
-	public function testSetEmptyListType() : void{
-		$list = new ListTag([], NBT::TAG_String);
-
-		$list->setTagType(NBT::TAG_Compound);
-		$list->push(new CompoundTag());
-		self::assertCount(1, $list);
-
-		$list->shift(); //empty the list
-
-		//once it's empty, we can set its type again
-		$list->setTagType(NBT::TAG_Byte);
-		$list->push(new ByteTag(0));
-		self::assertCount(1, $list);
-	}
-
-	/**
-	 * Non-empty lists should not be able to have their types changed
-	 */
-	public function testSetNotEmptyListType() : void{
-		$this->expectException(\LogicException::class);
-
-		$list = new ListTag();
-		$list->push(new StringTag("string"));
-
-		$list->setTagType(NBT::TAG_Compound);
-	}
-
 
 	/**
 	 * Cloning a list should clone all of its children
