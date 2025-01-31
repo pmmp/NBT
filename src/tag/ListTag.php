@@ -57,7 +57,6 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * @param Tag[] $value
-	 * @param int $tagType @deprecated
 	 */
 	public function __construct(array $value = [], int $tagType = NBT::TAG_End){
 		self::restrictArgCount(__METHOD__, func_num_args(), 2);
