@@ -27,6 +27,7 @@ use PHPUnit\Framework\TestCase;
 use pocketmine\nbt\NBT;
 use function array_fill;
 use function array_key_first;
+use function array_keys;
 use function array_map;
 
 class ListTagTest extends TestCase{
@@ -153,5 +154,26 @@ class ListTagTest extends TestCase{
 		}
 		//if we iterated by-ref, entries are likely to have been skipped
 		self::assertCount(0, $tag);
+	}
+
+	public function testInsert() : void{
+		$list = new ListTag();
+		$list->push(new IntTag(0));
+
+		$list->insert(1, new IntTag(2));
+		$list->insert(1, new IntTag(1)); //displaces int(2)
+
+		self::assertSame([0, 1, 2], $list->getAllValues());
+		self::assertSame([0, 1, 2], array_keys($list->getValue()), "Key order should be consecutive");
+	}
+
+	public function testDelete() : void{
+		$list = new ListTag();
+		foreach(range(0, 2) as $value){
+			$list->push(new IntTag($value));
+		}
+		$list->remove(1);
+		self::assertSame([0, 2], $list->getAllValues());
+		self::assertSame([0, 1], array_keys($list->getValue()));
 	}
 }
