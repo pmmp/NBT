@@ -23,8 +23,6 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt\tag;
 
-use pocketmine\nbt\NbtStreamWriter;
-
 abstract class Tag{
 
 	/**
@@ -37,8 +35,6 @@ abstract class Tag{
 	abstract public function getValue();
 
 	abstract public function getType() : int;
-
-	abstract public function write(NbtStreamWriter $writer) : void;
 
 	public function __toString(){
 		return $this->toString();

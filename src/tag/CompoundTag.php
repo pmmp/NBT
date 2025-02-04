@@ -42,8 +42,17 @@ use function strval;
 final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	use NoDynamicFieldsTrait;
 
-	/** @var Tag[] */
-	private $value = [];
+	/**
+	 * @var int[]
+	 * @phpstan-var array<string, int>
+	 */
+	private array $valueTypes = [];
+
+	/**
+	 * @var mixed[]
+	 * @phpstan-var array<string, mixed>
+	 */
+	private array $value = [];
 
 	public function __construct(){
 		self::restrictArgCount(__METHOD__, func_num_args(), 0);
@@ -71,7 +80,11 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @return Tag[]
 	 */
 	public function getValue(){
-		return $this->value;
+		$result = [];
+		foreach($this->value as $name => $value){
+			$result[$name] = NBT::boxValue($this->valueTypes[$name], $value);
+		}
+		return $result;
 	}
 
 	/*
@@ -82,7 +95,8 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * Returns the tag with the specified name, or null if it does not exist.
 	 */
 	public function getTag(string $name) : ?Tag{
-		return $this->value[$name] ?? null;
+		$value = $this->value[$name] ?? null;
+		return $value !== null ? NBT::boxValue($this->valueTypes[$name], $value) : null;
 	}
 
 	/**
@@ -115,7 +129,9 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @return $this
 	 */
 	public function setTag(string $name, Tag $tag) : self{
-		$this->value[$name] = $tag;
+		$this->valueTypes[$name] = $tag->getType();
+		$this->value[$name] = NBT::unboxValue($tag);
+
 		return $this;
 	}
 
@@ -126,6 +142,7 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	public function removeTag(string ...$names) : void{
 		foreach($names as $name){
 			unset($this->value[$name]);
+			unset($this->valueTypes[$name]);
 		}
 	}
 
@@ -144,19 +161,17 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @throws NoSuchTagException
 	 */
 	private function getTagValue(string $name, string $expectedClass, $default = null){
-		$tag = $this->getTag($name);
-		if($tag instanceof $expectedClass){
-			return $tag->getValue();
+		if(!isset($this->value[$name])){
+			if($default === null){
+				throw new NoSuchTagException("Tag \"$name\" does not exist");
+			}
+			return $default;
 		}
-		if($tag !== null){
-			throw new UnexpectedTagTypeException("Expected a tag of type $expectedClass, got " . get_class($tag));
+		$actualClass = NBT::getClass($this->valueTypes[$name]);
+		if($expectedClass !== $actualClass){
+			throw new UnexpectedTagTypeException("Expected a tag of type $expectedClass, got $actualClass");
 		}
-
-		if($default === null){
-			throw new NoSuchTagException("Tag \"$name\" does not exist");
-		}
-
-		return $default;
+		return $this->value[$name];
 	}
 
 	/*
@@ -204,6 +219,18 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 		return $this->getTagValue($name, IntArrayTag::class, $default);
 	}
 
+	/**
+	 * @param mixed $value
+	 *
+	 * @return $this
+	 */
+	private function setTagValue(string $name, int $type, $value) : self{
+		$this->valueTypes[$name] = $type;
+		$this->value[$name] = $value;
+
+		return $this;
+	}
+
 	/*
 	 * The following methods are wrappers around setTag() which create appropriate tag objects on the fly.
 	 */
@@ -212,56 +239,56 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @return $this
 	 */
 	public function setByte(string $name, int $value) : self{
-		return $this->setTag($name, new ByteTag($value));
+		return $this->setTagValue($name, NBT::TAG_Byte, $value);
 	}
 
 	/**
 	 * @return $this
 	 */
 	public function setShort(string $name, int $value) : self{
-		return $this->setTag($name, new ShortTag($value));
+		return $this->setTagValue($name, NBT::TAG_Short, $value);
 	}
 
 	/**
 	 * @return $this
 	 */
 	public function setInt(string $name, int $value) : self{
-		return $this->setTag($name, new IntTag($value));
+		return $this->setTagValue($name, NBT::TAG_Int, $value);
 	}
 
 	/**
 	 * @return $this
 	 */
 	public function setLong(string $name, int $value) : self{
-		return $this->setTag($name, new LongTag($value));
+		return $this->setTagValue($name, NBT::TAG_Long, $value);
 	}
 
 	/**
 	 * @return $this
 	 */
 	public function setFloat(string $name, float $value) : self{
-		return $this->setTag($name, new FloatTag($value));
+		return $this->setTagValue($name, NBT::TAG_Float, $value);
 	}
 
 	/**
 	 * @return $this
 	 */
 	public function setDouble(string $name, float $value) : self{
-		return $this->setTag($name, new DoubleTag($value));
+		return $this->setTagValue($name, NBT::TAG_Double, $value);
 	}
 
 	/**
 	 * @return $this
 	 */
 	public function setByteArray(string $name, string $value) : self{
-		return $this->setTag($name, new ByteArrayTag($value));
+		return $this->setTagValue($name, NBT::TAG_ByteArray, $value);
 	}
 
 	/**
 	 * @return $this
 	 */
 	public function setString(string $name, string $value) : self{
-		return $this->setTag($name, new StringTag($value));
+		return $this->setTagValue($name, NBT::TAG_String, $value);
 	}
 
 	/**
@@ -271,7 +298,7 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @return $this
 	 */
 	public function setIntArray(string $name, array $value) : self{
-		return $this->setTag($name, new IntArrayTag($value));
+		return $this->setTagValue($name, NBT::TAG_IntArray, $value);
 	}
 
 	protected function getTypeName() : string{
@@ -287,8 +314,9 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 		$tracker->protectDepth(static function() use($reader, $tracker, $result) : void{
 			for($type = $reader->readByte(); $type !== NBT::TAG_End; $type = $reader->readByte()){
 				$name = $reader->readString();
-				$tag = NBT::createTag($type, $reader, $tracker);
-				if($result->getTag($name) !== null){
+				$value = NBT::readValue($type, $reader, $tracker);
+
+				if(isset($result->value[$name])){
 					//this is technically a corruption case, but it's very common on older PM worlds (pretty much every
 					//furnace in PM worlds prior to 2017 is affected), and since we can't extricate this borked data
 					//from the rest in Anvil/McRegion worlds, we can't barf on this - it would result in complete loss
@@ -296,22 +324,23 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 					//TODO: add a flag to enable throwing on this (strict mode)
 					continue;
 				}
-				$result->setTag($name, $tag);
+				$result->setTagValue($name, $type, $value);
 			}
 		});
 		return $result;
 	}
 
 	public function write(NbtStreamWriter $writer) : void{
-		foreach($this->value as $name => $tag){
+		foreach($this->value as $name => $value){
 			if(is_int($name)){
 				//PHP sucks
 				//we only cast on seeing an int, because forcibly casting other types might conceal bugs.
 				$name = (string) $name;
 			}
-			$writer->writeByte($tag->getType());
+			$type = $this->valueTypes[$name];
+			$writer->writeByte($type);
 			$writer->writeString($name);
-			$tag->write($writer);
+			NBT::writeValue($type, $value, $writer);
 		}
 		$writer->writeByte(NBT::TAG_End);
 	}
@@ -319,14 +348,16 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	protected function stringifyValue(int $indentation) : string{
 		$str = "{\n";
 		foreach($this->value as $name => $tag){
-			$str .= str_repeat("  ", $indentation + 1) . "\"$name\" => " . $tag->toString($indentation + 1) . "\n";
+			$str .= str_repeat("  ", $indentation + 1) . "\"$name\" => " . NBT::boxValue($this->valueTypes[$name], $tag)->toString($indentation + 1) . "\n";
 		}
 		return $str . str_repeat("  ", $indentation) . "}";
 	}
 
 	public function __clone(){
-		foreach($this->value as $key => $tag){
-			$this->value[$key] = $tag->safeClone();
+		foreach($this->value as $name => $value){
+			if($value instanceof Tag){
+				$this->value[$name] = $value->safeClone();
+			}
 		}
 	}
 
@@ -339,21 +370,22 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @phpstan-return \Generator<string, Tag, void, void>
 	 */
 	public function getIterator() : \Generator{
-		foreach($this->value as $name => $tag){
+		foreach($this->value as $name => $value){
 			// PHP arrays are idiotic and cast keys like "1" to int(1)
 			// this also stops us using "yield from". REEEEEEEEEE
-			yield strval($name) => $tag;
+			yield strval($name) => NBT::boxValue($this->valueTypes[$name], $value);
 		}
 	}
 
 	public function equals(Tag $that) : bool{
-		if(!($that instanceof $this) or count($this->value) !== count($that->value)){
+		if(!($that instanceof $this) or $this->valueTypes !== $that->valueTypes){
 			return false;
 		}
 
-		foreach($this->value as $k => $v){
-			$other = $that->value[$k] ?? null;
-			if($other === null or !$v->equals($other)){
+		foreach($this->value as $name => $value){
+			$thatValue = $that->value[$name];
+
+			if($value !== $thatValue && (!$value instanceof Tag || !$thatValue instanceof Tag || !$value->equals($thatValue))){
 				return false;
 			}
 		}
@@ -370,8 +402,9 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	public function merge(CompoundTag $other) : CompoundTag{
 		$new = clone $this;
 
-		foreach($other as $k => $namedTag){
-			$new->setTag($k, clone $namedTag);
+		foreach($other->value as $name => $value){
+			$new->valueTypes[$name] = $other->valueTypes[$name];
+			$new->value[$name] = $value instanceof Tag ? clone $value : $value;
 		}
 
 		return $new;

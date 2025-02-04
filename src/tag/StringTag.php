@@ -25,8 +25,6 @@ namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\InvalidTagValueException;
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\NbtStreamReader;
-use pocketmine\nbt\NbtStreamWriter;
 use function func_num_args;
 use function strlen;
 
@@ -48,14 +46,6 @@ final class StringTag extends ImmutableTag{
 
 	public function getType() : int{
 		return NBT::TAG_String;
-	}
-
-	public static function read(NbtStreamReader $reader) : self{
-		return new self($reader->readString());
-	}
-
-	public function write(NbtStreamWriter $writer) : void{
-		$writer->writeString($this->value);
 	}
 
 	public function getValue() : string{

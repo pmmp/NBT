@@ -24,8 +24,6 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\NbtStreamReader;
-use pocketmine\nbt\NbtStreamWriter;
 
 final class ShortTag extends ImmutableTag{
 	use IntegerishTagTrait;
@@ -40,13 +38,5 @@ final class ShortTag extends ImmutableTag{
 
 	public function getType() : int{
 		return NBT::TAG_Short;
-	}
-
-	public static function read(NbtStreamReader $reader) : self{
-		return new self($reader->readSignedShort());
-	}
-
-	public function write(NbtStreamWriter $writer) : void{
-		$writer->writeShort($this->value);
 	}
 }

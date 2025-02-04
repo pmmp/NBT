@@ -24,8 +24,6 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\NbtStreamReader;
-use pocketmine\nbt\NbtStreamWriter;
 use function func_num_args;
 
 final class DoubleTag extends ImmutableTag{
@@ -43,14 +41,6 @@ final class DoubleTag extends ImmutableTag{
 
 	public function getType() : int{
 		return NBT::TAG_Double;
-	}
-
-	public static function read(NbtStreamReader $reader) : self{
-		return new self($reader->readDouble());
-	}
-
-	public function write(NbtStreamWriter $writer) : void{
-		$writer->writeDouble($this->value);
 	}
 
 	public function getValue() : float{

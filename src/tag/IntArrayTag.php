@@ -24,8 +24,6 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\NbtStreamReader;
-use pocketmine\nbt\NbtStreamWriter;
 use function array_values;
 use function assert;
 use function func_num_args;
@@ -64,14 +62,6 @@ final class IntArrayTag extends ImmutableTag{
 
 	public function getType() : int{
 		return NBT::TAG_IntArray;
-	}
-
-	public static function read(NbtStreamReader $reader) : self{
-		return new self($reader->readIntArray());
-	}
-
-	public function write(NbtStreamWriter $writer) : void{
-		$writer->writeIntArray($this->value);
 	}
 
 	protected function stringifyValue(int $indentation) : string{

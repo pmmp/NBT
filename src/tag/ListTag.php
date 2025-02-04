@@ -50,8 +50,8 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	/** @var int */
 	private $tagType;
 	/**
-	 * @var Tag[]
-	 * @phpstan-var list<Tag>
+	 * @var mixed[]
+	 * @phpstan-var list<mixed>
 	 */
 	private $value = [];
 
@@ -71,7 +71,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @phpstan-return list<Tag>
 	 */
 	public function getValue() : array{
-		return $this->value;
+		return array_map(fn(mixed $value) => NBT::boxValue($this->tagType, $value), $this->value);
 	}
 
 	/**
@@ -80,7 +80,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @phpstan-return list<mixed>
 	 */
 	public function getAllValues() : array{
-		return array_map(fn(Tag $t) => $t->getValue(), $this->value);
+		return array_map(fn(mixed $t) => $t instanceof Tag ? $t->getValue() : $t, $this->value);
 	}
 
 	public function count() : int{
@@ -96,7 +96,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 */
 	public function push(Tag $tag) : void{
 		$this->checkTagType($tag);
-		$this->value[] = $tag;
+		$this->value[] = NBT::unboxValue($tag);
 	}
 
 	/**
@@ -106,7 +106,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 		if(count($this->value) === 0){
 			throw new \LogicException("List is empty");
 		}
-		return array_pop($this->value);
+		return NBT::boxValue($this->tagType, array_pop($this->value));
 	}
 
 	/**
@@ -114,7 +114,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 */
 	public function unshift(Tag $tag) : void{
 		$this->checkTagType($tag);
-		array_unshift($this->value, $tag);
+		array_unshift($this->value, NBT::unboxValue($tag));
 	}
 
 	/**
@@ -124,7 +124,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 		if(count($this->value) === 0){
 			throw new \LogicException("List is empty");
 		}
-		return array_shift($this->value);
+		return NBT::boxValue($this->tagType, array_shift($this->value));
 	}
 
 	/**
@@ -140,7 +140,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 			throw new \OutOfRangeException("Offset cannot be negative or larger than the list's current size");
 		}
 		$newValue = array_slice($this->value, 0, $offset);
-		$newValue[] = $tag;
+		$newValue[] = NBT::unboxValue($tag);
 		array_push($newValue, ...array_slice($this->value, $offset));
 		$this->value = $newValue;
 	}
@@ -164,7 +164,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 		if(!isset($this->value[$offset])){
 			throw new \OutOfRangeException("No such tag at offset $offset");
 		}
-		return $this->value[$offset];
+		return NBT::boxValue($this->tagType, $this->value[$offset]);
 	}
 
 	/**
@@ -174,7 +174,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 		if(count($this->value) === 0){
 			throw new \LogicException("List is empty");
 		}
-		return $this->value[0];
+		return NBT::boxValue($this->tagType, $this->value[0]);
 	}
 
 	/**
@@ -184,7 +184,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 		if(count($this->value) === 0){
 			throw new \LogicException("List is empty");
 		}
-		return $this->value[array_key_last($this->value)];
+		return NBT::boxValue($this->tagType, $this->value[array_key_last($this->value)]);
 	}
 
 	/**
@@ -197,7 +197,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 		if($offset < 0 || $offset > count($this->value)){ //allow setting the end offset
 			throw new \OutOfRangeException("Offset cannot be negative or larger than the list's current size");
 		}
-		$this->value[$offset] = $tag;
+		$this->value[$offset] = NBT::unboxValue($tag);
 	}
 
 	/**
@@ -257,7 +257,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 			if(count($this->value) === 0){
 				$this->tagType = $type;
 			}else{
-				throw new \TypeError("Invalid tag of type " . get_class($tag) . " assigned to ListTag, expected " . get_class($this->value[0]));
+				throw new \TypeError("Invalid tag of type " . get_class($tag) . " assigned to ListTag, expected " . NBT::getClass($this->tagType));
 			}
 		}
 	}
@@ -267,6 +267,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 		$tagType = $reader->readByte();
 		$size = $reader->readInt();
 
+		$result = new self([], $tagType);
 		if($size > 0){
 			if($tagType === NBT::TAG_End){
 				throw new NbtDataException("Unexpected non-empty list of TAG_End");
@@ -274,31 +275,33 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 			$tracker->protectDepth(static function() use($size, $tagType, $reader, $tracker, &$value) : void{
 				for($i = 0; $i < $size; ++$i){
-					$value[] = NBT::createTag($tagType, $reader, $tracker);
+					$value[] = NBT::readValue($tagType, $reader, $tracker);
 				}
 			});
+			//set this directly, so we don't need to construct objects and do a bunch of useless type checks
+			$result->value = $value;
 		}
-		return new self($value, $tagType);
+		return $result;
 	}
 
 	public function write(NbtStreamWriter $writer) : void{
 		$writer->writeByte($this->tagType);
 		$writer->writeInt(count($this->value));
 		foreach($this->value as $tag){
-			$tag->write($writer);
+			NBT::writeValue($this->tagType, $tag, $writer);
 		}
 	}
 
 	protected function stringifyValue(int $indentation) : string{
 		$str = "{\n";
-		foreach($this->value as $tag){
+		foreach($this->getValue() as $tag){
 			$str .= str_repeat("  ", $indentation + 1) . $tag->toString($indentation + 1) . "\n";
 		}
 		return $str . str_repeat("  ", $indentation) . "}";
 	}
 
 	public function __clone(){
-		$this->value = array_map(fn(Tag $t) => $t->safeClone(), $this->value);
+		$this->value = array_map(fn(mixed $t) => $t instanceof Tag ? $t->safeClone() : $t, $this->value);
 	}
 
 	protected function makeCopy(){
@@ -310,16 +313,19 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @phpstan-return \Generator<int, Tag, void, void>
 	 */
 	public function getIterator() : \Generator{
-		yield from $this->value;
+		foreach($this->value as $v){
+			yield NBT::boxValue($this->tagType, $v);
+		}
 	}
 
 	public function equals(Tag $that) : bool{
-		if(!($that instanceof $this) or count($this->value) !== count($that->value)){
+		if(!($that instanceof $this) || $this->tagType !== $that->tagType || count($this->value) !== count($that->value)){
 			return false;
 		}
 
 		foreach($this->value as $k => $v){
-			if(!$v->equals($that->value[$k])){
+			$thatV = $that->value[$k];
+			if($v !== $thatV && (!$v instanceof Tag || !$thatV instanceof Tag || !$v->equals($thatV))){
 				return false;
 			}
 		}

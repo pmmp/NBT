@@ -24,8 +24,6 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\NbtStreamReader;
-use pocketmine\nbt\NbtStreamWriter;
 use function base64_encode;
 use function func_num_args;
 
@@ -44,14 +42,6 @@ final class ByteArrayTag extends ImmutableTag{
 
 	public function getType() : int{
 		return NBT::TAG_ByteArray;
-	}
-
-	public static function read(NbtStreamReader $reader) : self{
-		return new self($reader->readByteArray());
-	}
-
-	public function write(NbtStreamWriter $writer) : void{
-		$writer->writeByteArray($this->value);
 	}
 
 	public function getValue() : string{

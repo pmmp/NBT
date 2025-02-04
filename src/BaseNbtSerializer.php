@@ -51,7 +51,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 		}
 
 		$rootName = $this->readString();
-		return new TreeRoot(NBT::createTag($type, $this, new ReaderTracker($maxDepth)), $rootName);
+		return new TreeRoot(NBT::boxValue($type, NBT::readValue($type, $this, new ReaderTracker($maxDepth))), $rootName);
 	}
 
 	/**
@@ -87,7 +87,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	public function readHeadless(string $buffer, int $rootType, int &$offset = 0, int $maxDepth = 0) : Tag{
 		$this->buffer = new BinaryStream($buffer, $offset);
 
-		$data = NBT::createTag($rootType, $this, new ReaderTracker($maxDepth));
+		$data = NBT::boxValue($rootType, NBT::readValue($rootType, $this, new ReaderTracker($maxDepth)));
 		$offset = $this->buffer->getOffset();
 
 		return $data;
@@ -119,9 +119,12 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	private function writeRoot(TreeRoot $root) : void{
-		$this->writeByte($root->getTag()->getType());
+		$tag = $root->getTag();
+		$type = $tag->getType();
+
+		$this->writeByte($type);
 		$this->writeString($root->getName());
-		$root->getTag()->write($this);
+		NBT::writeValue($type, NBT::unboxValue($tag), $this);
 	}
 
 	public function write(TreeRoot $data) : string{
@@ -140,7 +143,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 */
 	public function writeHeadless(Tag $data) : string{
 		$this->buffer = new BinaryStream();
-		$data->write($this);
+		NBT::writeValue($data->getType(), NBT::unboxValue($data), $this);
 		return $this->buffer->getBuffer();
 	}
 
