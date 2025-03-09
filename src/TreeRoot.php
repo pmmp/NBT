@@ -25,6 +25,9 @@ namespace pocketmine\nbt;
 
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\Tag;
+use pocketmine\utils\Limits;
+use function sprintf;
+use function strlen;
 
 /**
  * This class wraps around the root Tag for NBT files to avoid losing the name information.
@@ -37,6 +40,9 @@ class TreeRoot{
 	private $name;
 
 	public function __construct(Tag $root, string $name = ""){
+		if(strlen($name) > Limits::INT16_MAX){
+			throw new \InvalidArgumentException(sprintf("Tag name must be at most %d bytes, but got %d bytes", Limits::INT16_MAX, strlen($name)));
+		}
 		$this->root = $root;
 		$this->name = $name;
 	}
