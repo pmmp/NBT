@@ -103,9 +103,10 @@ abstract class NBT{
 	}
 
 	public static function writeValue(int $type, mixed $value, NbtStreamWriter $writer) : void{
-		match (true) {
-			$value instanceof CompoundTag || $value instanceof ListTag => $value->write($writer),
-			default => match ($type) {
+		if($value instanceof CompoundTag || $value instanceof ListTag){
+			$value->write($writer);
+		}else{
+			match ($type) {
 				self::TAG_Byte => $writer->writeByte(self::assumeInt($value)),
 				self::TAG_Short => $writer->writeShort(self::assumeInt($value)),
 				self::TAG_Int => $writer->writeInt(self::assumeInt($value)),
@@ -115,26 +116,27 @@ abstract class NBT{
 				self::TAG_ByteArray => $writer->writeByteArray(self::assumeString($value)),
 				self::TAG_String => $writer->writeString(self::assumeString($value)),
 				self::TAG_IntArray => $writer->writeIntArray(self::assumeListInt($value)),
-				default => throw new \LogicException("Invalid tag type $type"),
-			},
-		};
+				default => throw new \LogicException("Unexpected unboxed tag type $type"),
+			};
+		}
 	}
 
 	public static function boxValue(int $type, mixed $value) : Tag{
-		return match (true) {
-			$value instanceof CompoundTag || $value instanceof ListTag => $value,
-			default => match ($type) {
-				self::TAG_Byte => new ByteTag(self::assumeInt($value)),
-				self::TAG_Short => new ShortTag(self::assumeInt($value)),
-				self::TAG_Int => new IntTag(self::assumeInt($value)),
-				self::TAG_Long => new LongTag(self::assumeInt($value)),
-				self::TAG_Float => new FloatTag(self::assumeFloat($value)),
-				self::TAG_Double => new DoubleTag(self::assumeFloat($value)),
-				self::TAG_ByteArray => new ByteArrayTag(self::assumeString($value)),
-				self::TAG_String => new StringTag(self::assumeString($value)),
-				self::TAG_IntArray => new IntArrayTag(self::assumeListInt($value)),
-				default => throw new \LogicException("Invalid tag type $type"),
-			},
+		if($value instanceof CompoundTag || $value instanceof IntTag){
+			return $value;
+		}
+
+		return match ($type) {
+			self::TAG_Byte => new ByteTag(self::assumeInt($value)),
+			self::TAG_Short => new ShortTag(self::assumeInt($value)),
+			self::TAG_Int => new IntTag(self::assumeInt($value)),
+			self::TAG_Long => new LongTag(self::assumeInt($value)),
+			self::TAG_Float => new FloatTag(self::assumeFloat($value)),
+			self::TAG_Double => new DoubleTag(self::assumeFloat($value)),
+			self::TAG_ByteArray => new ByteArrayTag(self::assumeString($value)),
+			self::TAG_String => new StringTag(self::assumeString($value)),
+			self::TAG_IntArray => new IntArrayTag(self::assumeListInt($value)),
+			default => throw new \LogicException("Unexpected unboxed tag type $type"),
 		};
 	}
 
