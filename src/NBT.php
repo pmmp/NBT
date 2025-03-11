@@ -122,7 +122,7 @@ abstract class NBT{
 	}
 
 	public static function boxValue(int $type, mixed $value) : Tag{
-		if($value instanceof CompoundTag || $value instanceof IntTag){
+		if($value instanceof CompoundTag || $value instanceof ListTag){
 			return $value;
 		}
 
