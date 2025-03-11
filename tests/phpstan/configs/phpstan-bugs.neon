@@ -13,7 +13,7 @@ parameters:
 			path: ../../../src/tag/IntArrayTag.php
 
 		-
-			message: '#^Property pocketmine\\nbt\\tag\\ListTag\:\:\$value \(list\<pocketmine\\nbt\\tag\\Tag\>\) does not accept non\-empty\-array\<int\<0, max\>, pocketmine\\nbt\\tag\\Tag\>\.$#'
+			message: '#^Property pocketmine\\nbt\\tag\\ListTag\:\:\$value \(list\<mixed\>\) does not accept non\-empty\-array\<int\<0, max\>, mixed\>\.$#'
 			identifier: assign.propertyType
 			count: 1
 			path: ../../../src/tag/ListTag.php

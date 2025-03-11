@@ -38,10 +38,6 @@ use pocketmine\nbt\tag\LongTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\nbt\tag\Tag;
-use function is_array;
-use function is_float;
-use function is_int;
-use function is_string;
 
 abstract class NBT{
 
@@ -79,59 +75,66 @@ abstract class NBT{
 		};
 	}
 
+	private static function assumeInt(mixed $value) : int{
+		/** @var int $value */
+		return $value;
+	}
+
+	private static function assumeFloat(mixed $value) : float{
+		/** @var float $value */
+		return $value;
+	}
+
+	private static function assumeString(mixed $value) : string{
+		/** @var string $value */
+		return $value;
+	}
+
+	/**
+	 * @return int[]
+	 * @phpstan-return list<int>
+	 */
+	private static function assumeListInt(mixed $value) : array{
+		/**
+		 * @var int[] $value
+		 * @phpstan-var list<int> $value
+		 */
+		return $value;
+	}
+
 	public static function writeValue(int $type, mixed $value, NbtStreamWriter $writer) : void{
 		match (true) {
-			is_int($value) => match ($type) {
-				self::TAG_Byte => $writer->writeByte($value),
-				self::TAG_Short => $writer->writeShort($value),
-				self::TAG_Int => $writer->writeInt($value),
-				self::TAG_Long => $writer->writeLong($value),
-				default => throw new \LogicException("Didn't expect an int value for tag type $type"),
-			},
-			is_float($value) => match ($type) {
-				self::TAG_Float => $writer->writeFloat($value),
-				self::TAG_Double => $writer->writeDouble($value),
-				default => throw new \LogicException("Didn't expect a float value for tag type $type"),
-			},
-			is_string($value) => match ($type) {
-				self::TAG_ByteArray => $writer->writeByteArray($value),
-				self::TAG_String => $writer->writeString($value),
-				default => throw new \LogicException("Didn't expect a string value for tag type $type"),
-			},
-			is_array($value) => match ($type) {
-				self::TAG_IntArray => $writer->writeIntArray($value),
-				default => throw new \LogicException("Didn't expect an array value for tag type $type"),
-			},
 			$value instanceof CompoundTag || $value instanceof ListTag => $value->write($writer),
-			default => throw new \LogicException("Invalid tag type $type"),
+			default => match ($type) {
+				self::TAG_Byte => $writer->writeByte(self::assumeInt($value)),
+				self::TAG_Short => $writer->writeShort(self::assumeInt($value)),
+				self::TAG_Int => $writer->writeInt(self::assumeInt($value)),
+				self::TAG_Long => $writer->writeLong(self::assumeInt($value)),
+				self::TAG_Float => $writer->writeFloat(self::assumeFloat($value)),
+				self::TAG_Double => $writer->writeDouble(self::assumeFloat($value)),
+				self::TAG_ByteArray => $writer->writeByteArray(self::assumeString($value)),
+				self::TAG_String => $writer->writeString(self::assumeString($value)),
+				self::TAG_IntArray => $writer->writeIntArray(self::assumeListInt($value)),
+				default => throw new \LogicException("Invalid tag type $type"),
+			},
 		};
 	}
 
 	public static function boxValue(int $type, mixed $value) : Tag{
 		return match (true) {
-			is_int($value) => match ($type) {
-				self::TAG_Byte => new ByteTag($value),
-				self::TAG_Short => new ShortTag($value),
-				self::TAG_Int => new IntTag($value),
-				self::TAG_Long => new LongTag($value),
-				default => throw new \LogicException("Didn't expect an int value for tag type $type"),
-			},
-			is_float($value) => match ($type) {
-				self::TAG_Float => new FloatTag($value),
-				self::TAG_Double => new DoubleTag($value),
-				default => throw new \LogicException("Didn't expect a float value for tag type $type"),
-			},
-			is_string($value) => match ($type) {
-				self::TAG_ByteArray => new ByteArrayTag($value),
-				self::TAG_String => new StringTag($value),
-				default => throw new \LogicException("Didn't expect a string value for tag type $type"),
-			},
-			is_array($value) => match ($type) {
-				self::TAG_IntArray => new IntArrayTag($value),
-				default => throw new \LogicException("Didn't expect an array value for tag type $type"),
-			},
 			$value instanceof CompoundTag || $value instanceof ListTag => $value,
-			default => throw new \LogicException("Invalid tag type $type"),
+			default => match ($type) {
+				self::TAG_Byte => new ByteTag(self::assumeInt($value)),
+				self::TAG_Short => new ShortTag(self::assumeInt($value)),
+				self::TAG_Int => new IntTag(self::assumeInt($value)),
+				self::TAG_Long => new LongTag(self::assumeInt($value)),
+				self::TAG_Float => new FloatTag(self::assumeFloat($value)),
+				self::TAG_Double => new DoubleTag(self::assumeFloat($value)),
+				self::TAG_ByteArray => new ByteArrayTag(self::assumeString($value)),
+				self::TAG_String => new StringTag(self::assumeString($value)),
+				self::TAG_IntArray => new IntArrayTag(self::assumeListInt($value)),
+				default => throw new \LogicException("Invalid tag type $type"),
+			},
 		};
 	}
 
