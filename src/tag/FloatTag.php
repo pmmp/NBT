@@ -27,6 +27,7 @@ use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 use function func_num_args;
+use function pack;
 
 final class FloatTag extends ImmutableTag{
 	/** @var float */

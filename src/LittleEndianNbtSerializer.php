@@ -24,56 +24,52 @@ declare(strict_types=1);
 namespace pocketmine\nbt;
 
 use pmmp\encoding\LE;
-use function array_values;
-use function assert;
 use function count;
-use function pack;
-use function unpack;
 
 class LittleEndianNbtSerializer extends BaseNbtSerializer{
 
 	public function readShort() : int{
-		return LE::readUnsignedShort($this->buffer);
+		return LE::readUnsignedShort($this->reader);
 	}
 
 	public function readSignedShort() : int{
-		return LE::readSignedShort($this->buffer);
+		return LE::readSignedShort($this->reader);
 	}
 
 	public function writeShort(int $v) : void{
-		LE::writeUnsignedShort($this->buffer, $v);
+		LE::writeUnsignedShort($this->writer, $v);
 	}
 
 	public function readInt() : int{
-		return LE::readSignedInt($this->buffer);
+		return LE::readSignedInt($this->reader);
 	}
 
 	public function writeInt(int $v) : void{
-		LE::writeSignedInt($this->buffer, $v);
+		LE::writeSignedInt($this->writer, $v);
 	}
 
 	public function readLong() : int{
-		return LE::readSignedLong($this->buffer);
+		return LE::readSignedLong($this->reader);
 	}
 
 	public function writeLong(int $v) : void{
-		LE::writeSignedLong($this->buffer, $v);
+		LE::writeSignedLong($this->writer, $v);
 	}
 
 	public function readFloat() : float{
-		return LE::readFloat($this->buffer);
+		return LE::readFloat($this->reader);
 	}
 
 	public function writeFloat(float $v) : void{
-		LE::writeFloat($this->buffer, $v);
+		LE::writeFloat($this->writer, $v);
 	}
 
 	public function readDouble() : float{
-		return LE::readDouble($this->buffer);
+		return LE::readDouble($this->reader);
 	}
 
 	public function writeDouble(float $v) : void{
-		LE::writeDouble($this->buffer, $v);
+		LE::writeDouble($this->writer, $v);
 	}
 
 	public function readIntArray() : array{
@@ -81,14 +77,11 @@ class LittleEndianNbtSerializer extends BaseNbtSerializer{
 		if($len < 0){
 			throw new NbtDataException("Array length cannot be less than zero ($len < 0)");
 		}
-		/** @var array<int>|false $unpacked */
-		$unpacked = unpack("V*", $this->buffer->readByteArray($len * 4));
-		assert($unpacked !== false, "The formatting string is valid, and we gave a multiple of 4 bytes");
-		return array_values($unpacked);
+		return LE::readSignedIntArray($this->reader, $len);
 	}
 
 	public function writeIntArray(array $array) : void{
 		$this->writeInt(count($array));
-		$this->buffer->writeByteArray(pack("V*", ...$array));
+		LE::writeSignedIntArray($this->writer, $array);
 	}
 }

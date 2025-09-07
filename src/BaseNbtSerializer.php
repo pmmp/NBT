@@ -24,7 +24,8 @@ declare(strict_types=1);
 namespace pocketmine\nbt;
 
 use pmmp\encoding\Byte;
-use pmmp\encoding\ByteBuffer;
+use pmmp\encoding\ByteBufferReader;
+use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\DataDecodeException;
 use pocketmine\nbt\tag\Tag;
 use function strlen;
@@ -33,18 +34,15 @@ use function strlen;
  * Base Named Binary Tag encoder/decoder
  */
 abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
-	protected ByteBuffer $buffer;
-
-	public function __construct(){
-		$this->buffer = new ByteBuffer();
-	}
+	protected ByteBufferReader $reader;
+	protected ByteBufferWriter $writer;
 
 	/**
 	 * @throws DataDecodeException
 	 * @throws NbtDataException
 	 */
 	private function readRoot(int $maxDepth) : TreeRoot{
-		$type = Byte::readUnsigned($this->buffer);
+		$type = Byte::readUnsigned($this->reader);
 		if($type === NBT::TAG_End){
 			throw new NbtDataException("Found TAG_End at the start of buffer");
 		}
@@ -61,15 +59,15 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @throws NbtDataException
 	 */
 	public function read(string $buffer, int &$offset = 0, int $maxDepth = 0) : TreeRoot{
-		$this->buffer = new ByteBuffer($buffer);
-		$this->buffer->setReadOffset($offset);
+		$this->reader = new ByteBufferReader($buffer);
+		$this->reader->setOffset($offset);
 
 		try{
 			$data = $this->readRoot($maxDepth);
 		}catch(DataDecodeException $e){
 			throw new NbtDataException($e->getMessage(), 0, $e);
 		}
-		$offset = $this->buffer->getReadOffset();
+		$offset = $this->reader->getOffset();
 
 		return $data;
 	}
@@ -85,11 +83,11 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @throws NbtDataException
 	 */
 	public function readHeadless(string $buffer, int $rootType, int &$offset = 0, int $maxDepth = 0) : Tag{
-		$this->buffer = new ByteBuffer($buffer);
-		$this->buffer->setReadOffset($offset);
+		$this->reader = new ByteBufferReader($buffer);
+		$this->reader->setOffset($offset);
 
 		$data = NBT::createTag($rootType, $this, new ReaderTracker($maxDepth));
-		$offset = $this->buffer->getReadOffset();
+		$offset = $this->reader->getOffset();
 
 		return $data;
 	}
@@ -104,11 +102,12 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @throws NbtDataException
 	 */
 	public function readMultiple(string $buffer, int $maxDepth = 0) : array{
-		$this->buffer = new ByteBuffer($buffer);
+		$this->reader = new ByteBufferReader($buffer);
 
 		$retval = [];
 
-		while($this->buffer->getReadOffset() < $this->buffer->getUsedLength()){
+		$length = strlen($this->reader->getData());
+		while($this->reader->getOffset() < $length){
 			try{
 				$retval[] = $this->readRoot($maxDepth);
 			}catch(DataDecodeException $e){
@@ -120,17 +119,17 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	private function writeRoot(TreeRoot $root) : void{
-		Byte::writeUnsigned($this->buffer, $root->getTag()->getType());
+		Byte::writeUnsigned($this->writer, $root->getTag()->getType());
 		$this->writeString($root->getName());
 		$root->getTag()->write($this);
 	}
 
 	public function write(TreeRoot $data) : string{
-		$this->buffer = new ByteBuffer();
+		$this->writer = new ByteBufferWriter();
 
 		$this->writeRoot($data);
 
-		return $this->buffer->toString();
+		return $this->writer->getData();
 	}
 
 	/**
@@ -140,32 +139,32 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @see BaseNbtSerializer::readHeadless()
 	 */
 	public function writeHeadless(Tag $data) : string{
-		$this->buffer = new ByteBuffer();
+		$this->writer = new ByteBufferWriter();
 		$data->write($this);
-		return $this->buffer->toString();
+		return $this->writer->getData();
 	}
 
 	/**
 	 * @param TreeRoot[] $data
 	 */
 	public function writeMultiple(array $data) : string{
-		$this->buffer = new ByteBuffer();
+		$this->writer = new ByteBufferWriter();
 		foreach($data as $root){
 			$this->writeRoot($root);
 		}
-		return $this->buffer->toString();
+		return $this->writer->getData();
 	}
 
 	public function readByte() : int{
-		return Byte::readUnsigned($this->buffer);
+		return Byte::readUnsigned($this->reader);
 	}
 
 	public function readSignedByte() : int{
-		return Byte::readSigned($this->buffer);
+		return Byte::readSigned($this->reader);
 	}
 
 	public function writeByte(int $v) : void{
-		Byte::writeUnsigned($this->buffer, $v);
+		Byte::writeUnsigned($this->writer, $v);
 	}
 
 	public function readByteArray() : string{
@@ -173,12 +172,12 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 		if($length < 0){
 			throw new NbtDataException("Array length cannot be less than zero ($length < 0)");
 		}
-		return $this->buffer->readByteArray($length);
+		return $this->reader->readByteArray($length);
 	}
 
 	public function writeByteArray(string $v) : void{
 		$this->writeInt(strlen($v)); //TODO: overflow
-		$this->buffer->writeByteArray($v);
+		$this->writer->writeByteArray($v);
 	}
 
 	/**
@@ -202,7 +201,7 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	}
 
 	public function readString() : string{
-		return $this->buffer->readByteArray(self::checkReadStringLength($this->readShort()));
+		return $this->reader->readByteArray(self::checkReadStringLength($this->readShort()));
 	}
 
 	/**
@@ -210,6 +209,6 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 */
 	public function writeString(string $v) : void{
 		$this->writeShort(self::checkWriteStringLength(strlen($v)));
-		$this->buffer->writeByteArray($v);
+		$this->writer->writeByteArray($v);
 	}
 }
