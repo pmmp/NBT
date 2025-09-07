@@ -80,7 +80,7 @@ class NbtSerializerTest extends TestCase{
 		$tag = new IntTag(123);
 		$serializer = new BigEndianNbtSerializer();
 		$raw = $serializer->writeHeadless($tag);
-		self::assertSame($raw, Binary::writeInt(123));
+		self::assertSame($raw, pack("N", 123));
 
 		$tag2 = $serializer->readHeadless($raw, NBT::TAG_Int);
 		self::assertEquals($tag, $tag2);
