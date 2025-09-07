@@ -5,6 +5,7 @@
     "require": {
         "php": "^8.1",
         "php-64bit": "*",
+        "pocketmine/binaryutils": "^0.2.0",
         "ext-encoding": "~0.5.0"
     },
     "require-dev": {

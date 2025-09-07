@@ -24,9 +24,12 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use PHPUnit\Framework\TestCase;
+use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\NBT;
+use pocketmine\nbt\TreeRoot;
 use function array_fill;
 use function array_key_first;
+use function array_keys;
 use function array_map;
 
 class ListTagTest extends TestCase{
@@ -45,56 +48,25 @@ class ListTagTest extends TestCase{
 	}
 
 	/**
-	 * Lists of TAG_End will have their type auto-detected when something is inserted
+	 * Empty lists will have their type auto-detected when something is inserted
 	 * @throws \Exception
 	 */
 	public function testTypeDetection() : void{
 		$list = new ListTag([], NBT::TAG_End);
 		$list->push(new StringTag("works"));
 
-		self::assertEquals(NBT::TAG_String, $list->getTagType(), "Adding a tag to an empty list of TAG_End type should change its type");
+		self::assertEquals(NBT::TAG_String, $list->getTagType(), "Adding a tag to an empty list should change its type to match the inserted tag");
 	}
 
 	/**
 	 * Lists with a pre-set type can't have other tag types added to them
 	 */
 	public function testAddWrongTypeEmptyList() : void{
-		$this->expectException(\TypeError::class);
-
 		$list = new ListTag([], NBT::TAG_Compound);
-		$list->push(new StringTag("shouldn't work"));
+		$list->push(new StringTag("works"));
+
+		self::assertEquals(NBT::TAG_String, $list->getTagType(), "Empty list type should change to match inserted values");
 	}
-
-	/**
-	 * Empty lists can have their tag changed manually, no matter what type they are
-	 */
-	public function testSetEmptyListType() : void{
-		$list = new ListTag([], NBT::TAG_String);
-
-		$list->setTagType(NBT::TAG_Compound);
-		$list->push(new CompoundTag());
-		self::assertCount(1, $list);
-
-		$list->shift(); //empty the list
-
-		//once it's empty, we can set its type again
-		$list->setTagType(NBT::TAG_Byte);
-		$list->push(new ByteTag(0));
-		self::assertCount(1, $list);
-	}
-
-	/**
-	 * Non-empty lists should not be able to have their types changed
-	 */
-	public function testSetNotEmptyListType() : void{
-		$this->expectException(\LogicException::class);
-
-		$list = new ListTag();
-		$list->push(new StringTag("string"));
-
-		$list->setTagType(NBT::TAG_Compound);
-	}
-
 
 	/**
 	 * Cloning a list should clone all of its children
@@ -153,5 +125,57 @@ class ListTagTest extends TestCase{
 		}
 		//if we iterated by-ref, entries are likely to have been skipped
 		self::assertCount(0, $tag);
+	}
+
+	public function testInsert() : void{
+		$list = new ListTag();
+		$list->push(new IntTag(0));
+
+		$list->insert(1, new IntTag(2));
+		$list->insert(1, new IntTag(1)); //displaces int(2)
+
+		self::assertSame([0, 1, 2], $list->getAllValues());
+		self::assertSame([0, 1, 2], array_keys($list->getValue()), "Key order should be consecutive");
+	}
+
+	public function testDelete() : void{
+		$list = new ListTag();
+		foreach(range(0, 2) as $value){
+			$list->push(new IntTag($value));
+		}
+		$list->remove(1);
+		self::assertSame([0, 2], $list->getAllValues());
+		self::assertSame([0, 1], array_keys($list->getValue()));
+	}
+
+	/**
+	 * Tests that empty lists remember their original type from deserialization
+	 * Previously we were discarding these, creating problems for read/write integrity testing
+	 */
+	public function testEmptyBinarySymmetry() : void{
+		$list = new ListTag([], NBT::TAG_Byte);
+
+		$serializer = new BigEndianNbtSerializer();
+		$list2 = $serializer->read($serializer->write(new TreeRoot($list)))->getTag();
+
+		self::assertInstanceOf(ListTag::class, $list2);
+		self::assertSame($list->getTagType(), $list2->getTagType());
+		self::assertSame($list->getCount(), $list2->getCount());
+	}
+
+	public function testEquals() : void{
+		$list1 = new ListTag([new IntTag(1)]);
+		$list2 = new ListTag([new IntTag(1)]);
+
+		self::assertTrue($list1->equals($list2));
+		self::assertTrue($list2->equals($list1));
+
+		$extraValue = new ListTag([new IntTag(1), new IntTag(2)]);
+		self::assertFalse($list1->equals($extraValue));
+		self::assertFalse($extraValue->equals($list1));
+
+		$differentValue = new ListTag([new IntTag(2)]);
+		self::assertFalse($list1->equals($differentValue));
+		self::assertFalse($differentValue->equals($list1));
 	}
 }

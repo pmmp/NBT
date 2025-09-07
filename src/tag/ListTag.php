@@ -28,9 +28,17 @@ use pocketmine\nbt\NbtDataException;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 use pocketmine\nbt\ReaderTracker;
+use function array_key_last;
+use function array_map;
+use function array_pop;
+use function array_push;
+use function array_shift;
+use function array_slice;
+use function array_unshift;
+use function array_values;
+use function count;
 use function func_num_args;
 use function get_class;
-use function iterator_to_array;
 use function str_repeat;
 
 /**
@@ -42,10 +50,10 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	/** @var int */
 	private $tagType;
 	/**
-	 * @var \SplDoublyLinkedList|Tag[]
-	 * @phpstan-var \SplDoublyLinkedList<Tag>
+	 * @var Tag[]
+	 * @phpstan-var list<Tag>
 	 */
-	private $value;
+	private $value = [];
 
 	/**
 	 * @param Tag[] $value
@@ -53,9 +61,8 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	public function __construct(array $value = [], int $tagType = NBT::TAG_End){
 		self::restrictArgCount(__METHOD__, func_num_args(), 2);
 		$this->tagType = $tagType;
-		$this->value = new \SplDoublyLinkedList();
 		foreach($value as $tag){
-			$this->push($tag);
+			$this->push($tag); //ensure types get checked
 		}
 	}
 
@@ -64,12 +71,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @phpstan-return list<Tag>
 	 */
 	public function getValue() : array{
-		$value = [];
-		foreach($this->value as $v){
-			$value[] = $v;
-		}
-
-		return $value;
+		return $this->value;
 	}
 
 	/**
@@ -78,20 +80,15 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @phpstan-return list<mixed>
 	 */
 	public function getAllValues() : array{
-		$result = [];
-		foreach($this->value as $tag){
-			$result[] = $tag->getValue();
-		}
-
-		return $result;
+		return array_map(fn(Tag $t) => $t->getValue(), $this->value);
 	}
 
 	public function count() : int{
-		return $this->value->count();
+		return count($this->value);
 	}
 
 	public function getCount() : int{
-		return $this->value->count();
+		return count($this->value);
 	}
 
 	/**
@@ -99,14 +96,17 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 */
 	public function push(Tag $tag) : void{
 		$this->checkTagType($tag);
-		$this->value->push($tag);
+		$this->value[] = $tag;
 	}
 
 	/**
 	 * Removes the last tag from the list and returns it.
 	 */
 	public function pop() : Tag{
-		return $this->value->pop();
+		if(count($this->value) === 0){
+			throw new \LogicException("List is empty");
+		}
+		return array_pop($this->value);
 	}
 
 	/**
@@ -114,14 +114,17 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 */
 	public function unshift(Tag $tag) : void{
 		$this->checkTagType($tag);
-		$this->value->unshift($tag);
+		array_unshift($this->value, $tag);
 	}
 
 	/**
 	 * Removes the first tag from the list and returns it.
 	 */
 	public function shift() : Tag{
-		return $this->value->shift();
+		if(count($this->value) === 0){
+			throw new \LogicException("List is empty");
+		}
+		return array_shift($this->value);
 	}
 
 	/**
@@ -133,14 +136,23 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 */
 	public function insert(int $offset, Tag $tag){
 		$this->checkTagType($tag);
-		$this->value->add($offset, $tag);
+		if($offset < 0 || $offset > count($this->value)){
+			throw new \OutOfRangeException("Offset cannot be negative or larger than the list's current size");
+		}
+		$newValue = array_slice($this->value, 0, $offset);
+		$newValue[] = $tag;
+		array_push($newValue, ...array_slice($this->value, $offset));
+		$this->value = $newValue;
 	}
 
 	/**
 	 * Removes a value from the list. All later tags in the list are moved down by 1 position.
 	 */
 	public function remove(int $offset) : void{
-		unset($this->value[$offset]);
+		//to keep phpstan happy we can't directly unset from $this->value
+		$newValue = $this->value;
+		unset($newValue[$offset]);
+		$this->value = array_values($newValue);
 	}
 
 	/**
@@ -159,14 +171,20 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 * Returns the element in the first position of the list, without removing it.
 	 */
 	public function first() : Tag{
-		return $this->value->bottom();
+		if(count($this->value) === 0){
+			throw new \LogicException("List is empty");
+		}
+		return $this->value[0];
 	}
 
 	/**
 	 * Returns the element in the last position in the list (the end), without removing it.
 	 */
 	public function last() : Tag{
-		return $this->value->top();
+		if(count($this->value) === 0){
+			throw new \LogicException("List is empty");
+		}
+		return $this->value[array_key_last($this->value)];
 	}
 
 	/**
@@ -176,6 +194,9 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 */
 	public function set(int $offset, Tag $tag) : void{
 		$this->checkTagType($tag);
+		if($offset < 0 || $offset > count($this->value)){ //allow setting the end offset
+			throw new \OutOfRangeException("Offset cannot be negative or larger than the list's current size");
+		}
 		$this->value[$offset] = $tag;
 	}
 
@@ -190,7 +211,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 * Returns whether there are any tags in the list.
 	 */
 	public function empty() : bool{
-		return $this->value->isEmpty();
+		return count($this->value) === 0;
 	}
 
 	protected function getTypeName() : string{
@@ -214,9 +235,12 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 *
 	 * @return void
 	 * @throws \LogicException if the list is not empty
+	 *
+	 * @deprecated As of 1.1, an empty list's type will always be inferred from the first Tag to be inserted.
+	 * Therefore, this function is now useless.
 	 */
 	public function setTagType(int $type){
-		if(!$this->value->isEmpty()){
+		if(count($this->value) > 0){
 			throw new \LogicException("Cannot change tag type of non-empty ListTag");
 		}
 		$this->tagType = $type;
@@ -230,11 +254,10 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	private function checkTagType(Tag $tag) : void{
 		$type = $tag->getType();
 		if($type !== $this->tagType){
-			if($this->tagType === NBT::TAG_End){
+			if(count($this->value) === 0){
 				$this->tagType = $type;
 			}else{
-				//TODO: reintroduce type info
-				throw new \TypeError("Invalid tag of type " . get_class($tag) . " assigned to ListTag");
+				throw new \TypeError("Invalid tag of type " . get_class($tag) . " assigned to ListTag, expected " . get_class($this->value[0]));
 			}
 		}
 	}
@@ -254,16 +277,13 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 					$value[] = NBT::createTag($tagType, $reader, $tracker);
 				}
 			});
-		}else{
-			$tagType = NBT::TAG_End; //Some older NBT implementations used TAG_Byte for empty lists.
 		}
 		return new self($value, $tagType);
 	}
 
 	public function write(NbtStreamWriter $writer) : void{
 		$writer->writeByte($this->tagType);
-		$writer->writeInt($this->value->count());
-		/** @var Tag $tag */
+		$writer->writeInt(count($this->value));
 		foreach($this->value as $tag){
 			$tag->write($writer);
 		}
@@ -271,7 +291,6 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	protected function stringifyValue(int $indentation) : string{
 		$str = "{\n";
-		/** @var Tag $tag */
 		foreach($this->value as $tag){
 			$str .= str_repeat("  ", $indentation + 1) . $tag->toString($indentation + 1) . "\n";
 		}
@@ -279,14 +298,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	}
 
 	public function __clone(){
-		/** @phpstan-var \SplDoublyLinkedList<Tag> $new */
-		$new = new \SplDoublyLinkedList();
-
-		foreach($this->value as $tag){
-			$new->push($tag->safeClone());
-		}
-
-		$this->value = $new;
+		$this->value = array_map(fn(Tag $t) => $t->safeClone(), $this->value);
 	}
 
 	protected function makeCopy(){
@@ -298,18 +310,16 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @phpstan-return \Generator<int, Tag, void, void>
 	 */
 	public function getIterator() : \Generator{
-		//we technically don't need iterator_to_array() here, but I don't feel comfortable relying on "yield from" to
-		//copy the underlying dataset referenced by SplDoublyLinkedList
-		yield from iterator_to_array($this->value, true);
+		yield from $this->value;
 	}
 
 	public function equals(Tag $that) : bool{
-		if(!($that instanceof $this) or $this->count() !== $that->count()){
+		if(!($that instanceof $this) or count($this->value) !== count($that->value)){
 			return false;
 		}
 
-		foreach($this as $k => $v){
-			if(!$v->equals($that->get($k))){
+		foreach($this->value as $k => $v){
+			if(!$v->equals($that->value[$k])){
 				return false;
 			}
 		}

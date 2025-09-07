@@ -29,11 +29,14 @@ use pocketmine\nbt\NbtStreamWriter;
 use pocketmine\nbt\NoSuchTagException;
 use pocketmine\nbt\ReaderTracker;
 use pocketmine\nbt\UnexpectedTagTypeException;
+use pocketmine\utils\Limits;
 use function count;
 use function func_num_args;
 use function get_class;
 use function is_int;
+use function sprintf;
 use function str_repeat;
+use function strlen;
 use function strval;
 
 /**
@@ -115,6 +118,9 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	 * @return $this
 	 */
 	public function setTag(string $name, Tag $tag) : self{
+		if(strlen($name) > Limits::INT16_MAX){
+			throw new \InvalidArgumentException(sprintf("Tag name must be at most %d bytes, but got %d bytes", Limits::INT16_MAX, strlen($name)));
+		}
 		$this->value[$name] = $tag;
 		return $this;
 	}
@@ -347,12 +353,12 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	}
 
 	public function equals(Tag $that) : bool{
-		if(!($that instanceof $this) or $this->count() !== $that->count()){
+		if(!($that instanceof $this) or count($this->value) !== count($that->value)){
 			return false;
 		}
 
-		foreach($this as $k => $v){
-			$other = $that->getTag($k);
+		foreach($this->value as $k => $v){
+			$other = $that->value[$k] ?? null;
 			if($other === null or !$v->equals($other)){
 				return false;
 			}
