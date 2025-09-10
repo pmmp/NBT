@@ -27,7 +27,6 @@ use PHPUnit\Framework\TestCase;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
-use pocketmine\utils\Binary;
 
 class NbtSerializerTest extends TestCase{
 
