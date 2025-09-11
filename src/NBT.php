@@ -40,6 +40,7 @@ use pocketmine\nbt\tag\StringTag;
 use pocketmine\nbt\tag\Tag;
 
 abstract class NBT{
+	public const MAX_STRING_LENGTH = 32767;
 
 	public const TAG_End = 0;
 	public const TAG_Byte = 1;

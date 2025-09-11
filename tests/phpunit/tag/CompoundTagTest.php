@@ -24,7 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use PHPUnit\Framework\TestCase;
-use pocketmine\utils\Limits;
+use pocketmine\nbt\NBT;
 use function array_fill;
 use function str_repeat;
 
@@ -187,10 +187,10 @@ class CompoundTagTest extends TestCase{
 
 	public function testNameLength() : void{
 		$tag = CompoundTag::create();
-		$tag->setTag(str_repeat(".", Limits::INT16_MAX), new IntTag(1)); //ok
+		$tag->setTag(str_repeat(".", NBT::MAX_STRING_LENGTH), new IntTag(1)); //ok
 
 		$this->expectException(\InvalidArgumentException::class);
-		$tag->setTag(str_repeat(".", Limits::INT16_MAX + 1), new IntTag(1)); //error
+		$tag->setTag(str_repeat(".", NBT::MAX_STRING_LENGTH + 1), new IntTag(1)); //error
 	}
 
 	//TODO: add more tests

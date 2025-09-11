@@ -25,7 +25,6 @@ namespace pocketmine\nbt;
 
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\Tag;
-use pocketmine\utils\Limits;
 use function sprintf;
 use function strlen;
 
@@ -40,8 +39,8 @@ class TreeRoot{
 	private $name;
 
 	public function __construct(Tag $root, string $name = ""){
-		if(strlen($name) > Limits::INT16_MAX){
-			throw new \InvalidArgumentException(sprintf("Tag name must be at most %d bytes, but got %d bytes", Limits::INT16_MAX, strlen($name)));
+		if(strlen($name) > NBT::MAX_STRING_LENGTH){
+			throw new \InvalidArgumentException(sprintf("Tag name must be at most %d bytes, but got %d bytes", NBT::MAX_STRING_LENGTH, strlen($name)));
 		}
 		$this->root = $root;
 		$this->name = $name;

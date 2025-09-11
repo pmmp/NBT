@@ -23,11 +23,11 @@ declare(strict_types=1);
 
 namespace pocketmine\nbt\tag;
 
+use pmmp\encoding\LE;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\NbtStreamReader;
 use pocketmine\nbt\NbtStreamWriter;
 use function func_num_args;
-use function pack;
 
 final class FloatTag extends ImmutableTag{
 	/** @var float */
@@ -66,6 +66,6 @@ final class FloatTag extends ImmutableTag{
 		//the values of TAG_Float are represented in 32 bits (single precision), so we don't want extra precision given
 		//by 64-bit in-memory representation to break comparison (e.g. 0.3 != decode(encode(0.3)))
 		//this intentionally truncates our value so that it compares as valid
-		return $that instanceof $this && pack("G", $this->value) === pack("G", $that->value);
+		return $that instanceof $this && LE::packFloat($this->value) === LE::packFloat($that->value);
 	}
 }

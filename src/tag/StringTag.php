@@ -36,8 +36,8 @@ final class StringTag extends ImmutableTag{
 
 	public function __construct(string $value){
 		self::restrictArgCount(__METHOD__, func_num_args(), 1);
-		if(strlen($value) > 32767){
-			throw new InvalidTagValueException("StringTag cannot hold more than 32767 bytes, got string of length " . strlen($value));
+		if(strlen($value) > NBT::MAX_STRING_LENGTH){
+			throw new InvalidTagValueException("StringTag cannot hold more than " . NBT::MAX_STRING_LENGTH . " bytes, got string of length " . strlen($value));
 		}
 		$this->value = $value;
 	}

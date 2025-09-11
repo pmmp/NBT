@@ -184,8 +184,8 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @throws NbtDataException
 	 */
 	protected static function checkReadStringLength(int $len) : int{
-		if($len > 32767){
-			throw new NbtDataException("NBT string length too large ($len > 32767)");
+		if($len > NBT::MAX_STRING_LENGTH){
+			throw new NbtDataException("NBT string length too large ($len > " . NBT::MAX_STRING_LENGTH . ")");
 		}
 		return $len;
 	}
@@ -194,8 +194,8 @@ abstract class BaseNbtSerializer implements NbtStreamReader, NbtStreamWriter{
 	 * @throws \InvalidArgumentException
 	 */
 	protected static function checkWriteStringLength(int $len) : int{
-		if($len > 32767){
-			throw new \InvalidArgumentException("NBT string length too large ($len > 32767)");
+		if($len > NBT::MAX_STRING_LENGTH){
+			throw new \InvalidArgumentException("NBT string length too large ($len > " . NBT::MAX_STRING_LENGTH . ")");
 		}
 		return $len;
 	}
