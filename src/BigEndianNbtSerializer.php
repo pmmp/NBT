@@ -24,7 +24,11 @@ declare(strict_types=1);
 namespace pocketmine\nbt;
 
 use pmmp\encoding\BE;
+use function array_values;
+use function assert;
 use function count;
+use function pack;
+use function unpack;
 
 class BigEndianNbtSerializer extends BaseNbtSerializer{
 
@@ -77,11 +81,14 @@ class BigEndianNbtSerializer extends BaseNbtSerializer{
 		if($len < 0){
 			throw new NbtDataException("Array length cannot be less than zero ($len < 0)");
 		}
-		return BE::readSignedIntArray($this->reader, $len);
+		/** @var array<int>|false $unpacked */
+		$unpacked = unpack("N*", $this->reader->readByteArray($len * 4));
+		assert($unpacked !== false, "The formatting string is valid, and we gave a multiple of 4 bytes");
+		return array_values($unpacked);
 	}
 
 	public function writeIntArray(array $array) : void{
 		$this->writeInt(count($array));
-		BE::writeSignedIntArray($this->writer, $array);
+		$this->writer->writeByteArray(pack("N*", ...$array));
 	}
 }
