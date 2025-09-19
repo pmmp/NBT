@@ -25,6 +25,7 @@ namespace pocketmine\nbt\tag;
 
 use PHPUnit\Framework\TestCase;
 use pocketmine\nbt\NBT;
+use pocketmine\nbt\UnexpectedTagTypeException;
 use function array_fill;
 use function str_repeat;
 
@@ -129,7 +130,9 @@ class CompoundTagTest extends TestCase{
 
 		self::assertTrue($tag1->equals($tag2));
 
-		$tag2->getCompoundTag("child9")->setFloat("hello", 1.0);
+		$child9 = $tag2->getCompoundTag("child9");
+		self::assertNotNull($child9);
+		$child9->setFloat("hello", 1.0);
 		self::assertNotTrue($tag1->equals($tag2));
 	}
 
@@ -191,6 +194,28 @@ class CompoundTagTest extends TestCase{
 
 		$this->expectException(\InvalidArgumentException::class);
 		$tag->setTag(str_repeat(".", NBT::MAX_STRING_LENGTH + 1), new IntTag(1)); //error
+	}
+
+	public function testGetListTagWithType() : void{
+		$tag = CompoundTag::create()
+			->setTag("empty", new ListTag())
+			->setTag("string1", new ListTag([new StringTag("string1")]));
+
+		//empty always works
+		self::assertNotNull($tag->getListTag("empty", CompoundTag::class));
+		self::assertNotNull($tag->getListTag("empty", StringTag::class));
+		self::assertNotNull($tag->getListTag("string1", StringTag::class));
+
+		self::assertNotNull($tag->getListTag("empty")); //no type also allowed
+		self::assertNotNull($tag->getListTag("string1"));
+	}
+
+	public function testGetListTagWithTypeErrors() : void{
+		$tag = CompoundTag::create()
+			->setTag("string1", new ListTag([new StringTag("string1")]));
+
+		$this->expectException(UnexpectedTagTypeException::class);
+		$tag->getListTag("string1", IntTag::class);
 	}
 
 	//TODO: add more tests

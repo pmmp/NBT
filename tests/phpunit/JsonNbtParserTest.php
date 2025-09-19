@@ -56,13 +56,11 @@ class JsonNbtParserTest extends TestCase{
 
 	public function testEmptyCompound() : void{
 		$tag = JsonNbtParser::parseJson("{}");
-		self::assertNotNull($tag);
 		self::assertCount(0, $tag);
 	}
 
 	public function testEmptyList() : void{
 		$tag = JsonNbtParser::parseJson("{TestList:[]}");
-		self::assertNotNull($tag);
 		$list = $tag->getTag("TestList");
 		self::assertTrue($list instanceof ListTag);
 		self::assertCount(0, $list);

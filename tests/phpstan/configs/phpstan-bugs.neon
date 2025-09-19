@@ -13,7 +13,37 @@ parameters:
 			path: ../../../src/tag/IntArrayTag.php
 
 		-
-			message: '#^Property pocketmine\\nbt\\tag\\ListTag\:\:\$value \(list\<pocketmine\\nbt\\tag\\Tag\>\) does not accept non\-empty\-array\<int\<0, max\>, pocketmine\\nbt\\tag\\Tag\>\.$#'
+			message: '#^Property pocketmine\\nbt\\tag\\ListTag\<TValue of pocketmine\\nbt\\tag\\Tag \= pocketmine\\nbt\\tag\\Tag\>\:\:\$value \(list\<TValue of pocketmine\\nbt\\tag\\Tag \= pocketmine\\nbt\\tag\\Tag\>\) does not accept non\-empty\-array\<int\<0, max\>, \(TNewValue of TValue of pocketmine\\nbt\\tag\\Tag \= pocketmine\\nbt\\tag\\Tag\)\|TValue of pocketmine\\nbt\\tag\\Tag \= pocketmine\\nbt\\tag\\Tag\>\.$#'
 			identifier: assign.propertyType
 			count: 1
 			path: ../../../src/tag/ListTag.php
+
+		-
+			message: '#^Property pocketmine\\nbt\\tag\\ListTag\<TValue of pocketmine\\nbt\\tag\\Tag \= pocketmine\\nbt\\tag\\Tag\>\:\:\$value \(list\<TValue of pocketmine\\nbt\\tag\\Tag \= pocketmine\\nbt\\tag\\Tag\>\) does not accept non\-empty\-list\<\(TNewValue of TValue of pocketmine\\nbt\\tag\\Tag \= pocketmine\\nbt\\tag\\Tag\)\|TValue of pocketmine\\nbt\\tag\\Tag \= pocketmine\\nbt\\tag\\Tag\>\.$#'
+			identifier: assign.propertyType
+			count: 3
+			path: ../../../src/tag/ListTag.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../phpunit/tag/CompoundTagTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertNotSame\(\) with \*NEVER\* and pocketmine\\nbt\\tag\\Tag will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: ../../phpunit/tag/ListTagTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertSame\(\) with \*NEVER\* and pocketmine\\nbt\\tag\\Tag will always evaluate to false\.$#'
+			identifier: staticMethod.impossibleType
+			count: 1
+			path: ../../phpunit/tag/ListTagTest.php
+
+		-
+			message: '#^Instanceof between \*NEVER\* and pocketmine\\nbt\\tag\\ImmutableTag will always evaluate to false\.$#'
+			identifier: instanceof.alwaysFalse
+			count: 1
+			path: ../../phpunit/tag/ListTagTest.php
