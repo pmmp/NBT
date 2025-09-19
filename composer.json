@@ -11,7 +11,8 @@
         "phpstan/phpstan": "2.1.0",
         "phpunit/phpunit": "^9.5",
         "phpstan/extension-installer": "^1.0",
-        "phpstan/phpstan-strict-rules": "^2.0"
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0"
     },
     "license": "LGPL-3.0",
     "autoload": {

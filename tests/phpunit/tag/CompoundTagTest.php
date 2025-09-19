@@ -129,7 +129,9 @@ class CompoundTagTest extends TestCase{
 
 		self::assertTrue($tag1->equals($tag2));
 
-		$tag2->getCompoundTag("child9")->setFloat("hello", 1.0);
+		$child9 = $tag2->getCompoundTag("child9");
+		self::assertNotNull($child9);
+		$child9->setFloat("hello", 1.0);
 		self::assertNotTrue($tag1->equals($tag2));
 	}
 

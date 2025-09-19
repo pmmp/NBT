@@ -1,0 +1,13 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Expression "clone \$tag" on a separate line does not do anything\.$#'
+			identifier: expr.resultUnused
+			count: 1
+			path: ../../phpunit/tag/CompoundTagTest.php
+
+		-
+			message: '#^Expression "clone \$tag" on a separate line does not do anything\.$#'
+			identifier: expr.resultUnused
+			count: 1
+			path: ../../phpunit/tag/ListTagTest.php
