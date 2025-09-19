@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\nbt\tag;
 
 use PHPUnit\Framework\TestCase;
+use pocketmine\nbt\UnexpectedTagTypeException;
 use pocketmine\utils\Limits;
 use function array_fill;
 use function str_repeat;
@@ -193,6 +194,28 @@ class CompoundTagTest extends TestCase{
 
 		$this->expectException(\InvalidArgumentException::class);
 		$tag->setTag(str_repeat(".", Limits::INT16_MAX + 1), new IntTag(1)); //error
+	}
+
+	public function testGetListTagWithType() : void{
+		$tag = CompoundTag::create()
+			->setTag("empty", new ListTag())
+			->setTag("string1", new ListTag([new StringTag("string1")]));
+
+		//empty always works
+		self::assertNotNull($tag->getListTag("empty", CompoundTag::class));
+		self::assertNotNull($tag->getListTag("empty", StringTag::class));
+		self::assertNotNull($tag->getListTag("string1", StringTag::class));
+
+		self::assertNotNull($tag->getListTag("empty")); //no type also allowed
+		self::assertNotNull($tag->getListTag("string1"));
+	}
+
+	public function testGetListTagWithTypeErrors() : void{
+		$tag = CompoundTag::create()
+			->setTag("string1", new ListTag([new StringTag("string1")]));
+
+		$this->expectException(UnexpectedTagTypeException::class);
+		$tag->getListTag("string1", IntTag::class);
 	}
 
 	//TODO: add more tests

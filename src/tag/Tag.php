@@ -57,6 +57,7 @@ abstract class Tag{
 	 * Used for cloning tags in tags that have children.
 	 *
 	 * @throws \RuntimeException if a recursive dependency was detected
+	 * @return static
 	 */
 	public function safeClone() : Tag{
 		if($this->cloning){

@@ -42,7 +42,8 @@ use function get_class;
 use function str_repeat;
 
 /**
- * @phpstan-implements \IteratorAggregate<int, Tag>
+ * @phpstan-template TValue of Tag = Tag
+ * @phpstan-implements \IteratorAggregate<int, TValue>
  */
 final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	use NoDynamicFieldsTrait;
@@ -51,12 +52,13 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	private $tagType;
 	/**
 	 * @var Tag[]
-	 * @phpstan-var list<Tag>
+	 * @phpstan-var list<TValue>
 	 */
 	private $value = [];
 
 	/**
 	 * @param Tag[] $value
+	 * @phpstan-param TValue[] $value
 	 */
 	public function __construct(array $value = [], int $tagType = NBT::TAG_End){
 		self::restrictArgCount(__METHOD__, func_num_args(), 2);
@@ -68,7 +70,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * @return Tag[]
-	 * @phpstan-return list<Tag>
+	 * @phpstan-return list<TValue>
 	 */
 	public function getValue() : array{
 		return $this->value;
@@ -83,6 +85,31 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 		return array_map(fn(Tag $t) => $t->getValue(), $this->value);
 	}
 
+	/**
+	 * @phpstan-template TTarget of Tag
+	 * @phpstan-param class-string<TTarget> $tagClass
+	 * @phpstan-this-out self<TTarget> $this
+	 */
+	private function checkTagClass(string $tagClass) : bool{
+		return count($this->value) === 0 || $this->first() instanceof $tagClass;
+	}
+
+	/**
+	 * Returns $this if the tag values are of type $tagClass, null otherwise.
+	 * The returned value will have the proper PHPStan generic types set if it matches.
+	 *
+	 * If the list is empty, the cast will always succeed, as empty lists infer their
+	 * type from the first value inserted.
+	 *
+	 * @phpstan-template TTarget of Tag
+	 * @phpstan-param class-string<TTarget> $tagClass
+	 *
+	 * @phpstan-return self<TTarget>|null
+	 */
+	public function cast(string $tagClass) : ?self{
+		return $this->checkTagClass($tagClass) ? $this : null;
+	}
+
 	public function count() : int{
 		return count($this->value);
 	}
@@ -93,6 +120,10 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * Appends the specified tag to the end of the list.
+	 *
+	 * @phpstan-template TNewValue of TValue
+	 * @phpstan-param TNewValue $tag
+	 * @phpstan-this-out self<TNewValue>
 	 */
 	public function push(Tag $tag) : void{
 		$this->checkTagType($tag);
@@ -101,6 +132,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * Removes the last tag from the list and returns it.
+	 * @phpstan-return TValue
 	 */
 	public function pop() : Tag{
 		if(count($this->value) === 0){
@@ -111,6 +143,10 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * Adds the specified tag to the start of the list.
+	 *
+	 * @phpstan-template TNewValue of TValue
+	 * @phpstan-param TNewValue $tag
+	 * @phpstan-this-out self<TNewValue>
 	 */
 	public function unshift(Tag $tag) : void{
 		$this->checkTagType($tag);
@@ -119,6 +155,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * Removes the first tag from the list and returns it.
+	 * @phpstan-return TValue
 	 */
 	public function shift() : Tag{
 		if(count($this->value) === 0){
@@ -130,6 +167,10 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	/**
 	 * Inserts a tag into the list between existing tags, at the specified offset. Later values in the list are moved up
 	 * by 1 position.
+	 *
+	 * @phpstan-template TNewValue of TValue
+	 * @phpstan-param TNewValue $tag
+	 * @phpstan-this-out self<TNewValue>
 	 *
 	 * @return void
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
@@ -158,6 +199,8 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	/**
 	 * Returns the tag at the specified offset.
 	 *
+	 * @phpstan-return TValue
+	 *
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
 	public function get(int $offset) : Tag{
@@ -169,6 +212,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * Returns the element in the first position of the list, without removing it.
+	 * @phpstan-return TValue
 	 */
 	public function first() : Tag{
 		if(count($this->value) === 0){
@@ -179,6 +223,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * Returns the element in the last position in the list (the end), without removing it.
+	 * @phpstan-return TValue
 	 */
 	public function last() : Tag{
 		if(count($this->value) === 0){
@@ -189,6 +234,10 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * Overwrites the tag at the specified offset.
+	 *
+	 * @phpstan-template TNewValue of TValue
+	 * @phpstan-param TNewValue $tag
+	 * @phpstan-this-out self<TNewValue>
 	 *
 	 * @throws \OutOfRangeException if the offset is not within the bounds of the list
 	 */
@@ -230,6 +279,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 	}
 
 	/**
+	 * @deprecated
 	 * Sets the type of tag that can be added to this list. If TAG_End is used, the type will be auto-detected from the
 	 * first tag added to the list.
 	 *
@@ -307,7 +357,7 @@ final class ListTag extends Tag implements \Countable, \IteratorAggregate{
 
 	/**
 	 * @return \Generator|Tag[]
-	 * @phpstan-return \Generator<int, Tag, void, void>
+	 * @phpstan-return \Generator<int, TValue, void, void>
 	 */
 	public function getIterator() : \Generator{
 		yield from $this->value;

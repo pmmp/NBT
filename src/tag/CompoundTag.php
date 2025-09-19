@@ -91,13 +91,26 @@ final class CompoundTag extends Tag implements \Countable, \IteratorAggregate{
 	/**
 	 * Returns the ListTag with the specified name, or null if it does not exist. Triggers an exception if a tag exists
 	 * with that name and the tag is not a ListTag.
+	 *
+	 * @phpstan-template TValue of Tag
+	 * @phpstan-param class-string<TValue> $tagClass
+	 * @phpstan-return ListTag<TValue>|null
+	 *
+	 * @throws UnexpectedTagTypeException
 	 */
-	public function getListTag(string $name) : ?ListTag{
+	public function getListTag(string $name, string $tagClass = Tag::class) : ?ListTag{
 		$tag = $this->getTag($name);
-		if($tag !== null && !($tag instanceof ListTag)){
-			throw new UnexpectedTagTypeException("Expected a tag of type " . ListTag::class . ", got " . get_class($tag));
+		if($tag !== null){
+			if(!$tag instanceof ListTag){
+				throw new UnexpectedTagTypeException("Expected a tag of type " . ListTag::class . ", got " . get_class($tag));
+			}
+			$casted = $tag->cast($tagClass);
+			if($casted === null){
+				throw new UnexpectedTagTypeException("Unable to cast list to ListTag<$tagClass>");
+			}
+			return $casted;
 		}
-		return $tag;
+		return null;
 	}
 
 	/**

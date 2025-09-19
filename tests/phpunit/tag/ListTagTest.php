@@ -178,4 +178,21 @@ class ListTagTest extends TestCase{
 		self::assertFalse($list1->equals($differentValue));
 		self::assertFalse($differentValue->equals($list1));
 	}
+
+	public static function castProvider() : \Generator{
+		yield [new ListTag(), StringTag::class, true]; //empty list can be casted to any type
+		yield [new ListTag([new StringTag("hello")]), StringTag::class, true];
+		yield [new ListTag([new StringTag("hello"), new StringTag("hello2")]), StringTag::class, true];
+		yield [new ListTag([new StringTag("hello")]), IntTag::class, false];
+		yield [new ListTag([new StringTag("hello"), new StringTag("hello2")]), IntTag::class, false];
+	}
+
+	/**
+	 * @phpstan-template TClass of Tag
+	 * @phpstan-param class-string<TClass> $targetClass
+	 * @dataProvider castProvider
+	 */
+	public function testCast(ListTag $in, string $targetClass, bool $succeeds) : void{
+		self::assertSame($succeeds, $in->cast($targetClass) !== null);
+	}
 }
